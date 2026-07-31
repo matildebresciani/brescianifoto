@@ -9,7 +9,7 @@ import type {
     TextField,
 } from 'payload';
 import { routedCollections } from '@/i18n/localized-collections';
-import type { Page, Post } from '@/payload-types';
+import type { Gallery, Page, Post } from '@/payload-types';
 
 type Relation<Slug extends CollectionSlug, T> = {
     relationTo: Slug;
@@ -19,6 +19,7 @@ type Relation<Slug extends CollectionSlug, T> = {
 type RelationSlugMap = {
     pages: Page;
     posts: Post;
+    galleries: Gallery;
 };
 
 export type PayloadLinkType = {

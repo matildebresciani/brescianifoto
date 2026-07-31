@@ -9,7 +9,10 @@ import sharp from 'sharp';
 import { defaultLexical } from '@/components/molecules/admin/fields/defaultLexical';
 import { Icons } from './collections/assets/icons/config';
 import { Media } from './collections/assets/media/config';
+import { Locations } from './collections/categories/locations/config';
 import { PostCategories } from './collections/categories/post-categories/config';
+import { Tags } from './collections/categories/tags/config';
+import { Galleries } from './collections/content/galleries/config';
 import { Pages } from './collections/content/pages/config';
 import { Posts } from './collections/content/posts/config';
 import { Faqs } from './collections/entries/faqs/config';
@@ -68,6 +71,9 @@ export default buildConfig({
         Pages,
         Posts,
         PostCategories,
+        Galleries,
+        Tags,
+        Locations,
         Media,
         Icons,
         SavedLayouts,
