@@ -1,0 +1,46 @@
+@layer base {
+    h1,
+    .heading-1,
+    h2,
+    .heading-2,
+    h3,
+    .heading-3,
+    h4,
+    .heading-4,
+    h5,
+    .heading-5 {
+        display: block;
+        hyphens: auto;
+    }
+
+    .wysiwyg {
+        & > * {
+            margin-bottom: 1rem;
+        }
+
+        ul,
+        ol {
+            padding: 0.5rem 2rem 0rem;
+        }
+
+        ul {
+            list-style-type: disc;
+        }
+
+        ol {
+            list-style-type: decimal;
+        }
+
+        li {
+            padding-bottom: 0.5rem;
+        }
+
+        picture {
+            display: block;
+
+            img {
+                display: inline;
+            }
+        }
+    }
+}

@@ -1,0 +1,70 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
+    "plugins": [
+        "node_modules/biome-plugin-no-type-assertion/no-type-assertion.grit"
+    ],
+    "files": {
+        "includes": ["**"]
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "useEditorconfig": true
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "single",
+            "lineWidth": 120,
+            "trailingCommas": "all",
+            "semicolons": "always"
+        }
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "suspicious": {
+                "noExplicitAny": "warn",
+                "noArrayIndexKey": "warn",
+                "useIterableCallbackReturn": {
+                    "level": "error",
+                    "options": {
+                        "checkForEach": false
+                    }
+                }
+            },
+            "style": {
+                "noNonNullAssertion": "warn",
+                "useConst": "warn",
+                "noParameterAssign": "error",
+                "useAsConstAssertion": "error",
+                "useDefaultParameterLast": "error",
+                "useEnumInitializers": "error",
+                "useSelfClosingElements": "error",
+                "useSingleVarDeclarator": "error",
+                "noUnusedTemplateLiteral": "error",
+                "useNumberNamespace": "error",
+                "noInferrableTypes": "error",
+                "noUselessElse": "error"
+            },
+            "correctness": {
+                "useExhaustiveDependencies": "warn"
+            },
+            "complexity": {
+                "noForEach": "off"
+            },
+            "security": {
+                "noDangerouslySetInnerHtml": "warn"
+            },
+            "a11y": {
+                "noSvgWithoutTitle": "off",
+                "useSemanticElements": "warn"
+            }
+        }
+    },
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true
+    }
+}

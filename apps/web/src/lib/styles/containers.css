@@ -1,0 +1,78 @@
+@layer base {
+    .dvh-screen-incl-header,
+    .lvh-screen-incl-header,
+    .svh-screen-incl-header,
+    .min-svh-screen-incl-header {
+        --calc-h: calc(100vh - var(--header-height));
+    }
+
+    .svh-screen-incl-header,
+    .min-svh-screen-incl-header {
+        --calc-h: calc(100svh - var(--header-height));
+    }
+
+    .svh-screen {
+        height: 100vh;
+        height: 100svh;
+    }
+
+    .svh-screen-incl-header {
+        height: var(--calc-h);
+    }
+
+    .min-svh-screen {
+        min-height: 100vh;
+        min-height: 100svh;
+    }
+
+    .min-svh-screen-incl-header {
+        min-height: min(var(--calc-h), 1500px);
+    }
+
+    .lvh-screen {
+        height: 100vh;
+        height: 100lvh;
+    }
+
+    .dvh-screen {
+        height: 100vh;
+        height: 100dvh;
+    }
+
+    .dvh-screen-incl-header {
+        --calc-h: calc(100dvh - var(--header-height));
+        height: var(--calc-h);
+    }
+
+    .base-block-outer {
+        padding-bottom: 2rem;
+
+        &:not(:first-of-type) {
+            padding-top: 2rem;
+        }
+    }
+
+    .base-block {
+        width: 100%;
+        max-width: 1920px;
+        margin-right: auto;
+        margin-left: auto;
+        padding-right: 1.25rem;
+        padding-left: 1.25rem;
+    }
+
+    @media (min-width: 768px) {
+        .base-block-outer {
+            padding-bottom: 3rem;
+
+            &:not(:first-of-type) {
+                padding-top: 3rem;
+            }
+        }
+
+        .base-block {
+            padding-right: 3rem;
+            padding-left: 3rem;
+        }
+    }
+}

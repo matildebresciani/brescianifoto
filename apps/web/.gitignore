@@ -1,0 +1,21 @@
+build
+dist / media
+node_modules
+.DS_Store
+.env
+.next
+.vercel
+
+# Payload default media upload directory
+public/uploads/
+
+public/robots.txt
+public/sitemap*.xml
+
+next-env.d.ts
+
+**/payload-types.ts
+src/app/(payload)/admin/importMap.js
+
+*storybook.log
+storybook-static

@@ -1,0 +1,54 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "ui": "tui",
+    "tasks": {
+        "generate:importmap": {
+            "cache": true,
+            "outputs": ["src/app/\\(payload\\)/admin/importMap.js"]
+        },
+        "generate:types": {
+            "cache": true,
+            "outputs": ["src/payload-types.ts", ".next/types/**"]
+        },
+        "build": {
+            "dependsOn": ["generate:importmap", "generate:types", "^build"],
+            "passThroughEnv": [
+                "PAYLOAD_SECRET",
+                "MEDUSA_API_KEY",
+                "CRON_SECRET",
+                "DATABASE_URI",
+                "BLOB_READ_WRITE_TOKEN"
+            ],
+            "env": ["MEDUSA_BACKEND_URL"],
+            "inputs": ["$TURBO_DEFAULT$", ".env*"],
+            "outputs": [".next/**", "!.next/cache/**"]
+        },
+        "lint": {
+            "dependsOn": ["^lint"]
+        },
+        "lint:fix": {
+            "cache": false
+        },
+        "typecheck": {
+            "dependsOn": ["generate:importmap", "generate:types", "^typecheck"]
+        },
+        "cycle-import-check": {
+            "dependsOn": ["^cycle-import-check"]
+        },
+        "format:fix": {
+            "cache": false
+        },
+        "format:check": {
+            "dependsOn": ["^format:check"],
+            "cache": true
+        },
+        "dev": {
+            "cache": false,
+            "persistent": true
+        },
+        "storybook": {
+            "cache": false,
+            "persistent": true
+        }
+    }
+}

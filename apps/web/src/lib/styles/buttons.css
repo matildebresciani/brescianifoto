@@ -1,0 +1,16 @@
+@layer base {
+    .btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid blue;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: blue;
+        color: white;
+    }
+
+    .btn-secondary {
+        border-color: black;
+    }
+}

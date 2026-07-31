@@ -1,0 +1,14 @@
+@import '~@payloadcms/ui/scss';
+
+.dashboard .after-dashboard {
+  margin-top: 4rem;
+
+  .support__link {
+    opacity: 0.7;
+
+    a {
+      text-underline-offset: 3px;
+    }
+  }
+
+}

@@ -1,0 +1,69 @@
+name: "Release"
+
+on:
+  push:
+    branches:
+      - staging
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      # Map the step output to a job output
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      prs_created: ${{ steps.release.outputs.prs_created }}
+      pr: ${{ steps.release.outputs.pr }}
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v5
+        with:
+          # Fetch all history so release-please can inspect commits and tags.
+          fetch-depth: 0
+
+      - name: "Run Release Please"
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          # Always target main for release PRs.
+          # Without this, release-please defaults to the triggering branch
+          # (staging), which is why release PRs were opening against staging.
+          # target-branch: main
+
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  promote:
+    runs-on: ubuntu-latest
+    needs: release-please
+    # This is the key: only run this job if a release was created in the previous job
+    if: ${{ needs.release-please.outputs.release_created }}
+    steps:
+      - name: "Checkout main branch"
+        uses: actions/checkout@v5
+        with:
+          # We check out 'main' because this is our destination branch.
+          ref: "main"
+          # Fetch all history so we can merge branches.
+          fetch-depth: 0
+
+      - name: "Merge staging into main"
+        run: |
+          # Configure git with bot credentials
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Merge the 'staging' branch into 'main'
+          git merge ${{ needs.release-please.outputs.tag_name }}
+
+          echo "✅ Staging successfully merged into main."
+
+      - name: "Push changes to main"
+        run: |
+          git push origin main
+          echo "🚀 Changes pushed to main branch."

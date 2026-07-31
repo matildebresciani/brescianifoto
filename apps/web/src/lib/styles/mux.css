@@ -1,0 +1,8 @@
+mux-player.mux-no-controls {
+    --controls: none;
+}
+
+mux-player.mux-full-screen {
+    --media-object-fit: cover;
+    --media-object-position: center;
+}

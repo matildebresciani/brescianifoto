@@ -1,0 +1,43 @@
+{
+    "name": "boilerplate-name",
+    "private": true,
+    "scripts": {
+        "build": "turbo build",
+        "cycle-import-check": "turbo cycle-import-check",
+        "dev": "turbo dev",
+        "superdev": "turbo dev",
+        "generate:importmap": "turbo generate:importmap",
+        "generate:types": "turbo generate:types",
+        "typecheck": "turbo typecheck",
+        "lint": "turbo lint && biome check .",
+        "lint:fix": "turbo lint:fix && biome check . --fix",
+        "format:check": "turbo format:check && biome format",
+        "format:fix": "turbo format:fix && biome format --fix",
+        "storybook": "turbo run storybook"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "2.4.4",
+        "biome-plugin-no-type-assertion": "^1.0.2",
+        "turbo": "^2.9.9",
+        "typescript": "5.5.4"
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "sharp",
+            "esbuild",
+            "@swc/core",
+            "@parcel/watcher",
+            "@tailwindcss/oxide",
+            "core-js-pure"
+        ]
+    },
+    "packageManager": "pnpm@10.30.0",
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "version": "0.2.2"
+}

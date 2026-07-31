@@ -1,0 +1,32 @@
+{
+    "extends": "@repo/typescript-config/nextjs.json",
+    "compilerOptions": {
+        "plugins": [
+            {
+                "name": "next"
+            }
+        ],
+        /* Strictness */
+        "noImplicitOverride": true,
+        "baseUrl": ".",
+        "strictNullChecks": true,
+        "forceConsistentCasingInFileNames": true,
+        "sourceMap": true,
+        "esModuleInterop": true,
+        "paths": {
+            "@payload-config": ["./src/payload.config.ts"],
+            "react": ["./node_modules/@types/react"],
+            "@public/*": ["./public/*"],
+            "@/*": ["./src/*"]
+        }
+    },
+    "include": [
+        "**/*.ts",
+        "**/*.tsx",
+        ".next/types/**/*.ts",
+        "redirects.ts",
+        "next.config.js",
+        "next-sitemap.config.cjs"
+    ],
+    "exclude": ["node_modules"]
+}
