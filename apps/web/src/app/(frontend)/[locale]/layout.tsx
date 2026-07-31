@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Roboto } from 'next/font/google';
+import { Archivo, IBM_Plex_Mono } from 'next/font/google';
 import { setRequestLocale } from 'next-intl/server';
 import EndBodyScripts from '@/components/organisms/global/body/EndBodyScripts';
 import StartBodyScripts from '@/components/organisms/global/body/StartBodyScripts';
@@ -16,9 +16,16 @@ import '../globals.css';
 
 type Props = LayoutProps<'/[locale]'>;
 
-const roboto = Roboto({
-    weight: ['400', '700'],
-    variable: '--font-roboto',
+const archivo = Archivo({
+    weight: ['400', '500', '700', '800', '900'],
+    variable: '--font-archivo',
+    style: ['normal'],
+    subsets: ['latin'],
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+    weight: ['400', '500'],
+    variable: '--font-mono',
     style: ['normal'],
     subsets: ['latin'],
 });
@@ -32,7 +39,12 @@ export default async function RootLayout({ children, params }: Props) {
     const options = await getCachedOptions(locale, 1);
 
     return (
-        <html data-scroll-behavior="smooth" className={cn(roboto.variable)} lang={locale} suppressHydrationWarning>
+        <html
+            data-scroll-behavior="smooth"
+            className={cn(archivo.variable, ibmPlexMono.variable)}
+            lang={locale}
+            suppressHydrationWarning
+        >
             <head>
                 <HeadScripts scripts={options.scriptInjection} />
                 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />

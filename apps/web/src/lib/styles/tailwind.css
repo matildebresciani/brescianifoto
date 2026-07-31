@@ -2,6 +2,7 @@
 
 @theme {
     --font-primary: var(--font-primary);
+    --font-mono: var(--font-mono);
 
     /* Brescianifoto raw palette */
     --color-void: var(--void);

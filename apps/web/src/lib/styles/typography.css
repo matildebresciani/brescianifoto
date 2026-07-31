@@ -13,6 +13,85 @@
         hyphens: auto;
     }
 
+    /* H1 — Archivo 900, clamps 48px (mobile) to 96px (desktop) */
+    h1,
+    .heading-1 {
+        font-family: var(--font-primary);
+        font-weight: 900;
+        font-size: clamp(3rem, 1.94rem + 4.51vw, 6rem);
+        line-height: 0.95;
+        letter-spacing: -0.02em;
+        text-transform: uppercase;
+    }
+
+    /* H2 — Archivo 800, clamps 32px to 40px */
+    h2,
+    .heading-2 {
+        font-family: var(--font-primary);
+        font-weight: 800;
+        font-size: clamp(2rem, 1.82rem + 0.75vw, 2.5rem);
+        line-height: 1.1;
+        letter-spacing: -0.015em;
+        text-transform: uppercase;
+    }
+
+    /* H3 — Archivo 700, clamps 18px to 22px */
+    h3,
+    .heading-3 {
+        font-family: var(--font-primary);
+        font-weight: 700;
+        font-size: clamp(1.125rem, 1.04rem + 0.38vw, 1.375rem);
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+        text-transform: uppercase;
+    }
+
+    /* Eyebrow / label — Archivo 700, fixed 11px, wide tracking */
+    .eyebrow {
+        font-family: var(--font-primary);
+        font-weight: 700;
+        font-size: 0.6875rem;
+        line-height: 1.2;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+    }
+
+    /* Body — Archivo 400, sentence case, --fog on dark */
+    .body-xs,
+    .body-sm,
+    .body-md,
+    .body-lg {
+        font-family: var(--font-primary);
+        font-weight: 400;
+        line-height: 1.6;
+        color: var(--fg-subtle);
+    }
+
+    .body-xs {
+        font-size: clamp(0.75rem, 0.73rem + 0.09vw, 0.8125rem);
+    }
+
+    .body-sm {
+        font-size: clamp(0.8125rem, 0.79rem + 0.09vw, 0.875rem);
+    }
+
+    .body-md {
+        font-size: clamp(0.9375rem, 0.89rem + 0.19vw, 1.0625rem);
+    }
+
+    .body-lg {
+        font-size: clamp(1.0625rem, 1.02rem + 0.19vw, 1.1875rem);
+    }
+
+    /* Caption / meta — IBM Plex Mono 400, --fog-dim, e.g. venue / date / camera / lens */
+    .caption {
+        font-family: var(--font-mono);
+        font-weight: 400;
+        font-size: clamp(0.6875rem, 0.64rem + 0.19vw, 0.8125rem);
+        line-height: 1.4;
+        color: var(--fg-faded);
+    }
+
     .wysiwyg {
         & > * {
             margin-bottom: 1rem;

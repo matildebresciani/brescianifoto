@@ -63,8 +63,9 @@
     --button-subtle-pressed: #464646;
 
     /* Fonts */
-    --font-roboto: "Roboto", sans-serif;
-    --font-primary: var(--font-sofia);
+    --font-archivo: "Archivo", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+    --font-primary: var(--font-archivo);
 
     /* Sizes */
     --header-height: 104px;
