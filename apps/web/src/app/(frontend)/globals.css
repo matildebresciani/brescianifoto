@@ -67,6 +67,19 @@
     --font-mono: "IBM Plex Mono", monospace;
     --font-primary: var(--font-archivo);
 
+    /* Spacing scale (8px base) */
+    --space-micro: 4px;
+    --space-xs: 8px;
+    --space-base: 16px;
+    --space-md: 24px;
+    --space-lg: 32px;
+    --space-xl: 48px;
+    --space-2xl: 64px;
+    --space-section: 96px;
+
+    /* Radius */
+    --btn-radius: 2px;
+
     /* Sizes */
     --header-height: 104px;
     --header-height-offset: calc(var(--header-height) + 1px);
