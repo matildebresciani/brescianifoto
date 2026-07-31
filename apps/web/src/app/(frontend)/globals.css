@@ -22,7 +22,45 @@
     --xxxl: 1920px;
 
     /* Colors */
-    --beige: #f2f4f0;
+    --void: #131417;
+    --ink: #1b1c20;
+    --bone: #f2ecdd;
+    --paper: #e6dcc2;
+    --fog: #a39a85;
+    --fog-dim: #726c5c;
+    --line: #f2eedd24;
+
+    /* Semantic tokens — bg */
+    --bg-base: var(--void);
+    --bg-subtle: var(--ink);
+    --bg-faded: #1c1d1f;
+    --bg-pressed: #292a2b;
+    --bg-highlight: var(--paper);
+    --bg-invert: var(--bone);
+
+    /* Semantic tokens — border */
+    --border-base: var(--line);
+    --border-subtle: #f2ecdd14;
+    --border-strong: var(--fog);
+    --border-highlight: var(--paper);
+    --border-focused: var(--bone);
+    --border-on-color: var(--void);
+
+    /* Semantic tokens — fg */
+    --fg-base: var(--bone);
+    --fg-subtle: var(--fog);
+    --fg-faded: var(--fog-dim);
+    --fg-highlight: var(--paper);
+    --fg-on-color: var(--void);
+    --fg-on-color-faded: #131417a6;
+
+    /* Semantic tokens — button */
+    --button-base: var(--bone);
+    --button-hovered: #d1ccbf;
+    --button-pressed: #afaba2;
+    --button-subtle: var(--ink);
+    --button-subtle-hovered: #313133;
+    --button-subtle-pressed: #464646;
 
     /* Fonts */
     --font-roboto: "Roboto", sans-serif;

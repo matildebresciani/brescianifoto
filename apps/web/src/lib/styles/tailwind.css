@@ -2,4 +2,45 @@
 
 @theme {
     --font-primary: var(--font-primary);
+
+    /* Brescianifoto raw palette */
+    --color-void: var(--void);
+    --color-ink: var(--ink);
+    --color-bone: var(--bone);
+    --color-paper: var(--paper);
+    --color-fog: var(--fog);
+    --color-fog-dim: var(--fog-dim);
+    --color-line: var(--line);
+
+    /* Semantic tokens — bg-* */
+    --color-bg-base: var(--bg-base);
+    --color-bg-subtle: var(--bg-subtle);
+    --color-bg-faded: var(--bg-faded);
+    --color-bg-pressed: var(--bg-pressed);
+    --color-bg-highlight: var(--bg-highlight);
+    --color-bg-invert: var(--bg-invert);
+
+    /* Semantic tokens — border-* */
+    --color-border-base: var(--border-base);
+    --color-border-subtle: var(--border-subtle);
+    --color-border-strong: var(--border-strong);
+    --color-border-highlight: var(--border-highlight);
+    --color-border-focused: var(--border-focused);
+    --color-border-on-color: var(--border-on-color);
+
+    /* Semantic tokens — fg-* */
+    --color-fg-base: var(--fg-base);
+    --color-fg-subtle: var(--fg-subtle);
+    --color-fg-faded: var(--fg-faded);
+    --color-fg-highlight: var(--fg-highlight);
+    --color-fg-on-color: var(--fg-on-color);
+    --color-fg-on-color-faded: var(--fg-on-color-faded);
+
+    /* Semantic tokens — button-* */
+    --color-button-base: var(--button-base);
+    --color-button-hovered: var(--button-hovered);
+    --color-button-pressed: var(--button-pressed);
+    --color-button-subtle: var(--button-subtle);
+    --color-button-subtle-hovered: var(--button-subtle-hovered);
+    --color-button-subtle-pressed: var(--button-subtle-pressed);
 }
