@@ -34,23 +34,27 @@ const MobileNavigation = ({ data, locale }: Props) => {
             <Portal>
                 <div
                     className={cn(
-                        'dvh-screen fixed top-0 left-0 flex flex-col gap-5 p-5 w-screen bg-white z-30 transition',
+                        'dvh-screen fixed top-0 left-0 z-30 flex w-screen flex-col gap-lg border-l border-border-base bg-bg-base p-lg text-fg-base transition',
                         isMenuOpen ? 'translate-x-0' : 'translate-x-full',
                     )}
                 >
                     <div className="flex justify-end">
                         <Close onClick={() => setIsMenuOpen(false)} />
                     </div>
-                    <div className="flex flex-col gap-5 items-end">
+                    <div className="flex flex-col items-end gap-lg">
                         {data?.map((item, i) => {
                             const itemLink = formatLink(item.link, locale);
                             if (!itemLink) return null;
+                            const isActive = itemLink === pathname;
 
                             return (
                                 <Link
                                     key={item.id ?? i}
                                     href={itemLink}
-                                    className={cn('text-xl hover:underline', itemLink === pathname && 'underline')}
+                                    className={cn(
+                                        'heading-3 transition-colors',
+                                        isActive ? 'text-fg-highlight' : 'text-fg-base hover:text-fg-highlight',
+                                    )}
                                     target={getLinkTarget(item.link)}
                                     onClick={() => setIsMenuOpen(false)}
                                 >

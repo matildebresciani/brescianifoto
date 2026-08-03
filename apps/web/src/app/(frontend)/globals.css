@@ -81,9 +81,9 @@
     --btn-radius: 2px;
 
     /* Sizes */
-    --header-height: 104px;
+    --header-height: 64px;
     --header-height-offset: calc(var(--header-height) + 1px);
-    --header-height-desktop: 128px;
+    --header-height-desktop: 80px;
     --header-height-desktop-offset: calc(var(--header-height-desktop) + 1px);
 }
 
@@ -101,6 +101,8 @@ body {
     flex-direction: column;
     min-height: 100svh;
     font-family: var(--font-primary);
+    background-color: var(--bg-base);
+    color: var(--fg-base);
 }
 
 body:has(.modal--open) {

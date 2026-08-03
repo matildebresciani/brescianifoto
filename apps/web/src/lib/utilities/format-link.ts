@@ -51,7 +51,10 @@ export const formatLink = (link: O.Path<Navigation, ['navItems', number, 'link']
 
     const slug = link.relation.value.slug;
     const slugPath = slug === '/' ? '' : (`/${slug}` as const);
-    const collectionPath = localizeCollection(link.relation.relationTo, validatedLocale);
+    const collectionPath =
+        link.relation.relationTo === 'tags'
+            ? ('/galleries' as const)
+            : localizeCollection(link.relation.relationTo, validatedLocale);
     if (!slug) {
         return `${localePath}${collectionPath}` as const;
     }

@@ -9,7 +9,7 @@ import type {
     TextField,
 } from 'payload';
 import { routedCollections } from '@/i18n/localized-collections';
-import type { Gallery, Page, Post } from '@/payload-types';
+import type { Gallery, Page, Post, Tag } from '@/payload-types';
 
 type Relation<Slug extends CollectionSlug, T> = {
     relationTo: Slug;
@@ -20,6 +20,7 @@ type RelationSlugMap = {
     pages: Page;
     posts: Post;
     galleries: Gallery;
+    tags: Tag;
 };
 
 export type PayloadLinkType = {
@@ -96,7 +97,7 @@ export const payloadLinkInner = (props: PayloadLinkInnerProps = {}): GroupField 
         type: 'relationship',
         name: 'relation',
         label: 'Link To',
-        relationTo: [...routedCollections],
+        relationTo: [...routedCollections, 'tags'],
         required,
         localized,
         admin: {

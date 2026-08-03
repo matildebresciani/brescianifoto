@@ -16,16 +16,22 @@ const MainNavigation = ({ data, locale }: Props) => {
     const pathname = usePathname();
 
     return (
-        <nav className="flex gap-5">
+        <nav className="flex items-center gap-xl">
             {data?.map((item, i) => {
                 const itemLink = formatLink(item.link, locale);
                 if (!itemLink) return null;
+                const isActive = itemLink === pathname;
 
                 return (
                     <Link
                         key={item.id ?? i}
                         href={itemLink}
-                        className={cn('hover:underline', itemLink === pathname && 'underline')}
+                        className={cn(
+                            'eyebrow relative py-micro text-fg-base transition-colors after:absolute after:-bottom-1 after:left-0 after:h-px after:bg-fg-highlight after:transition-all after:duration-300 after:content-[""]',
+                            isActive
+                                ? 'text-fg-highlight after:w-full'
+                                : 'after:w-0 hover:text-fg-highlight hover:after:w-full',
+                        )}
                         target={getLinkTarget(item.link)}
                     >
                         {item.link?.label}

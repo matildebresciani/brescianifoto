@@ -16,16 +16,20 @@ const SecondaryNavigation = ({ data, locale }: Props) => {
     const pathname = usePathname();
 
     return (
-        <nav className="flex justify-center gap-5 py-2 bg-gray-200">
+        <nav className="flex justify-center gap-md border-b border-border-subtle bg-bg-subtle py-xs">
             {data?.map((item, i) => {
                 const itemLink = formatLink(item.link, locale);
                 if (!itemLink) return null;
+                const isActive = itemLink === pathname;
 
                 return (
                     <Link
                         key={item.id ?? i}
                         href={itemLink}
-                        className={cn('text-xs hover:underline', itemLink === pathname && 'underline')}
+                        className={cn(
+                            'eyebrow transition-colors',
+                            isActive ? 'text-fg-highlight' : 'text-fg-subtle hover:text-fg-base',
+                        )}
                         target={getLinkTarget(item.link)}
                     >
                         {item.link?.label}

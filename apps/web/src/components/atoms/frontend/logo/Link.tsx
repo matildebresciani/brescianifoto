@@ -3,7 +3,7 @@ import Logo from './Logo';
 
 const LogoLink = () => {
     return (
-        <Link href="/">
+        <Link href="/" className="opacity-100 transition-opacity hover:opacity-70">
             <Logo />
         </Link>
     );
