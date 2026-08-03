@@ -33,6 +33,11 @@ const MobileNavigation = ({ data, locale }: Props) => {
             <BurgerButton isOpen={isMenuOpen} onClick={(open) => setIsMenuOpen(open)} />
             <Portal>
                 <div
+                    id="mobile-navigation"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Menu"
+                    inert={!isMenuOpen}
                     className={cn(
                         'dvh-screen fixed top-0 left-0 z-30 flex w-screen flex-col gap-lg border-l border-border-base bg-bg-base p-lg text-fg-base transition',
                         isMenuOpen ? 'translate-x-0' : 'translate-x-full',
@@ -41,7 +46,7 @@ const MobileNavigation = ({ data, locale }: Props) => {
                     <div className="flex justify-end">
                         <Close onClick={() => setIsMenuOpen(false)} />
                     </div>
-                    <div className="flex flex-col items-end gap-lg">
+                    <nav aria-label="Mobile" className="flex flex-col items-end gap-lg">
                         {data?.map((item, i) => {
                             const itemLink = formatLink(item.link, locale);
                             if (!itemLink) return null;
@@ -52,7 +57,7 @@ const MobileNavigation = ({ data, locale }: Props) => {
                                     key={item.id ?? i}
                                     href={itemLink}
                                     className={cn(
-                                        'heading-3 transition-colors',
+                                        'focus-ring heading-3 transition-colors',
                                         isActive ? 'text-fg-highlight' : 'text-fg-base hover:text-fg-highlight',
                                     )}
                                     target={getLinkTarget(item.link)}
@@ -62,7 +67,7 @@ const MobileNavigation = ({ data, locale }: Props) => {
                                 </Link>
                             );
                         })}
-                    </div>
+                    </nav>
                 </div>
             </Portal>
         </>

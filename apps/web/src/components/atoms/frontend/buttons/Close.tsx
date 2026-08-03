@@ -4,7 +4,13 @@ type Props = {
 
 const Close = ({ onClick }: Props) => {
     return (
-        <button type="button" title="Close" aria-label="Close" className="relative size-10" onClick={() => onClick()}>
+        <button
+            type="button"
+            title="Close"
+            aria-label="Close"
+            className="focus-ring-tight relative size-10"
+            onClick={() => onClick()}
+        >
             <span className="absolute h-[1px] w-5 bg-fg-base -translate-x-1/2 -translate-y-1/2 rotate-45" />
             <span className="absolute h-[1px] w-5 bg-fg-base -translate-x-1/2 -translate-y-1/2 -rotate-45" />
         </button>

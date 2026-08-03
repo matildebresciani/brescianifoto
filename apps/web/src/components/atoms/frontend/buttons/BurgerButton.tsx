@@ -9,8 +9,11 @@ const BurgerButton = (props: Props) => {
     return (
         <button
             type="button"
-            title="Burger"
-            className="relative flex item-center justify-center size-10"
+            title="Menu"
+            aria-label="Menu"
+            aria-expanded={isOpen}
+            aria-controls="mobile-navigation"
+            className="focus-ring-tight relative flex item-center justify-center size-10"
             onClick={() => {
                 onClick(!isOpen);
             }}

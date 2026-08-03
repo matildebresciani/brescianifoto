@@ -16,7 +16,10 @@ const SecondaryNavigation = ({ data, locale }: Props) => {
     const pathname = usePathname();
 
     return (
-        <nav className="flex justify-center gap-md border-b border-border-subtle bg-bg-subtle py-xs">
+        <nav
+            aria-label="Secondary"
+            className="flex justify-center gap-md border-b border-border-subtle bg-bg-subtle py-xs"
+        >
             {data?.map((item, i) => {
                 const itemLink = formatLink(item.link, locale);
                 if (!itemLink) return null;
@@ -27,7 +30,7 @@ const SecondaryNavigation = ({ data, locale }: Props) => {
                         key={item.id ?? i}
                         href={itemLink}
                         className={cn(
-                            'eyebrow transition-colors',
+                            'focus-ring-tight eyebrow transition-colors',
                             isActive ? 'text-fg-highlight' : 'text-fg-subtle hover:text-fg-base',
                         )}
                         target={getLinkTarget(item.link)}

@@ -16,16 +16,20 @@ const Navigation = ({ data }: Props) => {
 
     return (
         <nav>
-            <ul>
+            <ul className="flex flex-col gap-xs">
                 {data?.map((item, i) => {
                     const itemLink = formatLink(item.link, locale);
                     if (!itemLink) return null;
+                    const isActive = itemLink === pathname;
 
                     return (
                         <li key={item.id ?? i}>
                             <Link
                                 href={itemLink}
-                                className={cn('hover:underline', itemLink === pathname && 'underline')}
+                                className={cn(
+                                    'focus-ring body-sm w-fit transition-colors hover:text-fg-base',
+                                    isActive && 'text-fg-highlight',
+                                )}
                                 target={getLinkTarget(item.link)}
                             >
                                 {item.link?.label}

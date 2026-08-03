@@ -16,7 +16,7 @@ const MainNavigation = ({ data, locale }: Props) => {
     const pathname = usePathname();
 
     return (
-        <nav className="flex items-center gap-xl">
+        <nav aria-label="Main" className="flex items-center gap-xl">
             {data?.map((item, i) => {
                 const itemLink = formatLink(item.link, locale);
                 if (!itemLink) return null;
@@ -27,10 +27,10 @@ const MainNavigation = ({ data, locale }: Props) => {
                         key={item.id ?? i}
                         href={itemLink}
                         className={cn(
-                            'eyebrow relative py-micro text-fg-base transition-colors after:absolute after:-bottom-1 after:left-0 after:h-px after:bg-fg-highlight after:transition-all after:duration-300 after:content-[""]',
+                            'focus-ring eyebrow relative py-micro text-fg-base transition-colors after:absolute after:-bottom-1 after:left-0 after:h-px after:bg-fg-highlight after:transition-all after:duration-300 after:content-[""]',
                             isActive
                                 ? 'text-fg-highlight after:w-full'
-                                : 'after:w-0 hover:text-fg-highlight hover:after:w-full',
+                                : 'after:w-0 hover:text-fg-highlight hover:after:w-full focus-visible:text-fg-highlight focus-visible:after:w-full',
                         )}
                         target={getLinkTarget(item.link)}
                     >

@@ -9,7 +9,7 @@ const Logo: FC<LogoProps> = ({ className }) => {
     return (
         <span
             className={cn(
-                'font-primary text-base font-black tracking-tight text-fg-base uppercase md:text-lg',
+                'font-primary text-lg leading-none font-black tracking-tight text-fg-base uppercase md:text-xl',
                 className,
             )}
         >
