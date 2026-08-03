@@ -11,7 +11,7 @@ export const localizedCollections = {
     },
     galleries: {
         en: 'gallery',
-        da: 'galleri',
+        da: 'gallery',
     },
 } as const;
 
