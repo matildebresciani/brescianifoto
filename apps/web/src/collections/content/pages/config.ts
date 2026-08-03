@@ -1,6 +1,7 @@
 import type { Block } from 'payload';
 import { Embed } from '@/collections/embed/config';
 import { Divider } from '@/components/organisms/blocks/divider/config';
+import { Gallery } from '@/components/organisms/blocks/gallery/config';
 import { Hero } from '@/components/organisms/blocks/hero/config';
 import { Paragraph } from '@/components/organisms/blocks/paragraph/config';
 import { SavedLayoutsBlock } from '@/components/organisms/blocks/saved-layouts/config';
@@ -11,7 +12,7 @@ import { populatePublishedAt } from '../../../lib/hooks/populate-published-at';
 import { enforceHomepage } from './hooks/enforce-homepage';
 
 const collection = 'pages';
-const blocks: Block[] = [Divider, Embed, Hero, Paragraph, TextImage, SavedLayoutsBlock];
+const blocks: Block[] = [Divider, Embed, Gallery, Hero, Paragraph, TextImage, SavedLayoutsBlock];
 
 export const Pages = createRoutedCollection(collection, {
     defaultPopulate: {

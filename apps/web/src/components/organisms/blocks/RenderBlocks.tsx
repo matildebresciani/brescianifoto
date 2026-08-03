@@ -4,6 +4,7 @@ import EmbedBlock from '@/collections/embed/Embed';
 import type { Locale, RoutedCollectionSlug } from '@/i18n/localized-collections';
 import type { Page, Post } from '@/payload-types';
 import DividerBlock from './divider/Divider';
+import GalleryBlock from './gallery/Gallery';
 import HeroBlock from './hero/Hero';
 import ParagraphBlock from './paragraph/Paragraph';
 import SavedLayoutsBlock from './saved-layouts/SavedLayouts';
@@ -16,6 +17,7 @@ const blockComponents = {
     divider: DividerBlock,
     'saved-layouts': SavedLayoutsBlock,
     embed: EmbedBlock,
+    gallery: GalleryBlock,
 };
 
 export const RenderBlocks: React.FC<{
