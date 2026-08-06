@@ -1,10 +1,9 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
+import GalleryCard from '@/components/molecules/frontend/GalleryCard';
 import BaseBlock from '@/components/organisms/blocks/base-block/BaseBlock';
 import { getCachedCollection } from '@/lib/data/payload/get-cached-collection';
 import { assertLocale } from '@/lib/utilities/assert-locale';
-import { formatLinkByCollection } from '@/lib/utilities/format-link';
 
 type Props = {
     params: Promise<{
@@ -35,6 +34,8 @@ export default async function GalleriesByTagPage({ params: paramsPromise }: Prop
         locale,
         whereFields: { 'tags.slug': { equals: tagDoc.slug } },
         limit: 100,
+        depth: 1,
+        sort: '-date',
     });
 
     return (
@@ -46,17 +47,12 @@ export default async function GalleriesByTagPage({ params: paramsPromise }: Prop
             </BaseBlock>
 
             <BaseBlock className="oakgrid mt-6 lg:mt-10">
-                <ul className="col-span-12 grid gap-y-10 gap-x-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-y-20">
-                    {galleries.docs.map((gallery) => {
-                        const link = formatLinkByCollection(gallery.slug, 'galleries', locale);
-                        if (!link) return null;
-
-                        return (
-                            <li key={gallery.id}>
-                                <Link href={link}>{gallery.title}</Link>
-                            </li>
-                        );
-                    })}
+                <ul className="col-span-12 grid gap-base sm:grid-cols-2 lg:grid-cols-3">
+                    {galleries.docs.map((gallery) => (
+                        <li key={gallery.id}>
+                            <GalleryCard data={gallery} locale={locale} />
+                        </li>
+                    ))}
                 </ul>
             </BaseBlock>
         </article>
