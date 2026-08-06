@@ -13,7 +13,7 @@ const BurgerButton = (props: Props) => {
             aria-label="Menu"
             aria-expanded={isOpen}
             aria-controls="mobile-navigation"
-            className="focus-ring-tight relative flex item-center justify-center size-10"
+            className="focus-ring-tight relative flex items-center justify-center size-10"
             onClick={() => {
                 onClick(!isOpen);
             }}

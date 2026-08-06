@@ -5,22 +5,23 @@ import Link from 'next/link';
 import { ImageMedia } from '@/components/atoms/frontend/media/ImageMedia';
 import type { Locale } from '@/i18n/localized-collections';
 import { downUpToggle } from '@/lib/motion/motion-variants';
-import { payloadObject } from '@/lib/utilities/composables';
+import { getGalleryCoverImage, payloadObject } from '@/lib/utilities/composables';
 import { formatLinkByCollection } from '@/lib/utilities/format-link';
-// Note: the generated type for the Galleries collection is named `Gallery1` due to a
-// name collision with the page-builder `Gallery` block (see payload-types.ts).
-import type { Gallery1 } from '@/payload-types';
+import type { Gallery } from '@/payload-types';
+import Tag from './Tag';
 
 type Props = {
-    data: Gallery1;
+    data: Gallery;
     locale: Locale;
+    /** Off by default — the tag badge is built but not yet part of the card design. */
+    showTag?: boolean;
 };
 
-const GalleryCard = ({ data, locale }: Props) => {
+const GalleryCard = ({ data, locale, showTag = false }: Props) => {
     const link = formatLinkByCollection(data.slug, 'galleries', locale);
     if (!link) return null;
 
-    const cover = payloadObject(data.contentMeta?.featuredImage) ?? payloadObject(data.gallery[0]);
+    const cover = getGalleryCoverImage(data);
     const tag = data.tags?.map((item) => payloadObject(item)).filter((item) => item !== undefined)[0];
 
     return (
@@ -44,11 +45,7 @@ const GalleryCard = ({ data, locale }: Props) => {
                     />
                 )}
 
-                {tag && (
-                    <span className="eyebrow absolute top-xs left-xs border border-border-base bg-bg-base/60 px-xs py-micro text-fg-subtle">
-                        {tag.tag}
-                    </span>
-                )}
+                {showTag && tag && <Tag tag={tag} locale={locale} className="absolute top-xs left-xs" />}
 
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[45%] bg-linear-to-t from-bg-base/90 to-transparent" />
 

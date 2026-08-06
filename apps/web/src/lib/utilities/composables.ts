@@ -1,3 +1,4 @@
+import type { Gallery } from '@/payload-types';
 import type { PayloadLinkType } from '../field-templates/links';
 
 export const trimTrailingSlash = (url: string) => {
@@ -6,6 +7,10 @@ export const trimTrailingSlash = (url: string) => {
 
 export const payloadObject = <T>(value: string | T | null | undefined): T | undefined => {
     return typeof value === 'object' && value !== null ? value : undefined;
+};
+
+export const getGalleryCoverImage = (data: Pick<Gallery, 'contentMeta' | 'gallery'>) => {
+    return payloadObject(data.contentMeta?.featuredImage) ?? payloadObject(data.gallery[0]);
 };
 
 export const getPayloadId = (item: { id: string } | string) => {

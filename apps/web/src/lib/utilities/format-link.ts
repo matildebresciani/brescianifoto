@@ -83,6 +83,17 @@ export const formatLinkByCollection = (
     return finalPath === '' ? ('/' as const) : finalPath;
 };
 
+// Tags don't have their own routed archive collection (see the hardcoded `/galleries`
+// special-case in `formatLink` above) — this mirrors that same route for direct use.
+export const formatTagLink = (slug?: string | null, locale?: string | null) => {
+    if (!slug || !locale) return null;
+
+    const validatedLocale = isLocale(locale) ? locale : defaultLocale;
+    const localePath = validatedLocale === defaultLocale ? ('' as const) : (`/${validatedLocale}` as const);
+
+    return `${localePath}/galleries/${slug}` as const;
+};
+
 type FormatArchiveLinkProps = {
     locale?: string;
     slug?: string;

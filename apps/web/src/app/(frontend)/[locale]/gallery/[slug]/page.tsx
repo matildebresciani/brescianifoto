@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import Gallery from '@/components/molecules/frontend/Gallery';
+import GalleryHero from '@/components/molecules/frontend/GalleryHero';
 import BaseBlock from '@/components/organisms/blocks/base-block/BaseBlock';
 import { getCachedEntryBySlug } from '@/lib/data/payload/get-cached-entry-by-slug';
 import { assertLocale } from '@/lib/utilities/assert-locale';
@@ -23,11 +24,7 @@ export default async function GallerySinglePage({ params: paramsPromise }: Props
 
     return (
         <article>
-            <BaseBlock className="oakgrid mt-6 lg:mt-16">
-                <div className="col-span-12">
-                    <h1 className="text-2xl font-medium lg:text-4xl">{gallery.title}</h1>
-                </div>
-            </BaseBlock>
+            <GalleryHero data={gallery} locale={locale} />
 
             <BaseBlock>
                 <Gallery images={gallery.gallery} />
