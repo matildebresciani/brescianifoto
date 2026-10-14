@@ -11,7 +11,8 @@ import { revalidateEntry } from '../utilities/entry-revalidation';
 export const createAfterChangeRevalidateHook = (slug: CollectionSlug): CollectionAfterChangeHook => {
     return ({ doc, previousDoc, req: { context } }) => {
         if (!context.disableRevalidate) {
-            if (doc.publishStatus === 'public' || doc._status === 'published') {
+            const isGalleryTaxonomy = slug === 'tags' || slug === 'tag-groups';
+            if (isGalleryTaxonomy || doc.publishStatus === 'public' || doc._status === 'published') {
                 revalidateEntry(doc, slug);
             }
 

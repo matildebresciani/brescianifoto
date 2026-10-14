@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatLink } from './format-link';
+import { formatGalleryArchiveLink, formatLink, formatTagLink } from './format-link';
 
 const pageTemplate = {
     slug: '/',
@@ -12,6 +12,49 @@ const pageTemplate = {
 } as const;
 
 describe('formatLink', () => {
+    it('formats public group links in the same namespace as existing tag links', () => {
+        const groupLink = {
+            type: 'reference' as const,
+            relation: {
+                relationTo: 'tag-groups' as const,
+                value: {
+                    id: 'group',
+                    name: 'Concerts',
+                    slug: 'concerts',
+                    hasArchivePage: true,
+                    createdAt: '',
+                    updatedAt: '',
+                },
+            },
+        };
+        expect(formatLink(groupLink, 'da')).toBe('/galleries/concerts');
+        expect(formatLink(groupLink, 'en')).toBe('/en/galleries/concerts');
+        expect(formatGalleryArchiveLink('festivals', 'en')).toBe('/en/galleries/festivals');
+        expect(formatTagLink('copenhell', 'da')).toBe('/galleries/copenhell');
+    });
+
+    it('does not render a navigation link to a disabled group or one without a slug', () => {
+        const group = { id: 'group', name: 'Artists', slug: 'artists', createdAt: '', updatedAt: '' };
+        expect(
+            formatLink({ type: 'reference', relation: { relationTo: 'tag-groups', value: group } }, 'da'),
+        ).toBeNull();
+        expect(
+            formatLink(
+                { type: 'reference', relation: { relationTo: 'tag-groups', value: 'unpopulated-group-id' } },
+                'da',
+            ),
+        ).toBeNull();
+        expect(
+            formatLink(
+                {
+                    type: 'reference',
+                    relation: { relationTo: 'tag-groups', value: { ...group, hasArchivePage: true, slug: null } },
+                },
+                'da',
+            ),
+        ).toBeNull();
+    });
+
     it('should format custom url links correctly with different locales', () => {
         const customLink = {
             type: 'custom' as const,

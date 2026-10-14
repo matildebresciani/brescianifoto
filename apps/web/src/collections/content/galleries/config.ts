@@ -7,7 +7,7 @@ const slug = 'galleries';
 export const Galleries = createRoutedCollection(slug, {
     defaultPopulate: { title: true, slug: true, tags: true },
     admin: {
-        defaultColumns: ['name', 'title', 'slug', 'updatedAt', 'publishStatus'],
+        defaultColumns: ['name', 'title', 'tagGroup', 'slug', 'updatedAt', 'publishStatus'],
         group: 'Content',
     },
     fields: [
@@ -21,6 +21,18 @@ export const Galleries = createRoutedCollection(slug, {
                 {
                     label: 'Meta',
                     fields: [
+                        {
+                            name: 'tagGroup',
+                            label: 'Main browsing group',
+                            type: 'relationship',
+                            relationTo: 'tag-groups',
+                            index: true,
+                            filterOptions: { hasArchivePage: { equals: true } },
+                            admin: {
+                                description:
+                                    'Choose one section, such as Concerts or Festivals. Tags can describe artists and festivals across sections.',
+                            },
+                        },
                         {
                             name: 'tags',
                             type: 'relationship',

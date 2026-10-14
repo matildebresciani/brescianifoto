@@ -1,4 +1,7 @@
 {
     "frontpage": "Gå til forsiden",
-    "posts": "Indlæg"
+    "posts": "Indlæg",
+    "galleryArchive": {
+        "empty": "Der er ingen gallerier endnu."
+    }
 }

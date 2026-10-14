@@ -45,8 +45,14 @@ export const formatLink = (link: O.Path<Navigation, ['navItems', number, 'link']
         return link.url;
     }
 
-    if (typeof link.relation?.value !== 'object' || link.type !== 'reference') {
+    if (!link.relation?.value || typeof link.relation.value !== 'object' || link.type !== 'reference') {
+        if (link.relation?.relationTo === 'tag-groups') return null;
         return `${localePath}` as const;
+    }
+
+    if (link.relation.relationTo === 'tag-groups') {
+        if (!link.relation.value.hasArchivePage) return null;
+        return formatGalleryArchiveLink(link.relation.value.slug, validatedLocale);
     }
 
     const slug = link.relation.value.slug;
@@ -83,9 +89,8 @@ export const formatLinkByCollection = (
     return finalPath === '' ? ('/' as const) : finalPath;
 };
 
-// Tags don't have their own routed archive collection (see the hardcoded `/galleries`
-// special-case in `formatLink` above) — this mirrors that same route for direct use.
-export const formatTagLink = (slug?: string | null, locale?: string | null) => {
+/** Formats the shared public archive URL for tags and enabled tag groups. */
+export const formatGalleryArchiveLink = (slug?: string | null, locale?: string | null) => {
     if (!slug || !locale) return null;
 
     const validatedLocale = isLocale(locale) ? locale : defaultLocale;
@@ -93,6 +98,8 @@ export const formatTagLink = (slug?: string | null, locale?: string | null) => {
 
     return `${localePath}/galleries/${slug}` as const;
 };
+
+export const formatTagLink = formatGalleryArchiveLink;
 
 type FormatArchiveLinkProps = {
     locale?: string;

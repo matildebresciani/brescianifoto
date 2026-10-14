@@ -1,4 +1,7 @@
 {
     "frontpage": "Go to the frontpage",
-    "posts": "Posts"
+    "posts": "Posts",
+    "galleryArchive": {
+        "empty": "No galleries yet."
+    }
 }

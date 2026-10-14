@@ -1,6 +1,7 @@
 import { anyone } from '@/access/anyone';
 import { slugField } from '@/components/molecules/admin/fields/slug';
 import { createCollection } from '@/lib/collection-templates/collection';
+import { createGalleryArchiveValidationHook } from '@/lib/payload-hooks/validate-gallery-archive';
 
 export const Tags = createCollection('tags', {
     access: {
@@ -9,11 +10,14 @@ export const Tags = createCollection('tags', {
     admin: {
         group: 'Taxonomies',
         useAsTitle: 'tag',
-        defaultColumns: ['name', 'slug'],
+        defaultColumns: ['name', 'tagGroup', 'slug'],
     },
     labels: {
         singular: 'Tag',
         plural: 'Tags',
+    },
+    hooks: {
+        beforeChange: [createGalleryArchiveValidationHook('tags')],
     },
     fields: [
         {
@@ -31,6 +35,16 @@ export const Tags = createCollection('tags', {
             name: 'tag',
             label: 'Tag',
             localized: true,
+        },
+        {
+            name: 'tagGroup',
+            label: 'Tag Group',
+            type: 'relationship',
+            relationTo: 'tag-groups',
+            admin: {
+                position: 'sidebar',
+                description: 'Optionally organize this tag into a group, such as Festivals or Artists.',
+            },
         },
         {
             type: 'checkbox',

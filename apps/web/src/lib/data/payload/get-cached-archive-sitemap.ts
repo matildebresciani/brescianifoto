@@ -1,4 +1,5 @@
 import { defaultLocale, type Locale, localizedPaths } from '@/i18n/localized-collections';
+import { formatGalleryArchiveLink } from '@/lib/utilities/format-link';
 import { getServerSideURL } from '@/lib/utilities/get-url';
 import { getCachedCollection } from './get-cached-collection';
 
@@ -6,12 +7,22 @@ export const getCachedArchiveSitemaps = async (locale: Locale) => {
     const localizedSiteUrl = `${getServerSideURL()}${locale === defaultLocale ? '' : `/${locale}`}`;
     const localizedPostsSlug = localizedPaths.posts[locale];
 
-    const tags = await getCachedCollection({
-        collection: 'post-categories',
-        publicOnly: false,
-        limit: 0,
-        locale,
-    });
+    const [tags, groups] = await Promise.all([
+        getCachedCollection({
+            collection: 'post-categories',
+            publicOnly: false,
+            limit: 0,
+            locale,
+        }),
+        getCachedCollection({
+            collection: 'tag-groups',
+            publicOnly: false,
+            limit: 0,
+            locale,
+            sort: 'name',
+            whereFields: { hasArchivePage: { equals: true } },
+        }),
+    ]);
 
     // Filtering all tags that includes posts (viewPostsInCategory) and formatting them to return a valid sitemap structure
     const tagsWithPosts = tags.docs
@@ -31,6 +42,11 @@ export const getCachedArchiveSitemaps = async (locale: Locale) => {
         },
         // Adding all sub archives for posts collection
         ...tagsWithPosts,
+        ...groups.docs.flatMap((group) => {
+            const link = formatGalleryArchiveLink(group.slug, locale);
+            if (!group.hasArchivePage || !group.title?.trim() || !link) return [];
+            return [{ loc: `${getServerSideURL().replace(/\/$/, '')}${link}`, lastmod: group.updatedAt }];
+        }),
     ];
 
     return sitemap;

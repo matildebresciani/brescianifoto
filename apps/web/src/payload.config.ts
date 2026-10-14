@@ -11,6 +11,7 @@ import { Icons } from './collections/assets/icons/config';
 import { Media } from './collections/assets/media/config';
 import { Locations } from './collections/categories/locations/config';
 import { PostCategories } from './collections/categories/post-categories/config';
+import { TagGroups } from './collections/categories/tag-groups/config';
 import { Tags } from './collections/categories/tags/config';
 import { Galleries } from './collections/content/galleries/config';
 import { Pages } from './collections/content/pages/config';
@@ -73,6 +74,7 @@ export default buildConfig({
         PostCategories,
         Galleries,
         Tags,
+        TagGroups,
         Locations,
         Media,
         Icons,
