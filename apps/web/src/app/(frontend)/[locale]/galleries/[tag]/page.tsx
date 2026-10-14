@@ -30,21 +30,21 @@ export default async function GalleryArchivePage({ params: paramsPromise }: Prop
         locale,
         whereFields: archive.galleryWhere,
         limit: 100,
-        depth: 1,
+        depth: 2,
         sort: '-date',
     });
 
     return (
         <article>
-            <BaseBlock className="oakgrid mt-6 lg:mt-16">
-                <div className="col-span-12">
+            <BaseBlock className="mt-6 lg:mt-16">
+                <div>
                     <h1 className="heading-1">{archive.title}</h1>
                 </div>
             </BaseBlock>
 
-            <BaseBlock className="oakgrid mt-6 lg:mt-10">
-                {galleries.docs.length === 0 && <p className="body-md col-span-12">{t('empty')}</p>}
-                <ul className="col-span-12 grid gap-base sm:grid-cols-2 lg:grid-cols-3">
+            <BaseBlock className="mt-6 lg:mt-10">
+                {galleries.docs.length === 0 && <p className="body-md">{t('empty')}</p>}
+                <ul className="grid gap-base sm:grid-cols-2 lg:grid-cols-3">
                     {galleries.docs.map((gallery) => (
                         <li key={gallery.id}>
                             <GalleryCard data={gallery} locale={locale} />

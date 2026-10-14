@@ -108,6 +108,8 @@ summary:focus-visible,
     letter-spacing: var(--tracking-heading);
 }
 .body-copy {
+    font-family: var(--font-body);
+    text-transform: none;
     font-size: var(--text-body);
     font-weight: var(--weight-regular);
     line-height: var(--leading-body);

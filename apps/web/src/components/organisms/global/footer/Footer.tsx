@@ -2,6 +2,7 @@ import type { Locale } from '@/i18n/localized-collections';
 import { getCachedNavigation } from '@/lib/data/payload/get-cached-navigation';
 import { getCachedOptions } from '@/lib/data/payload/get-cached-options';
 import { getCachedTranslations } from '@/lib/data/payload/get-cached-translations';
+import { formatFooterCredit } from '@/lib/utilities/footer-credit';
 import { FooterClient } from './Footer.client';
 
 export async function Footer({ locale }: { locale: Locale }) {
@@ -20,7 +21,7 @@ export async function Footer({ locale }: { locale: Locale }) {
             footer3={footer3}
             companyDetails={options.companyDetails}
             socialLinks={options.socialLinks}
-            copyright={translations.general?.footer?.tlCopyright}
+            copyright={formatFooterCredit(translations.general?.footer?.tlCopyright)}
         />
     );
 }

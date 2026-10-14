@@ -99,7 +99,7 @@ describe('shared gallery archive pages', () => {
         expect(html).not.toContain('Unlisted show');
         expect(html).not.toContain('Ungrouped show');
         expect(mocks.getCachedCollection).toHaveBeenLastCalledWith(
-            expect.objectContaining({ collection: 'galleries', limit: 100, sort: '-date', depth: 1 }),
+            expect.objectContaining({ collection: 'galleries', limit: 100, sort: '-date', depth: 2 }),
         );
     });
 

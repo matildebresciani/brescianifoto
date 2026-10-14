@@ -1,23 +1,25 @@
 'use client';
 
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import Link from 'next/link';
 import { ImageMedia } from '@/components/atoms/frontend/media/ImageMedia';
 import type { Locale } from '@/i18n/localized-collections';
 import { downUpToggle } from '@/lib/motion/motion-variants';
 import { getGalleryCoverImage, payloadObject } from '@/lib/utilities/composables';
 import { formatLinkByCollection } from '@/lib/utilities/format-link';
+import { formatGalleryCardCaption } from '@/lib/utilities/gallery-metadata';
 import type { Gallery } from '@/payload-types';
 import Tag from './Tag';
 
 type Props = {
     data: Gallery;
     locale: Locale;
-    /** Off by default — the tag badge is built but not yet part of the card design. */
+    /** Displays an optional tag link separately from the gallery links. */
     showTag?: boolean;
 };
 
 const GalleryCard = ({ data, locale, showTag = false }: Props) => {
+    const shouldReduceMotion = useReducedMotion();
     const link = formatLinkByCollection(data.slug, 'galleries', locale);
     if (!link) return null;
 
@@ -26,33 +28,34 @@ const GalleryCard = ({ data, locale, showTag = false }: Props) => {
 
     return (
         <motion.div
+            className="motion-reduce:transform-none! motion-reduce:opacity-100!"
             variants={downUpToggle}
-            initial="hidden"
+            animate={shouldReduceMotion ? { opacity: 1, y: 0 } : undefined}
+            initial={shouldReduceMotion ? false : 'hidden'}
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.6, ease: 'easeOut' }}
         >
-            <Link
-                href={link}
-                className="focus-ring-tight group relative block aspect-4/5 w-full cursor-pointer overflow-hidden border border-border-base bg-bg-base"
-            >
-                {cover && (
-                    <ImageMedia
-                        resource={cover}
-                        fill
-                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.08]"
-                        size="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
-                    />
-                )}
-
-                {showTag && tag && <Tag tag={tag} locale={locale} className="absolute top-xs left-xs" />}
-
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[45%] bg-linear-to-t from-bg-base/90 to-transparent" />
-
-                <p className="heading-3 absolute inset-x-0 bottom-0 p-base text-fg-base transition-colors duration-300 group-hover:text-fg-highlight">
-                    {data.title}
-                </p>
-            </Link>
+            <figure>
+                <Link href={link} className="focus-ring-tight group block">
+                    <div className="relative aspect-4/5 w-full overflow-hidden bg-bg-subtle">
+                        {cover && (
+                            <ImageMedia
+                                resource={cover}
+                                fill
+                                className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
+                                size="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
+                            />
+                        )}
+                    </div>
+                </Link>
+                <figcaption className="mt-md">
+                    <Link href={link} className="focus-ring-tight block">
+                        <p className="metadata">{formatGalleryCardCaption(data)}</p>
+                    </Link>
+                    {showTag && tag && <Tag tag={tag} locale={locale} className="mt-xs" />}
+                </figcaption>
+            </figure>
         </motion.div>
     );
 };

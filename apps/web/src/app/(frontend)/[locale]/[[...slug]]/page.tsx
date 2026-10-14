@@ -5,6 +5,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { LivePreviewListener } from '@/components/molecules/admin/LivePreviewListener';
 import { RenderBlocks } from '@/components/organisms/blocks/RenderBlocks';
 import { defaultLocale, type Locale } from '@/i18n/localized-collections';
+import { presentationCopy } from '@/i18n/presentation';
 import { generateEntryMetadata } from '@/lib/data/metadata';
 import { getCachedEntryById } from '@/lib/data/payload/get-cached-entry-by-id';
 import { getCachedEntryBySlug } from '@/lib/data/payload/get-cached-entry-by-slug';
@@ -57,7 +58,9 @@ export const generateMetadata = async ({ params: paramsPromise }: Props): Promis
 
     if (!page?.slug) return {};
 
-    return generateEntryMetadata(page.slug, collection, locale);
+    const metadata = await generateEntryMetadata(page.slug, collection, locale);
+    if (slug === '' && !page.meta?.title?.trim()) metadata.title = presentationCopy.homepageTitle;
+    return metadata;
 };
 
 const fetchHomepage = async (locale: Locale) => {

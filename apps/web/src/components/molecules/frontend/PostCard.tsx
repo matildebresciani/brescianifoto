@@ -1,5 +1,4 @@
 'use client';
-import { DateTime } from 'luxon';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { ImageMedia } from '@/components/atoms/frontend/media/ImageMedia';
@@ -7,6 +6,7 @@ import LinkArrow from '@/components/atoms/frontend/ui/LinkArrow';
 import type { Locale } from '@/i18n/localized-collections';
 import { topDownToggle } from '@/lib/motion/motion-variants';
 import { formatLinkByCollection } from '@/lib/utilities/format-link';
+import { formatPresentationDate } from '@/lib/utilities/gallery-metadata';
 import type { Post } from '@/payload-types';
 
 type Props = {
@@ -55,10 +55,7 @@ const PostCard = ({ data, locale }: Props) => {
                         <LinkArrow className="absolute top-0 right-0 opacity-0 transition group-hover:opacity-100" />
                         {data.publishedAt && (
                             <span className="metadata transition group-hover:opacity-0">
-                                {DateTime.fromISO(data.publishedAt)
-                                    .setLocale(locale)
-                                    .setZone('Europe/Copenhagen')
-                                    .toFormat('dd. LLLL, yyyy')}
+                                {formatPresentationDate(data.publishedAt)}
                             </span>
                         )}
                     </div>

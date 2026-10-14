@@ -6,6 +6,7 @@ import {
     localizedPaths,
     paginationTranslations,
 } from '@/i18n/localized-collections';
+import { presentationCopy } from '@/i18n/presentation';
 import { initPayload } from '../config';
 import { pageNumberSchema } from '../schemas/pages';
 import { trimTrailingSlash } from '../utilities/composables';
@@ -143,7 +144,7 @@ export const generateArchiveMetadata = async (props: ArchiveMetadataProps) => {
     const options = await getCachedOptions(validatedLocale, 1);
 
     if (slug) {
-        const fallbackTitle = collection === 'posts' ? 'Artikler' : 'Events';
+        const fallbackTitle = presentationCopy.postsTitle;
         metadata.title = `${fallbackTitle} | ${slug}`;
     } else {
         if (options.archives?.[archivesSlug]) {

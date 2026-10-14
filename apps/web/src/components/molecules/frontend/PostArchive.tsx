@@ -34,8 +34,7 @@ const PostArchive = async ({ entries, locale, order, tag, showFilter }: Props) =
         .map((category) => (category.slug ? { value: category.slug, label: category.title } : undefined))
         .filter((category) => category !== undefined);
 
-    // TODO: Transate
-    filteredCategories.unshift({ value: '', label: 'Kategorier' });
+    filteredCategories.unshift({ value: '', label: 'Categories' });
 
     return (
         <BaseBlock>

@@ -59,7 +59,7 @@ const UpdateParamSelector = ({ getParam, defaultValue, options }: Props) => {
         <div className={cn('relative w-full max-w-[350px]', isOptionsOpen ? 'z-[2]' : 'z-[1]')}>
             <button
                 type="button"
-                className="param-selector relative flex items-center gap-3 w-full py-6 px-5 text-left overflow-hidden z-[2] cursor-pointer"
+                className="param-selector focus-ring-tight min-h-12 relative flex items-center gap-3 w-full py-6 px-5 text-left overflow-hidden z-[2] cursor-pointer"
                 onClick={() => setIsOptionsOpen(!isOptionsOpen)}
             >
                 <ChevronIcon
@@ -67,7 +67,7 @@ const UpdateParamSelector = ({ getParam, defaultValue, options }: Props) => {
                 />
                 <span className="ui-text sort-filter">{selected?.label}</span>
             </button>
-            <div className="absolute top-0 left-0 w-full pt-[64px] bg-oak-alabaster border border-oak-gray-dark rounded-[24px] overflow-hidden md:pt-[66px]">
+            <div className="absolute top-0 left-0 w-full pt-[64px] bg-bg-subtle border border-border-base rounded-corners overflow-hidden md:pt-[66px]">
                 <div
                     className={cn(
                         'grid transition-all duration-300',
@@ -84,7 +84,7 @@ const UpdateParamSelector = ({ getParam, defaultValue, options }: Props) => {
                                         <button
                                             key={option.value}
                                             type="button"
-                                            className="ui-text sort-filter flex items-center gap-3 w-full p-5 text-left cursor-pointer border-oak-gray-dark transition hover:bg-oak-gray-light first:border-t not-last:border-b"
+                                            className="ui-text sort-filter flex items-center gap-3 w-full p-5 text-left cursor-pointer border-border-base transition-colors hover:bg-bg-pressed focus-ring-tight first:border-t not-last:border-b"
                                             onClick={() => {
                                                 setSelected(option);
                                                 updateOrder(option?.value ?? '');
@@ -93,8 +93,8 @@ const UpdateParamSelector = ({ getParam, defaultValue, options }: Props) => {
                                         >
                                             <div
                                                 className={cn(
-                                                    'h-6 w-6 min-w-6 border border-oak-gray-dark rounded-[10px]',
-                                                    option?.value === selected?.value && 'bg-oak-gray-dark',
+                                                    'h-6 w-6 min-w-6 border border-border-strong rounded-corners',
+                                                    option?.value === selected?.value && 'bg-button-base',
                                                 )}
                                             />
                                             <span>{option?.label}</span>

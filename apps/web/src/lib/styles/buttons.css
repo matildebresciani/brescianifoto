@@ -1,16 +1,77 @@
 @layer base {
     .btn {
-        padding: 0.5rem 1rem;
-        border: 1px solid blue;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-xs);
+        min-height: 48px;
+        padding: var(--space-xs) var(--space-base);
+        border: 1px solid var(--border-base);
+        border-radius: var(--btn-radius);
         cursor: pointer;
+        transition:
+            color 200ms ease,
+            background-color 200ms ease,
+            border-color 200ms ease;
     }
-
     .btn-primary {
-        background-color: blue;
-        color: white;
+        background: var(--button-base);
+        border-color: var(--button-base);
+        color: var(--fg-on-color);
     }
-
+    .btn-primary:hover {
+        background: var(--button-hovered);
+        border-color: var(--button-hovered);
+    }
+    .btn-primary:active {
+        background: var(--button-pressed);
+    }
     .btn-secondary {
-        border-color: black;
+        background: transparent;
+        color: var(--fg-base);
+    }
+    .btn-secondary:hover {
+        background: var(--button-subtle-hovered);
+        border-color: var(--border-strong);
+    }
+    .btn-secondary:active {
+        background: var(--button-subtle-pressed);
+    }
+    .btn:focus-visible,
+    .form-control:focus-visible {
+        outline: 2px solid var(--border-focused);
+        outline-offset: 4px;
+    }
+    .btn:disabled,
+    .btn[aria-disabled="true"] {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    .form-control {
+        min-height: 48px;
+        border: 1px solid var(--border-base);
+        border-radius: var(--btn-radius);
+        background: var(--bg-subtle);
+        color: var(--fg-base);
+        transition:
+            border-color 200ms ease,
+            background-color 200ms ease;
+    }
+    .form-control:focus {
+        border-color: var(--border-focused);
+    }
+    .form-control:disabled {
+        color: var(--fg-subtle);
+        background: var(--bg-faded);
+        cursor: not-allowed;
+    }
+    .form-control::placeholder {
+        color: var(--fg-subtle);
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .btn,
+        .form-control {
+            transition: none;
+        }
     }
 }

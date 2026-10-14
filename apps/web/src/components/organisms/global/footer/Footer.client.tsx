@@ -38,8 +38,16 @@ export const FooterClient: React.FC<FooterClientProps> = ({
     return (
         <footer className="relative z-20 mt-auto border-t border-border-base bg-bg-base">
             <div className="base-block grid gap-2xl py-section md:grid-cols-12 md:gap-xl">
-                <div className={cn('flex flex-col gap-lg', hasNav ? 'md:col-span-5 lg:col-span-4' : 'md:col-span-12')}>
-                    <Link href="/" className="focus-ring w-fit opacity-100 transition-opacity hover:opacity-70">
+                <div
+                    className={cn(
+                        'min-w-0 flex flex-col gap-lg',
+                        hasNav ? 'md:col-span-5 lg:col-span-4' : 'md:col-span-12',
+                    )}
+                >
+                    <Link
+                        href="/"
+                        className="focus-ring w-fit max-w-full opacity-100 transition-opacity hover:opacity-70"
+                    >
                         <Logo className="text-[length:var(--logo-font-size-footer)]" />
                     </Link>
 

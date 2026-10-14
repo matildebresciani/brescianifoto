@@ -1,5 +1,6 @@
 import { getRequestConfig } from 'next-intl/server';
 import { isLocale } from './localized-collections';
+import { presentationLanguage } from './presentation';
 import { routing } from './routing';
 
 export default getRequestConfig(async ({ requestLocale }) => {
@@ -13,6 +14,6 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
     return {
         locale,
-        messages: (await import(`../lib/messages/${locale}.json`)).default,
+        messages: (await import(`../lib/messages/${presentationLanguage}.json`)).default,
     };
 });

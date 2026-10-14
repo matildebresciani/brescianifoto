@@ -6,6 +6,7 @@ import StartBodyScripts from '@/components/organisms/global/body/StartBodyScript
 import { Footer } from '@/components/organisms/global/footer/Footer';
 import HeadScripts from '@/components/organisms/global/head/HeadScripts';
 import { Header } from '@/components/organisms/global/header/Header';
+import { presentationLanguage } from '@/i18n/presentation';
 import { getDefaultOgImage, metadataIcons } from '@/lib/data/metadata';
 import { getCachedOptions } from '@/lib/data/payload/get-cached-options';
 import { Providers } from '@/lib/providers/Providers';
@@ -49,7 +50,7 @@ export default async function RootLayout({ children, params }: Props) {
         <html
             data-scroll-behavior="smooth"
             className={cn(archivo.variable, ibmPlexMono.variable, instrumentSerif.variable)}
-            lang={locale}
+            lang={presentationLanguage}
             suppressHydrationWarning
         >
             <head>

@@ -49,13 +49,14 @@ const Pagination = ({ totalPages, pageNumber, locale, searchParams, routeDetails
                 <BaseBlock className={cn(className)}>
                     <div className="flex justify-center items-center flex-wrap gap-2">
                         <Link
+                            aria-label="Previous page"
                             href={`${formatPaginationPrevLink(pageNumber, locale, routeDetails)}${formattedSearchParams ? `${formattedSearchParams}` : ''}`}
                             className={cn(
-                                'flex items-center justify-center size-8 bg-bh-green rounded-full',
+                                'flex items-center justify-center size-12 border border-border-base text-fg-base rounded-full focus-ring-tight',
                                 pageNumber <= 1 && 'opacity-0 pointer-events-none',
                             )}
                         >
-                            <ChevronIcon className="text-white size-4 -scale-x-100" />
+                            <ChevronIcon className="size-4 -scale-x-100" />
                         </Link>
                         {pages.map((page, index) => {
                             const nextPageNumber = pages[index + 1];
@@ -65,26 +66,27 @@ const Pagination = ({ totalPages, pageNumber, locale, searchParams, routeDetails
                                     <Link
                                         href={`${formatPaginationLink(page, locale, routeDetails)}${formattedSearchParams ? `${formattedSearchParams}` : ''}`}
                                         className={cn(
-                                            'ui-text flex items-center justify-center',
-                                            pageNumber === page ? 'text-black' : 'text-black/50 hover:text-black',
+                                            'ui-text focus-ring-tight min-h-12 min-w-8 flex items-center justify-center',
+                                            pageNumber === page ? 'text-fg-base' : 'text-fg-subtle hover:text-fg-base',
                                         )}
                                     >
                                         {page}
                                     </Link>
                                     {nextPageNumber && nextPageNumber - page > 1 && (
-                                        <div className="ui-text flex items-center text-black/50">...</div>
+                                        <div className="ui-text flex items-center text-fg-subtle">...</div>
                                     )}
                                 </Fragment>
                             );
                         })}
                         <Link
+                            aria-label="Next page"
                             href={`${formatPaginationNextLink(pageNumber, locale, routeDetails)}${formattedSearchParams ? `${formattedSearchParams}` : ''}`}
                             className={cn(
-                                'flex items-center justify-center size-8 bg-bh-green rounded-full',
+                                'flex items-center justify-center size-12 border border-border-base text-fg-base rounded-full focus-ring-tight',
                                 totalPages <= pageNumber && 'opacity-0 pointer-events-none',
                             )}
                         >
-                            <ChevronIcon className="text-white size-4" />
+                            <ChevronIcon className="size-4" />
                         </Link>
                     </div>
                 </BaseBlock>
