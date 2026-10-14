@@ -30,7 +30,7 @@ const Gallery = ({ images, className, priorityCount = 3 }: Props) => {
                 return (
                     <motion.figure
                         key={item.id}
-                        className="mb-xs break-inside-avoid md:mb-base"
+                        className="mb-xs inline-block w-full break-inside-avoid align-top md:mb-base"
                         variants={downUpToggle}
                         initial="hidden"
                         whileInView="visible"
