@@ -1,12 +1,12 @@
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud';
 import { seoPlugin } from '@payloadcms/plugin-seo';
 import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types';
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob';
 import type { Plugin } from 'payload';
 
 import { isLocale } from '@/i18n/localized-collections';
 import { getServerSideURL } from '@/lib/utilities/get-url';
 import type { Page, Post } from '@/payload-types';
+import { r2Storage } from './r2-storage';
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
     return doc?.title ? `${doc.title} | Oak Boilerplate` : 'Oak Boilerplate';
@@ -26,14 +26,5 @@ export const plugins: Plugin[] = [
         generateURL,
     }),
     payloadCloudPlugin(),
-    vercelBlobStorage({
-        enabled: process.env.NODE_ENV === 'production',
-        // Specify which collections should use Vercel Blob
-        collections: {
-            media: true,
-            icons: true,
-        },
-        // Token provided by Vercel once Blob storage is added to your Vercel project
-        token: process.env.BLOB_READ_WRITE_TOKEN,
-    }),
+    r2Storage,
 ];

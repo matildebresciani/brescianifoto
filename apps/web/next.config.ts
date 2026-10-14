@@ -14,19 +14,22 @@ const withNextIntl = createNextIntlPlugin();
 const nextConfig: NextConfig = {
     images: {
         remotePatterns: [
-            ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
-                const url = new URL(item);
+            ...[NEXT_PUBLIC_SERVER_URL, process.env.R2_PUBLIC_URL]
+                .filter((item): item is string => Boolean(item))
+                .map((item): { hostname: string; protocol: 'http' | 'https'; port: string } => {
+                    const url = new URL(item);
 
-                const protocol = url.protocol.replace(':', '');
-                if (!isHttpOrHttps(protocol)) {
-                    throw new Error(`Invalid protocol: ${protocol}`);
-                }
+                    const protocol = url.protocol.replace(':', '');
+                    if (!isHttpOrHttps(protocol)) {
+                        throw new Error(`Invalid protocol: ${protocol}`);
+                    }
 
-                return {
-                    hostname: url.hostname,
-                    protocol,
-                } as const;
-            }),
+                    return {
+                        hostname: url.hostname,
+                        protocol: protocol === 'https' ? 'https' : 'http',
+                        port: url.port,
+                    };
+                }),
         ],
         dangerouslyAllowLocalIP: process.env.NODE_ENV !== 'production',
     },

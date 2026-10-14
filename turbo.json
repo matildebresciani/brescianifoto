@@ -1,6 +1,20 @@
 {
     "$schema": "https://turbo.build/schema.json",
     "ui": "tui",
+    "globalEnv": [
+        "NEXT_PUBLIC_SERVER_URL",
+        "VERCEL_PROJECT_PRODUCTION_URL",
+        "R2_BUCKET",
+        "R2_ENDPOINT",
+        "R2_PUBLIC_URL"
+    ],
+    "globalPassThroughEnv": [
+        "PAYLOAD_SECRET",
+        "DATABASE_URI",
+        "R2_ACCESS_KEY_ID",
+        "R2_SECRET_ACCESS_KEY",
+        "RESEND_API_KEY"
+    ],
     "tasks": {
         "generate:importmap": {
             "cache": true,
@@ -16,8 +30,7 @@
                 "PAYLOAD_SECRET",
                 "MEDUSA_API_KEY",
                 "CRON_SECRET",
-                "DATABASE_URI",
-                "BLOB_READ_WRITE_TOKEN"
+                "DATABASE_URI"
             ],
             "env": ["MEDUSA_BACKEND_URL"],
             "inputs": ["$TURBO_DEFAULT$", ".env*"],
