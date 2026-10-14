@@ -30,8 +30,10 @@ const PostCard = ({ data, locale }: Props) => {
                         />
                     )}
                 </div>
-                <p className="heading-5 font-semibold">{data.title}</p>
-                {data.contentMeta?.excerpt && <p className="mb-6 text-oak-gray-dark">{data.contentMeta.excerpt}</p>}
+                <p className="heading-3">{data.title}</p>
+                {data.contentMeta?.excerpt && (
+                    <p className="body-sm mb-6 text-oak-gray-dark">{data.contentMeta.excerpt}</p>
+                )}
                 <div className="flex flex-col gap-y-2 gap-x-5 mt-auto sm:justify-between md:flex-row md:items-center">
                     {data.categories && (
                         <div className="relative flex flex-wrap gap-2 overflow-hidden">
@@ -41,7 +43,7 @@ const PostCard = ({ data, locale }: Props) => {
                                 return (
                                     <span
                                         key={category.id}
-                                        className="category paragraph-small block max-w-full py-2 px-4 border border-oak-gray-dark rounded-[13px] font-bold truncate"
+                                        className="category eyebrow block max-w-full py-2 px-4 border border-oak-gray-dark rounded-[13px] font-bold"
                                     >
                                         {category.title}
                                     </span>
@@ -52,7 +54,7 @@ const PostCard = ({ data, locale }: Props) => {
                     <div className="relative flex items-center min-h-[60px] sm:ml-auto">
                         <LinkArrow className="absolute top-0 right-0 opacity-0 transition group-hover:opacity-100" />
                         {data.publishedAt && (
-                            <span className="paragraph-small font-bold whitespace-nowrap transition group-hover:opacity-0">
+                            <span className="metadata transition group-hover:opacity-0">
                                 {DateTime.fromISO(data.publishedAt)
                                     .setLocale(locale)
                                     .setZone('Europe/Copenhagen')

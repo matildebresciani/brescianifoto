@@ -65,14 +65,14 @@ const Pagination = ({ totalPages, pageNumber, locale, searchParams, routeDetails
                                     <Link
                                         href={`${formatPaginationLink(page, locale, routeDetails)}${formattedSearchParams ? `${formattedSearchParams}` : ''}`}
                                         className={cn(
-                                            'paragraph flex items-center justify-center',
+                                            'ui-text flex items-center justify-center',
                                             pageNumber === page ? 'text-black' : 'text-black/50 hover:text-black',
                                         )}
                                     >
                                         {page}
                                     </Link>
                                     {nextPageNumber && nextPageNumber - page > 1 && (
-                                        <div className="flex items-center font-semibold text-black/50">...</div>
+                                        <div className="ui-text flex items-center text-black/50">...</div>
                                     )}
                                 </Fragment>
                             );

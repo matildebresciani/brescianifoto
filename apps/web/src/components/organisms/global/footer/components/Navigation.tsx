@@ -27,7 +27,7 @@ const Navigation = ({ data }: Props) => {
                             <Link
                                 href={itemLink}
                                 className={cn(
-                                    'focus-ring body-sm w-fit transition-colors hover:text-fg-base',
+                                    'focus-ring ui-text w-fit transition-colors hover:text-fg-base',
                                     isActive && 'text-fg-highlight',
                                 )}
                                 target={getLinkTarget(item.link)}

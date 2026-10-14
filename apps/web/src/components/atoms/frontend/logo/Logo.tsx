@@ -9,11 +9,11 @@ const Logo: FC<LogoProps> = ({ className }) => {
     return (
         <span
             className={cn(
-                'font-primary text-lg leading-none font-black tracking-tight text-fg-base uppercase md:text-xl',
+                'font-primary text-[length:var(--logo-font-size)] leading-none font-black tracking-[var(--logo-letter-spacing)] text-fg-base normal-case',
                 className,
             )}
         >
-            Brescianifoto
+            brescianifoto
         </span>
     );
 };

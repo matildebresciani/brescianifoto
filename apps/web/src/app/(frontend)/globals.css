@@ -22,50 +22,94 @@
     --xxxl: 1920px;
 
     /* Colors */
-    --void: #131417;
-    --ink: #1b1c20;
-    --bone: #f2ecdd;
-    --paper: #e6dcc2;
-    --fog: #a39a85;
-    --fog-dim: #726c5c;
-    --line: #f2eedd24;
+    --void: #151611;
+    --ink: #25261f;
+    --bone: #faffef;
+    --paper: #f0f3e6;
+    --fog: #55584c;
+    --fog-dim: #737769;
+    --line: rgba(21, 22, 17, 0.18);
 
     /* Semantic tokens — bg */
-    --bg-base: var(--void);
-    --bg-subtle: var(--ink);
-    --bg-faded: #1c1d1f;
-    --bg-pressed: #292a2b;
+    --bg-base: var(--bone);
+    --bg-subtle: var(--paper);
+    --bg-faded: color-mix(in srgb, var(--bone) 50%, var(--paper));
+    --bg-pressed: color-mix(in srgb, var(--paper) 88%, var(--void));
     --bg-highlight: var(--paper);
-    --bg-invert: var(--bone);
+    --bg-invert: var(--void);
 
     /* Semantic tokens — border */
     --border-base: var(--line);
-    --border-subtle: #f2ecdd14;
+    --border-subtle: color-mix(in srgb, var(--void) 8%, transparent);
     --border-strong: var(--fog);
-    --border-highlight: var(--paper);
-    --border-focused: var(--bone);
-    --border-on-color: var(--void);
+    --border-highlight: var(--void);
+    --border-focused: var(--void);
+    --border-on-color: var(--bone);
 
     /* Semantic tokens — fg */
-    --fg-base: var(--bone);
+    --fg-base: var(--void);
     --fg-subtle: var(--fog);
     --fg-faded: var(--fog-dim);
-    --fg-highlight: var(--paper);
-    --fg-on-color: var(--void);
-    --fg-on-color-faded: #131417a6;
+    --fg-highlight: var(--ink);
+    --fg-on-color: var(--bone);
+    --fg-on-color-faded: color-mix(in srgb, var(--bone) 65%, transparent);
 
     /* Semantic tokens — button */
-    --button-base: var(--bone);
-    --button-hovered: #d1ccbf;
-    --button-pressed: #afaba2;
-    --button-subtle: var(--ink);
-    --button-subtle-hovered: #313133;
-    --button-subtle-pressed: #464646;
+    --button-base: var(--void);
+    --button-hovered: var(--ink);
+    --button-pressed: var(--ink);
+    --button-subtle: var(--paper);
+    --button-subtle-hovered: color-mix(in srgb, var(--paper) 88%, var(--void));
+    --button-subtle-pressed: color-mix(in srgb, var(--paper) 76%, var(--void));
 
     /* Fonts */
-    --font-archivo: "Archivo", sans-serif;
-    --font-mono: "IBM Plex Mono", monospace;
-    --font-primary: var(--font-archivo);
+    --font-archivo: var(--font-loaded-archivo, "Archivo", Arial, sans-serif);
+    --font-mono: var(--font-metadata);
+    --font-statement: var(
+        --font-loaded-statement,
+        "Instrument Serif",
+        "Times New Roman",
+        serif
+    );
+    --font-body: var(--font-archivo);
+    --font-metadata: var(
+        --font-loaded-metadata,
+        "IBM Plex Mono",
+        "Courier New",
+        monospace
+    );
+    --font-primary: var(--font-body);
+
+    /* Fluid type scale — 320px to 1440px, with rem bounds that respect text resizing */
+    --text-statement: clamp(3rem, 1.857143rem + 5.714286vw, 7rem);
+    --text-title: clamp(2.5rem, 1.928571rem + 2.857143vw, 4.5rem);
+    --text-heading-2: clamp(1.75rem, 1.535714rem + 1.071429vw, 2.5rem);
+    --text-heading-3: clamp(1.125rem, 1.053571rem + 0.357143vw, 1.375rem);
+    --text-heading-4: clamp(1rem, 0.928571rem + 0.357143vw, 1.25rem);
+    --text-heading-5: clamp(0.9375rem, 0.883929rem + 0.267857vw, 1.125rem);
+    --text-heading-6: clamp(0.875rem, 0.839286rem + 0.178571vw, 1rem);
+    --text-intro: clamp(1.0625rem, 1.026786rem + 0.178571vw, 1.1875rem);
+    --text-body: clamp(0.9375rem, 0.901786rem + 0.178571vw, 1.0625rem);
+    --text-small: clamp(0.875rem, 0.839286rem + 0.178571vw, 1rem);
+    --text-ui: clamp(0.75rem, 0.714286rem + 0.178571vw, 0.875rem);
+    --text-metadata: clamp(0.6875rem, 0.651786rem + 0.178571vw, 0.8125rem);
+    --weight-regular: 400;
+    --weight-medium: 500;
+    --weight-label: 700;
+    --weight-headline: 900;
+    --leading-statement: 0.97;
+    --leading-heading: 1.15;
+    --leading-body: 1.6;
+    --leading-ui: 1.4;
+    --tracking-statement: -0.025em;
+    --tracking-heading: -0.02em;
+    --tracking-label: 0.08em;
+    --tracking-metadata: 0.02em;
+
+    /* Logo */
+    --logo-font-size: clamp(1.375rem, 1.339286rem + 0.178571vw, 1.5rem);
+    --logo-font-size-footer: clamp(1.5rem, 1.357143rem + 0.714286vw, 2rem);
+    --logo-letter-spacing: -0.06em;
 
     /* Spacing scale (8px base) */
     --space-micro: 4px;
@@ -76,6 +120,7 @@
     --space-xl: 48px;
     --space-2xl: 64px;
     --space-section: 96px;
+    --space-section-wide: 128px;
 
     /* Radius */
     --btn-radius: 2px;
@@ -101,6 +146,10 @@ body {
     flex-direction: column;
     min-height: 100svh;
     font-family: var(--font-primary);
+    font-size: var(--text-body);
+    font-weight: var(--weight-regular);
+    line-height: var(--leading-body);
+    text-transform: none;
     background-color: var(--bg-base);
     color: var(--fg-base);
 }

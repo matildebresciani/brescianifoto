@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Archivo, IBM_Plex_Mono } from 'next/font/google';
+import { Archivo, IBM_Plex_Mono, Instrument_Serif } from 'next/font/google';
 import { setRequestLocale } from 'next-intl/server';
 import EndBodyScripts from '@/components/organisms/global/body/EndBodyScripts';
 import StartBodyScripts from '@/components/organisms/global/body/StartBodyScripts';
@@ -17,15 +17,22 @@ import '../globals.css';
 type Props = LayoutProps<'/[locale]'>;
 
 const archivo = Archivo({
-    weight: ['400', '500', '700', '800', '900'],
-    variable: '--font-archivo',
+    weight: ['400', '500', '700', '900'],
+    variable: '--font-loaded-archivo',
     style: ['normal'],
     subsets: ['latin'],
 });
 
 const ibmPlexMono = IBM_Plex_Mono({
     weight: ['400', '500'],
-    variable: '--font-mono',
+    variable: '--font-loaded-metadata',
+    style: ['normal'],
+    subsets: ['latin'],
+});
+
+const instrumentSerif = Instrument_Serif({
+    weight: '400',
+    variable: '--font-loaded-statement',
     style: ['normal'],
     subsets: ['latin'],
 });
@@ -41,13 +48,13 @@ export default async function RootLayout({ children, params }: Props) {
     return (
         <html
             data-scroll-behavior="smooth"
-            className={cn(archivo.variable, ibmPlexMono.variable)}
+            className={cn(archivo.variable, ibmPlexMono.variable, instrumentSerif.variable)}
             lang={locale}
             suppressHydrationWarning
         >
             <head>
                 <HeadScripts scripts={options.scriptInjection} />
-                <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
             </head>
             <body>
                 <StartBodyScripts scripts={options.scriptInjection} />

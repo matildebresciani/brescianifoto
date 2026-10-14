@@ -14,7 +14,7 @@ const UpdateParamSelector = ({ getParam, defaultValue, options }: Props) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const [showOptions, setShowOptions] = useState(false);
+    const [isOptionsOpen, setIsOptionsOpen] = useState(false);
     const [selected, setSelected] = useState(options.find((option) => option?.value === defaultValue) ?? options[0]);
 
     let formattedPathname = pathname;
@@ -44,7 +44,7 @@ const UpdateParamSelector = ({ getParam, defaultValue, options }: Props) => {
         const handleClick = (e: MouseEvent) => {
             const target = e.target;
             if (target instanceof HTMLElement && !target.closest('.param-selector')) {
-                setShowOptions(false);
+                setIsOptionsOpen(false);
             }
         };
 
@@ -56,22 +56,22 @@ const UpdateParamSelector = ({ getParam, defaultValue, options }: Props) => {
     }, []);
 
     return (
-        <div className={cn('relative w-full max-w-[350px]', showOptions ? 'z-[2]' : 'z-[1]')}>
+        <div className={cn('relative w-full max-w-[350px]', isOptionsOpen ? 'z-[2]' : 'z-[1]')}>
             <button
                 type="button"
                 className="param-selector relative flex items-center gap-3 w-full py-6 px-5 text-left overflow-hidden z-[2] cursor-pointer"
-                onClick={() => setShowOptions(!showOptions)}
+                onClick={() => setIsOptionsOpen(!isOptionsOpen)}
             >
                 <ChevronIcon
-                    className={cn('min-w-6 transition duration-300', showOptions ? 'rotate-180' : 'rotate-0')}
+                    className={cn('min-w-6 transition duration-300', isOptionsOpen ? 'rotate-180' : 'rotate-0')}
                 />
-                <span className="sort-filter truncate capitalize">{selected?.label}</span>
+                <span className="ui-text sort-filter">{selected?.label}</span>
             </button>
             <div className="absolute top-0 left-0 w-full pt-[64px] bg-oak-alabaster border border-oak-gray-dark rounded-[24px] overflow-hidden md:pt-[66px]">
                 <div
                     className={cn(
                         'grid transition-all duration-300',
-                        showOptions ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+                        isOptionsOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
                     )}
                 >
                     <div className="h-full w-full overflow-hidden">
@@ -84,11 +84,11 @@ const UpdateParamSelector = ({ getParam, defaultValue, options }: Props) => {
                                         <button
                                             key={option.value}
                                             type="button"
-                                            className="sort-filter flex items-center gap-3 w-full p-5 text-left cursor-pointer border-oak-gray-dark transition hover:bg-oak-gray-light first:border-t not-last:border-b"
+                                            className="ui-text sort-filter flex items-center gap-3 w-full p-5 text-left cursor-pointer border-oak-gray-dark transition hover:bg-oak-gray-light first:border-t not-last:border-b"
                                             onClick={() => {
                                                 setSelected(option);
                                                 updateOrder(option?.value ?? '');
-                                                setShowOptions(false);
+                                                setIsOptionsOpen(false);
                                             }}
                                         >
                                             <div
@@ -97,7 +97,7 @@ const UpdateParamSelector = ({ getParam, defaultValue, options }: Props) => {
                                                     option?.value === selected?.value && 'bg-oak-gray-dark',
                                                 )}
                                             />
-                                            <span className="capitalize">{option?.label}</span>
+                                            <span>{option?.label}</span>
                                         </button>
                                     );
                                 })}

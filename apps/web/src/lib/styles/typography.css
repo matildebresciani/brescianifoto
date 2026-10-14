@@ -1,6 +1,21 @@
 @layer base {
     h1,
     .heading-1,
+    .statement {
+        font-family: var(--font-statement);
+        font-weight: var(--weight-regular);
+        font-size: var(--text-title);
+        line-height: var(--leading-statement);
+        letter-spacing: var(--tracking-statement);
+        text-transform: uppercase;
+        overflow-wrap: anywhere;
+        hyphens: none;
+    }
+
+    .statement {
+        font-size: var(--text-statement);
+    }
+
     h2,
     .heading-2,
     h3,
@@ -8,118 +23,166 @@
     h4,
     .heading-4,
     h5,
-    .heading-5 {
-        display: block;
-        hyphens: auto;
+    .heading-5,
+    h6,
+    .heading-6 {
+        font-family: var(--font-body);
+        font-weight: var(--weight-label);
+        line-height: var(--leading-heading);
+        letter-spacing: var(--tracking-heading);
+        text-transform: none;
+        overflow-wrap: anywhere;
+        hyphens: none;
     }
 
-    /* H1 — Archivo 900, clamps 48px (mobile) to 96px (desktop) */
-    h1,
-    .heading-1 {
-        font-family: var(--font-primary);
-        font-weight: 900;
-        font-size: clamp(3rem, 1.94rem + 4.51vw, 6rem);
-        line-height: 0.95;
-        letter-spacing: -0.02em;
-        text-transform: uppercase;
-    }
-
-    /* H2 — Archivo 800, clamps 32px to 40px */
     h2,
     .heading-2 {
-        font-family: var(--font-primary);
-        font-weight: 800;
-        font-size: clamp(2rem, 1.82rem + 0.75vw, 2.5rem);
-        line-height: 1.1;
-        letter-spacing: -0.015em;
-        text-transform: uppercase;
+        font-weight: var(--weight-headline);
+        font-size: var(--text-heading-2);
     }
-
-    /* H3 — Archivo 700, clamps 18px to 22px */
     h3,
     .heading-3 {
-        font-family: var(--font-primary);
-        font-weight: 700;
-        font-size: clamp(1.125rem, 1.04rem + 0.38vw, 1.375rem);
-        line-height: 1.2;
-        letter-spacing: -0.01em;
-        text-transform: uppercase;
+        font-size: var(--text-heading-3);
+    }
+    h4,
+    .heading-4 {
+        font-size: var(--text-heading-4);
+    }
+    h5,
+    .heading-5 {
+        font-size: var(--text-heading-5);
+    }
+    h6,
+    .heading-6 {
+        font-size: var(--text-heading-6);
     }
 
-    /* Eyebrow / label — Archivo 700, fixed 11px, wide tracking */
+    .eyebrow,
+    .ui-text,
+    button,
+    select,
+    label,
+    .btn {
+        font-family: var(--font-body);
+        font-size: var(--text-ui);
+        font-weight: var(--weight-medium);
+        line-height: var(--leading-ui);
+        text-transform: none;
+    }
+
     .eyebrow {
-        font-family: var(--font-primary);
-        font-weight: 700;
-        font-size: 0.6875rem;
-        line-height: 1.2;
-        letter-spacing: 0.22em;
-        text-transform: uppercase;
+        font-weight: var(--weight-label);
+        letter-spacing: var(--tracking-label);
     }
 
-    /* Body — Archivo 400, sentence case, --fog on dark */
+    input,
+    textarea {
+        font-family: var(--font-body);
+        font-size: var(--text-body);
+        font-weight: var(--weight-regular);
+        line-height: var(--leading-body);
+        text-transform: none;
+    }
+
     .body-xs,
     .body-sm,
     .body-md,
     .body-lg {
-        font-family: var(--font-primary);
-        font-weight: 400;
-        line-height: 1.6;
+        font-family: var(--font-body);
+        font-weight: var(--weight-regular);
+        line-height: var(--leading-body);
+        text-transform: none;
         color: var(--fg-subtle);
+        overflow-wrap: anywhere;
     }
-
     .body-xs {
-        font-size: clamp(0.75rem, 0.73rem + 0.09vw, 0.8125rem);
+        font-size: var(--text-ui);
+        font-weight: var(--weight-medium);
     }
-
     .body-sm {
-        font-size: clamp(0.8125rem, 0.79rem + 0.09vw, 0.875rem);
+        font-size: var(--text-small);
     }
-
     .body-md {
-        font-size: clamp(0.9375rem, 0.89rem + 0.19vw, 1.0625rem);
+        font-size: var(--text-body);
     }
-
     .body-lg {
-        font-size: clamp(1.0625rem, 1.02rem + 0.19vw, 1.1875rem);
+        font-size: var(--text-intro);
     }
 
-    /* Caption / meta — IBM Plex Mono 400, --fog-dim, e.g. venue / date / camera / lens */
-    .caption {
-        font-family: var(--font-mono);
-        font-weight: 400;
-        font-size: clamp(0.6875rem, 0.64rem + 0.19vw, 0.8125rem);
-        line-height: 1.4;
+    .caption,
+    .metadata {
+        font-family: var(--font-metadata);
+        font-weight: var(--weight-regular);
+        font-size: var(--text-metadata);
+        line-height: var(--leading-ui);
+        letter-spacing: var(--tracking-metadata);
+        text-transform: uppercase;
         color: var(--fg-faded);
+        overflow-wrap: anywhere;
+    }
+
+    /* Metadata needs a darker tone when its parent uses the paper surface. */
+    .bg-bg-subtle,
+    .bg-paper,
+    .bg-bg-highlight {
+        --fg-faded: var(--fog);
     }
 
     .wysiwyg {
         & > * {
             margin-bottom: 1rem;
         }
-
+        & > :last-child {
+            margin-bottom: 0;
+        }
+        p,
+        li,
+        blockquote {
+            font-size: inherit;
+            line-height: var(--leading-body);
+        }
+        a {
+            text-decoration: underline;
+            text-underline-offset: 0.2em;
+        }
+        strong {
+            font-weight: var(--weight-label);
+        }
+        code,
+        pre {
+            font-family: var(--font-body);
+            font-size: inherit;
+            text-transform: none;
+        }
         ul,
         ol {
-            padding: 0.5rem 2rem 0rem;
+            padding: 0.5rem 2rem 0;
         }
-
         ul {
             list-style-type: disc;
         }
-
         ol {
             list-style-type: decimal;
         }
-
         li {
             padding-bottom: 0.5rem;
         }
-
         picture {
             display: block;
-
             img {
                 display: inline;
             }
         }
+    }
+}
+
+@layer utilities {
+    .font-mono,
+    .font-statement {
+        text-transform: uppercase;
+    }
+    .font-primary,
+    .font-body {
+        text-transform: none;
     }
 }

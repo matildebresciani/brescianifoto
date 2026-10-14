@@ -40,11 +40,11 @@ export const FooterClient: React.FC<FooterClientProps> = ({
             <div className="base-block grid gap-2xl py-section md:grid-cols-12 md:gap-xl">
                 <div className={cn('flex flex-col gap-lg', hasNav ? 'md:col-span-5 lg:col-span-4' : 'md:col-span-12')}>
                     <Link href="/" className="focus-ring w-fit opacity-100 transition-opacity hover:opacity-70">
-                        <Logo className="text-2xl md:text-3xl" />
+                        <Logo className="text-[length:var(--logo-font-size-footer)]" />
                     </Link>
 
                     {hasContact && (
-                        <address className="caption flex w-fit flex-col gap-micro not-italic">
+                        <address className="body-xs flex w-fit flex-col gap-micro not-italic">
                             {location && <span>{location}</span>}
                             {companyDetails?.email && (
                                 <a
@@ -77,7 +77,7 @@ export const FooterClient: React.FC<FooterClientProps> = ({
 
             <div className="border-t border-border-subtle">
                 <div className="base-block flex flex-col items-start gap-base py-lg md:flex-row md:items-center md:justify-between">
-                    {copyright && <p className="caption">{copyright}</p>}
+                    {copyright && <p className="body-xs">{copyright}</p>}
 
                     <div className="flex items-center gap-lg">
                         {socialLinks && socialLinks.length > 0 && (

@@ -42,7 +42,7 @@ export default async function GalleriesByTagPage({ params: paramsPromise }: Prop
         <article>
             <BaseBlock className="oakgrid mt-6 lg:mt-16">
                 <div className="col-span-12">
-                    <h1 className="text-2xl font-medium lg:text-4xl">{tagDoc.tag ?? tagDoc.name}</h1>
+                    <h1 className="heading-1">{tagDoc.tag ?? tagDoc.name}</h1>
                 </div>
             </BaseBlock>
 

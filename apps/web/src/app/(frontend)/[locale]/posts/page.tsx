@@ -83,7 +83,7 @@ export default async function PostsPage({ params: paramsPromise, searchParams: s
         <article>
             <div className="base-block oakgrid mt-6 lg:mt-16">
                 <div className="col-span-12">
-                    <h1 className="text-2xl font-medium lg:text-4xl">Posts</h1>
+                    <h1 className="heading-1">Posts</h1>
                 </div>
             </div>
 

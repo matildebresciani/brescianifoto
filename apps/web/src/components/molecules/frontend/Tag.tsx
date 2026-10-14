@@ -18,7 +18,7 @@ const Tag = ({ tag, locale, className }: Props) => {
         <Link
             href={link}
             className={cn(
-                'eyebrow focus-ring-tight inline-block cursor-pointer bg-bg-highlight px-xs py-micro text-fg-on-color transition-colors duration-200 hover:bg-button-hovered',
+                'eyebrow focus-ring-tight inline-block cursor-pointer bg-bg-highlight px-xs py-micro text-fg-base hover:text-fg-on-color transition-colors duration-200 hover:bg-button-hovered',
                 className,
             )}
         >

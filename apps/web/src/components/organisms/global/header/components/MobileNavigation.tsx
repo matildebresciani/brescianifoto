@@ -57,7 +57,7 @@ const MobileNavigation = ({ data, locale }: Props) => {
                                     key={item.id ?? i}
                                     href={itemLink}
                                     className={cn(
-                                        'focus-ring heading-3 transition-colors',
+                                        'focus-ring eyebrow transition-colors',
                                         isActive ? 'text-fg-highlight' : 'text-fg-base hover:text-fg-highlight',
                                     )}
                                     target={getLinkTarget(item.link)}

@@ -1,9 +1,18 @@
 @import "tailwindcss";
 
-@theme {
-    --font-primary: var(--font-primary);
-    --font-mono: var(--font-mono);
+@theme inline {
+    --font-primary: var(--font-body);
+    --font-body: var(--font-archivo);
+    --font-statement: var(
+        --font-loaded-statement,
+        "Instrument Serif",
+        "Times New Roman",
+        serif
+    );
+    --font-mono: var(--font-metadata);
+}
 
+@theme {
     /* Brescianifoto raw palette */
     --color-void: var(--void);
     --color-ink: var(--ink);

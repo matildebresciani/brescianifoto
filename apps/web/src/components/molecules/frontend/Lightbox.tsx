@@ -1,10 +1,10 @@
 'use client';
 
-import { RichText } from '@payloadcms/richtext-lexical/react';
 import { useEffect, useRef } from 'react';
 import Close from '@/components/atoms/frontend/buttons/Close';
 import ArrowIcon from '@/components/atoms/frontend/icons/ArrowIcon';
 import { ImageMedia } from '@/components/atoms/frontend/media/ImageMedia';
+import RichText from '@/components/molecules/admin/RichText';
 import Portal from '@/components/molecules/Portal';
 import { cn } from '@/lib/utilities/ui';
 import { wrapIndex } from '@/lib/utilities/wrap-index';
@@ -53,8 +53,10 @@ const Lightbox = ({ items, index, onClose, onNavigate }: Props) => {
                     <p className="caption">
                         {index + 1} / {items.length}
                     </p>
-                    <div className="caption text-center">
-                        {current.caption && <RichText data={current.caption} className="caption" />}
+                    <div className="body-sm min-w-0 text-center">
+                        {current.caption && (
+                            <RichText data={current.caption} enableGutter={false} className="body-sm" />
+                        )}
                     </div>
                     <Close onClick={onClose} className="justify-self-end" />
                 </div>

@@ -1,7 +1,7 @@
 'use client';
-import { RichText } from '@payloadcms/richtext-lexical/react';
 import type { SerializedEditorState, SerializedLexicalNode } from 'lexical';
 import { useId, useState } from 'react';
+import RichText from '@/components/molecules/admin/RichText';
 import { cn } from '@/lib/utilities/ui';
 
 type Props = {
@@ -19,7 +19,7 @@ const Accordion = ({ title, content }: Props) => {
                 type="button"
                 aria-expanded={isOpen}
                 aria-controls={accordionId}
-                className="grid grid-cols-[1fr_3.5rem] items-center gap-5 w-full p-4 text-lg leading-[155%] font-bold text-left cursor-pointer lg:p-6 lg:pr-10 lg:text-xl"
+                className="grid grid-cols-[1fr_3.5rem] items-center gap-5 w-full p-4 heading-3 text-left cursor-pointer lg:p-6 lg:pr-10"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <span>{title}</span>
@@ -36,7 +36,7 @@ const Accordion = ({ title, content }: Props) => {
             <div id={accordionId} className={cn('grid transition-all', isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>
                 <div aria-hidden={!isOpen} className="h-full overflow-hidden">
                     <div className="wysiwyg max-w-[850px] pb-6 px-5 lg:pb-11 lg:px-7">
-                        <RichText data={content} />
+                        <RichText data={content} enableGutter={false} />
                     </div>
                 </div>
             </div>
