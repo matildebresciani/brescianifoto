@@ -1,6 +1,6 @@
-import type { Field } from 'payload';
+import type { DateField, SelectField } from 'payload';
 
-export const payloadPublishStatus: Field = {
+export const payloadPublishStatus: SelectField = {
     name: 'publishStatus',
     type: 'select',
     admin: {
@@ -25,22 +25,24 @@ export const payloadPublishStatus: Field = {
     localized: true,
 };
 
-export const payloadPublishedAt: Field = {
+export const payloadPublishedAt: DateField = {
     name: 'publishedAt',
     type: 'date',
     admin: {
         date: {
             pickerAppearance: 'dayAndTime',
+            displayFormat: 'dd/MM/yyyy HH:mm',
+            timeFormat: 'HH:mm',
         },
         position: 'sidebar',
     },
     hooks: {
         beforeChange: [
-            ({ siblingData, value }) => {
-                if (siblingData._status === 'published' && !value) {
-                    return new Date();
-                }
-                return value;
+            ({ siblingData, previousSiblingDoc, value, previousValue }) => {
+                const publishStatus = siblingData.publishStatus ?? previousSiblingDoc?.publishStatus;
+                const publishedAt = value || previousValue;
+                if (publishStatus === 'public' && !publishedAt) return new Date().toISOString();
+                return publishedAt ?? value;
             },
         ],
     },

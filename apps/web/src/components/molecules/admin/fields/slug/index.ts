@@ -1,16 +1,17 @@
 import type { CheckboxField, TextField } from 'payload';
 
-import { formatSlugHook } from './formatSlug';
+import { formatSlug, formatSlugHook } from './formatSlug';
 
 type Overrides = {
     slugOverrides?: Partial<TextField>;
     checkboxOverrides?: Partial<CheckboxField>;
+    shouldGenerateFromTitle?: boolean;
 };
 
 type Slug = (fieldToUse?: string, overrides?: Overrides) => [TextField, CheckboxField];
 
 export const slugField: Slug = (fieldToUse = 'title', overrides = {}) => {
-    const { slugOverrides, checkboxOverrides } = overrides;
+    const { slugOverrides, checkboxOverrides, shouldGenerateFromTitle = true } = overrides;
 
     const checkBoxField: CheckboxField = {
         name: 'slugLock',
@@ -33,7 +34,11 @@ export const slugField: Slug = (fieldToUse = 'title', overrides = {}) => {
         ...(slugOverrides || {}),
         hooks: {
             // Kept this in for hook or API based updates
-            beforeValidate: [formatSlugHook(fieldToUse)],
+            beforeValidate: [
+                shouldGenerateFromTitle
+                    ? formatSlugHook(fieldToUse)
+                    : ({ value }) => (typeof value === 'string' ? formatSlug(value) : value),
+            ],
         },
         admin: {
             position: 'sidebar',
@@ -44,6 +49,7 @@ export const slugField: Slug = (fieldToUse = 'title', overrides = {}) => {
                     clientProps: {
                         fieldToUse,
                         checkboxFieldPath: checkBoxField.name,
+                        shouldGenerateFromTitle,
                     },
                 },
             },

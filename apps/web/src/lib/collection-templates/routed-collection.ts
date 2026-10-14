@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload';
+import type { CollectionConfig, Field } from 'payload';
 import { slugField } from '@/components/molecules/admin/fields/slug';
 import type { RoutedCollectionSlug } from '@/i18n/localized-collections';
 import { contentMeta } from '../field-templates/content-meta';
@@ -8,9 +8,11 @@ import { payloadTitleCollection } from '../field-templates/title';
 import { generatePreviewPath } from '../utilities/generate-preview-path';
 import { createCollection } from './collection';
 
+/** Builds a routed collection with optional collection-specific title and URL fields. */
 export const createRoutedCollection = <Slug extends RoutedCollectionSlug>(
     slug: Slug,
     config: Omit<CollectionConfig<Slug>, 'slug'>,
+    options: { titleFields?: Field[]; slugFields?: Field[] } = {},
 ): CollectionConfig<Slug> => {
     return createCollection(slug, {
         ...config,
@@ -26,11 +28,11 @@ export const createRoutedCollection = <Slug extends RoutedCollectionSlug>(
             ...config.admin,
         },
         fields: [
-            ...payloadTitleCollection,
+            ...(options.titleFields ?? payloadTitleCollection),
             ...config.fields,
             payloadPublishedAt,
             payloadPublishStatus,
-            ...slugField(),
+            ...(options.slugFields ?? slugField()),
             contentMeta(),
         ],
         versions: {

@@ -35,7 +35,8 @@ export const formatGalleryCardCaption = (
     // A saved main group takes precedence over cross-section tags. Older galleries can use their festival tag.
     const isFestival = group ? isFestivalGroup(group) : Boolean(festivalTag);
     const date = formatPresentationDate(gallery.date);
-    if (!isFestival) return [gallery.title, date].filter(Boolean).join(' / ');
+    if (!isFestival)
+        return [gallery.title, payloadObject(gallery.location)?.name.trim(), date].filter(Boolean).join(' / ');
 
     const festival =
         festivalTag?.tag?.trim() || festivalTag?.name.trim() || payloadObject(gallery.location)?.name.trim();

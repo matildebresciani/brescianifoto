@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, FieldLabel, TextInput, useField, useForm, useFormFields } from '@payloadcms/ui';
+import { Button, FieldDescription, FieldLabel, TextInput, useField, useForm, useFormFields } from '@payloadcms/ui';
 import type { TextFieldClientProps } from 'payload';
 import type React from 'react';
 import { useCallback, useEffect } from 'react';
@@ -11,6 +11,7 @@ import './index.scss';
 type SlugComponentProps = {
     fieldToUse: string;
     checkboxFieldPath: string;
+    shouldGenerateFromTitle?: boolean;
 } & TextFieldClientProps;
 
 export const SlugComponent: React.FC<SlugComponentProps> = ({
@@ -19,6 +20,7 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
     checkboxFieldPath: checkboxFieldPathFromProps,
     path,
     readOnly: readOnlyFromProps,
+    shouldGenerateFromTitle = true,
 }) => {
     const { label } = field;
 
@@ -26,7 +28,7 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
         ? `${path}.${checkboxFieldPathFromProps}`
         : checkboxFieldPathFromProps;
 
-    const { value, setValue } = useField<string>({ path: path || field.name });
+    const { value, setValue, showError } = useField<string>({ path: path || field.name });
 
     const { dispatchFields } = useForm();
 
@@ -42,7 +44,7 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
     });
 
     useEffect(() => {
-        if (checkboxValue) {
+        if (checkboxValue && shouldGenerateFromTitle) {
             if (targetFieldValue && typeof targetFieldValue === 'string') {
                 const formattedSlug = formatSlug(targetFieldValue);
 
@@ -51,7 +53,7 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
                 if (value !== '') setValue('');
             }
         }
-    }, [targetFieldValue, checkboxValue, setValue, value]);
+    }, [targetFieldValue, checkboxValue, setValue, value, shouldGenerateFromTitle]);
 
     const handleLock = useCallback(
         (e: React.MouseEvent<Element>) => {
@@ -78,7 +80,14 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
                 </Button>
             </div>
 
-            <TextInput value={value} onChange={setValue} path={path || field.name} readOnly={Boolean(readOnly)} />
+            <TextInput
+                value={value}
+                onChange={setValue}
+                path={path || field.name}
+                readOnly={Boolean(readOnly)}
+                showError={showError}
+            />
+            <FieldDescription description={field.admin?.description} path={path || field.name} />
         </div>
     );
 };

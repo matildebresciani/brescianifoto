@@ -49,7 +49,7 @@ const GalleryCard = ({ data, locale, showTag = false }: Props) => {
                         )}
                     </div>
                 </Link>
-                <figcaption className="mt-md">
+                <figcaption className="mt-xs">
                     <Link href={link} className="focus-ring-tight block">
                         <p className="metadata">{formatGalleryCardCaption(data)}</p>
                     </Link>

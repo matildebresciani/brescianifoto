@@ -1,6 +1,6 @@
-import type { Field } from 'payload';
+import type { TextField } from 'payload';
 
-export const paylaodPageName: Field = {
+export const paylaodPageName: TextField = {
     name: 'name',
     label: 'Page Name',
     type: 'text',
@@ -10,7 +10,7 @@ export const paylaodPageName: Field = {
     },
 };
 
-export const payloadTitle: Field = {
+export const payloadTitle: TextField = {
     name: 'title',
     type: 'text',
     required: true,

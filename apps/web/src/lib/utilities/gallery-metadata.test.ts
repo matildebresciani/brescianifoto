@@ -35,6 +35,15 @@ const festivalTag = {
 };
 
 describe('compact gallery card captions', () => {
+    it('distinguishes repeated artist shows with the venue and date', () => {
+        expect(
+            formatGalleryCardCaption({
+                title: 'Fontaines D.C.',
+                location: { id: 'vega', name: 'VEGA', createdAt: '', updatedAt: '' },
+                date: '2026-10-14',
+            }),
+        ).toBe('Fontaines D.C. / VEGA / 14 Oct 2026');
+    });
     it('uses artist and English date for a concert, preserving content case for CSS', () => {
         expect(formatGalleryCardCaption({ title: '5 seconds of summer', date: '2026-04-26T12:00:00Z' })).toBe(
             '5 seconds of summer / 26 Apr 2026',

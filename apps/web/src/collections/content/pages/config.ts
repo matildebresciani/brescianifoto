@@ -8,7 +8,6 @@ import { SavedLayoutsBlock } from '@/components/organisms/blocks/saved-layouts/c
 import { TextImage } from '@/components/organisms/blocks/text-image/config';
 import { createRoutedCollection } from '@/lib/collection-templates/routed-collection';
 import { payloadSEO } from '@/lib/field-templates/seo';
-import { populatePublishedAt } from '../../../lib/hooks/populate-published-at';
 import { enforceHomepage } from './hooks/enforce-homepage';
 
 const collection = 'pages';
@@ -46,6 +45,6 @@ export const Pages = createRoutedCollection(collection, {
         },
     ],
     hooks: {
-        beforeChange: [populatePublishedAt, enforceHomepage],
+        beforeChange: [enforceHomepage],
     },
 });
