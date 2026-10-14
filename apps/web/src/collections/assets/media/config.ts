@@ -2,6 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FixedToolbarFeature, InlineToolbarFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 import type { CollectionConfig } from 'payload';
+import { resolveAdminThumbnail } from '@/lib/payload-hooks/resolve-admin-thumbnail';
 
 import { anyone } from '../../../access/anyone';
 import { authenticated } from '../../../access/authenticated';
@@ -19,6 +20,9 @@ export const Media: CollectionConfig = {
         delete: authenticated,
         read: anyone,
         update: authenticated,
+    },
+    hooks: {
+        afterRead: [resolveAdminThumbnail],
     },
     fields: [
         {
