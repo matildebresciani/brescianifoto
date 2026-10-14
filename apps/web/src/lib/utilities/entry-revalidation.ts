@@ -14,8 +14,8 @@ export const revalidateEntry = (doc: Page | Post, collection: CollectionSlug) =>
     }
 
     // Revalidating entire collection to hit the archive page
-    revalidateTag(collection, 'max');
-    revalidateTag(`${collection}-sitemap`, 'max');
-    revalidateTag(`${collection}-by-id_${doc.id}`, 'max');
-    revalidateTag(`${collection}-by-slug_${doc.slug}`, 'max');
+    revalidateTag(collection, { expire: 0 });
+    revalidateTag(`${collection}-sitemap`, { expire: 0 });
+    revalidateTag(`${collection}-by-id_${doc.id}`, { expire: 0 });
+    revalidateTag(`${collection}-by-slug_${doc.slug}`, { expire: 0 });
 };

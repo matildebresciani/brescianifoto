@@ -15,9 +15,9 @@ export const getCachedOptions = (locale: Locale, depth = 0) => {
 
             return options;
         },
-        ['global_options', locale],
+        ['options', locale, depth.toString()],
         {
-            tags: ['global_options'],
+            tags: ['options'],
         },
     )();
 };
