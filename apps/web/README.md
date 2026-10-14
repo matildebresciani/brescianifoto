@@ -84,7 +84,9 @@ See the [Collections](https://payloadcms.com/docs/configuration/collections) doc
 
 - #### Media
 
-  This is the uploads enabled collection used by pages, posts, and projects to contain media like images, videos, downloads, and other assets. It features pre-configured sizes, focal point and manual resizing to help you manage your pictures.
+  This is the uploads enabled collection used by pages, posts, and galleries to contain media like images, videos, downloads, and other assets. Photos retain their original resolution and generate only a 300px-wide admin thumbnail. The frontend uses the original URL with Next.js image optimization, so generating additional responsive sizes during upload would duplicate work and delay saves. Focal point and manual cropping remain available.
+
+  In production, the browser uploads directly to R2, then Payload processes the image and stores the thumbnail before completing the save. Removing the unused sizes reduces processing and storage requests; it does not remove the original file transfer. Existing uploads continue to work without regeneration or a database migration. Previously generated files remain in R2; this change does not delete them.
 
 - #### Categories
 
