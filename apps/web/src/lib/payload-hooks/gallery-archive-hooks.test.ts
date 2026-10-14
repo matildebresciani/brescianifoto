@@ -16,11 +16,12 @@ beforeAll(async () => {
         collections: [
             { slug: 'tags', fields: [{ name: 'slug', type: 'text', localized: true }] },
             { slug: 'tag-groups', fields: [{ name: 'name', type: 'text' }] },
+            { slug: 'navigation', fields: [{ name: 'title', type: 'text' }] },
         ],
     });
 });
 
-const getCollection = (slug: 'tags' | 'tag-groups') => {
+const getCollection = (slug: 'tags' | 'tag-groups' | 'navigation') => {
     const collection = payload.config.collections.find((entry) => entry.slug === slug);
     if (!collection) throw new Error('Missing test collection');
     return collection;
@@ -88,6 +89,24 @@ describe('gallery archive Payload hooks', () => {
             req,
         });
         expect(mocks.revalidateEntry).toHaveBeenCalledWith(doc, 'tag-groups');
+    });
+
+    it.each([
+        'create',
+        'update',
+    ] as const)('invalidates navigation on %s without a publish status', async (operation) => {
+        const req = await createLocalReq({ locale: 'da' }, payload);
+        const doc = { id: 'main-menu', title: 'Main navigation', position: { main: true, mobile: true } };
+        await createAfterChangeRevalidateHook('navigation')({
+            collection: getCollection('navigation'),
+            context: req.context,
+            operation,
+            data: doc,
+            doc,
+            previousDoc: operation === 'update' ? { ...doc, position: { main: true, mobile: false } } : {},
+            req,
+        });
+        expect(mocks.revalidateEntry).toHaveBeenCalledWith(doc, 'navigation');
     });
 
     it('respects disabled revalidation during maintenance operations', async () => {

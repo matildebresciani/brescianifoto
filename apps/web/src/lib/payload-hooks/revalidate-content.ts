@@ -12,7 +12,13 @@ export const createAfterChangeRevalidateHook = (slug: CollectionSlug): Collectio
     return ({ doc, previousDoc, req: { context } }) => {
         if (!context.disableRevalidate) {
             const isGalleryTaxonomy = slug === 'tags' || slug === 'tag-groups';
-            if (isGalleryTaxonomy || doc.publishStatus === 'public' || doc._status === 'published') {
+            // Menus have no publication state; every save changes the public navigation.
+            if (
+                slug === 'navigation' ||
+                isGalleryTaxonomy ||
+                doc.publishStatus === 'public' ||
+                doc._status === 'published'
+            ) {
                 revalidateEntry(doc, slug);
             }
 
