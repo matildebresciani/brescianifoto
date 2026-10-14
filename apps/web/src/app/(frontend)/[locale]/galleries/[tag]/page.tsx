@@ -36,13 +36,8 @@ export default async function GalleryArchivePage({ params: paramsPromise }: Prop
 
     return (
         <article>
-            <BaseBlock className="mt-6 lg:mt-16">
-                <div>
-                    <h1 className="heading-1">{archive.title}</h1>
-                </div>
-            </BaseBlock>
-
-            <BaseBlock className="mt-6 lg:mt-10">
+            <BaseBlock className="mt-md flex flex-col gap-md md:gap-lg lg:mt-2xl">
+                <h1 className="heading-1">{archive.title}</h1>
                 {galleries.docs.length === 0 && <p className="body-md">{t('empty')}</p>}
                 <ul className="grid gap-base sm:grid-cols-2 lg:grid-cols-3">
                     {galleries.docs.map((gallery) => (

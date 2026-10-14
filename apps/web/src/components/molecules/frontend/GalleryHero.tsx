@@ -25,7 +25,7 @@ const GalleryHero = ({ data, locale }: Props) => {
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: shouldReduceMotion ? 0 : 0.6, ease: 'easeOut' }}
-                className="base-block flex flex-col gap-md py-xl motion-reduce:transform-none! motion-reduce:opacity-100!"
+                className="base-block flex flex-col gap-md pt-xl pb-md md:pb-lg motion-reduce:transform-none! motion-reduce:opacity-100!"
             >
                 {tags.length > 0 && (
                     <div className="flex flex-wrap gap-xs">
