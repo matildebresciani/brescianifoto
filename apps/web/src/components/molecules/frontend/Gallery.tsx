@@ -23,14 +23,14 @@ const Gallery = ({ images, className, priorityCount = 3 }: Props) => {
     if (!items?.length) return null;
 
     return (
-        <div className={cn('columns-2 gap-base lg:columns-3', className)}>
+        <div className={cn('columns-2 gap-xs md:gap-base lg:columns-3', className)}>
             {items.map((item, index) => {
                 const isAboveFold = index < priorityCount;
 
                 return (
                     <motion.figure
                         key={item.id}
-                        className="mb-base break-inside-avoid"
+                        className="mb-xs break-inside-avoid md:mb-base"
                         variants={downUpToggle}
                         initial="hidden"
                         whileInView="visible"
@@ -39,7 +39,10 @@ const Gallery = ({ images, className, priorityCount = 3 }: Props) => {
                     >
                         <button
                             type="button"
-                            className="group block w-full cursor-pointer text-left"
+                            className="group block w-full cursor-pointer overflow-hidden bg-bg-subtle text-left"
+                            style={{
+                                aspectRatio: item.width && item.height ? `${item.width} / ${item.height}` : undefined,
+                            }}
                             onClick={() => setLightboxIndex(index)}
                         >
                             <ImageMedia
