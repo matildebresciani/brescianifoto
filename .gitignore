@@ -50,3 +50,7 @@ devenv.local.nix
 
 static
 data
+
+# Keep application data-fetching modules in deployments.
+!apps/web/src/lib/data/
+!apps/web/src/lib/data/**
