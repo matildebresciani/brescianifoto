@@ -3,6 +3,7 @@ import { createRoutedCollection } from '@/lib/collection-templates/routed-collec
 import { payloadGallery } from '@/lib/field-templates/images';
 import { payloadSEO } from '@/lib/field-templates/seo';
 import { paylaodPageName, payloadTitle } from '@/lib/field-templates/title';
+import { refreshAutomaticGalleryMix } from '@/lib/payload-hooks/automatic-gallery-mix';
 import { prepareGalleryIdentity, validateGalleryDate, validateGallerySlug } from '@/lib/payload-hooks/gallery-identity';
 
 const slug = 'galleries';
@@ -16,6 +17,7 @@ export const Galleries = createRoutedCollection(
             group: 'Content',
         },
         hooks: {
+            afterChange: [refreshAutomaticGalleryMix],
             beforeValidate: [validateGalleryDate, prepareGalleryIdentity, validateGallerySlug],
         },
         fields: [

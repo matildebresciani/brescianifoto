@@ -2,6 +2,17 @@ import type { Field } from 'payload';
 
 export const globalContentFields: Field[] = [
     {
+        name: 'automaticGalleryMix',
+        type: 'group',
+        localized: true,
+        admin: { hidden: true, readOnly: true },
+        fields: [
+            { name: 'isInitialized', type: 'checkbox', defaultValue: false },
+            { name: 'consideredGalleryIds', type: 'text', hasMany: true },
+            { name: 'photos', type: 'upload', relationTo: 'media', hasMany: true },
+        ],
+    },
+    {
         label: 'Set Homepage',
         name: 'defaultPages',
         type: 'group',
@@ -63,6 +74,7 @@ export const globalContentFields: Field[] = [
                         label: 'E-mail',
                         type: 'email',
                         localized: true,
+                        defaultValue: 'matildepio@hotmail.dk',
                     },
                     {
                         name: 'phone',
@@ -79,10 +91,12 @@ export const globalContentFields: Field[] = [
         label: 'Social Links',
         type: 'array',
         localized: true,
+        defaultValue: [{ label: 'instagram', link: 'https://www.instagram.com/brescianifoto/' }],
         fields: [
             {
                 type: 'row',
                 fields: [
+                    { name: 'label', label: 'Text label', type: 'text' },
                     {
                         type: 'upload',
                         name: 'platform',

@@ -1,4 +1,4 @@
-import type { Field } from 'payload';
+import type { Field, UploadField } from 'payload';
 import type { PayloadBaseProps } from './types/field-template-types';
 
 export const payloadImage = (props: PayloadBaseProps = {}): Field => {
@@ -14,7 +14,7 @@ export const payloadImage = (props: PayloadBaseProps = {}): Field => {
     };
 };
 
-export const payloadGallery = (props: PayloadBaseProps = {}): Field => {
+export const payloadGallery = (props: PayloadBaseProps = {}): Extract<UploadField, { relationTo: string }> => {
     const { required = false, localized = true } = props;
 
     return {

@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { FixedToolbarFeature, InlineToolbarFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 import type { CollectionConfig } from 'payload';
 import { resolveAdminThumbnail } from '@/lib/payload-hooks/resolve-admin-thumbnail';
+import { revalidatePortfolioMedia } from '@/lib/payload-hooks/revalidate-portfolio-media';
 
 import { anyone } from '../../../access/anyone';
 import { authenticated } from '../../../access/authenticated';
@@ -22,6 +23,8 @@ export const Media: CollectionConfig = {
         update: authenticated,
     },
     hooks: {
+        afterChange: [revalidatePortfolioMedia],
+        afterDelete: [revalidatePortfolioMedia],
         afterRead: [resolveAdminThumbnail],
     },
     fields: [
