@@ -15,6 +15,7 @@ export const createAfterChangeRevalidateHook = (slug: CollectionSlug): Collectio
             // Menus have no publication state; every save changes the public navigation.
             if (
                 slug === 'navigation' ||
+                slug === 'redirects' ||
                 isGalleryTaxonomy ||
                 doc.publishStatus === 'public' ||
                 doc._status === 'published'

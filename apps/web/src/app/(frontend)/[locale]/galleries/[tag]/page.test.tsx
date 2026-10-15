@@ -99,7 +99,7 @@ describe('shared gallery archive pages', () => {
         expect(html).not.toContain('Unlisted show');
         expect(html).not.toContain('Ungrouped show');
         expect(mocks.getCachedCollection).toHaveBeenLastCalledWith(
-            expect.objectContaining({ collection: 'galleries', limit: 100, sort: '-date', depth: 2 }),
+            expect.objectContaining({ collection: 'galleries', limit: 0, sort: '-date', depth: 2 }),
         );
     });
 
@@ -155,6 +155,25 @@ describe('shared gallery archive pages', () => {
 
     it('falls back to a tag when the matching group is disabled', async () => {
         expect(await getGalleryArchive('artists', 'da')).toMatchObject({ kind: 'tag', title: 'Artist tag' });
+    });
+
+    it('includes year-only entries in calendar ordering before limiting the archive', async () => {
+        const docs = [
+            ...Array.from({ length: 100 }, (_, index) => ({
+                id: `old-${index}`,
+                title: `Old ${index}`,
+                date: '2024-01-01',
+            })),
+            { id: 'year', title: 'Year-only festival', datePrecision: 'year', year: 2026, date: '2020-01-01' },
+            { id: 'dated', title: 'Dated festival', date: '2026-06-20' },
+        ];
+        mocks.getCachedCollection.mockImplementation(({ collection }: { collection: string }) =>
+            Promise.resolve({ docs: collection === 'tag-groups' ? groups : collection === 'tags' ? tags : docs }),
+        );
+        const html = renderToStaticMarkup(await GalleryArchivePage({ params: params('festivals') }));
+        expect(html.indexOf('Dated festival')).toBeLessThan(html.indexOf('Year-only festival'));
+        expect(html.indexOf('Year-only festival')).toBeLessThan(html.indexOf('Old 0'));
+        expect(html).not.toContain('Old 99');
     });
 
     it('returns 404 for unknown archives and disabled groups without a matching tag', async () => {

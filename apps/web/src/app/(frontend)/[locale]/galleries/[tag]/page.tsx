@@ -7,6 +7,7 @@ import { generateGalleryArchiveMetadata } from '@/lib/data/gallery-archive-metad
 import { getCachedCollection } from '@/lib/data/payload/get-cached-collection';
 import { getGalleryArchive } from '@/lib/data/payload/get-gallery-archive';
 import { assertLocale } from '@/lib/utilities/assert-locale';
+import { getGallerySortValue } from '@/lib/utilities/festival-gallery';
 
 type Props = {
     params: Promise<{
@@ -29,17 +30,14 @@ export default async function GalleryArchivePage({ params: paramsPromise }: Prop
         collection: 'galleries',
         locale,
         whereFields: archive.galleryWhere,
-        limit: 100,
+        // Sort all matches before applying the archive cap, so year-only entries are not excluded by date sorting.
+        limit: 0,
         depth: 2,
         sort: '-date',
     });
-    const sortedGalleries = [...galleries.docs].sort((first, second) => {
-        const firstDate = Date.parse(first.date ?? '');
-        const secondDate = Date.parse(second.date ?? '');
-        if (Number.isNaN(firstDate)) return Number.isNaN(secondDate) ? 0 : 1;
-        if (Number.isNaN(secondDate)) return -1;
-        return secondDate - firstDate;
-    });
+    const sortedGalleries = [...galleries.docs]
+        .sort((first, second) => getGallerySortValue(second) - getGallerySortValue(first))
+        .slice(0, 100);
 
     return (
         <article>

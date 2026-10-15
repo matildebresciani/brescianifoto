@@ -2,6 +2,7 @@ import { type CollectionBeforeValidateHook, ValidationError } from 'payload';
 import { z } from 'zod';
 import { formatSlug } from '@/components/molecules/admin/fields/slug/formatSlug';
 import { defaultLocale, isLocale, locales } from '@/i18n/localized-collections';
+import { isGalleryYear } from '@/lib/utilities/festival-gallery';
 import { formatGalleryIdentity } from '@/lib/utilities/gallery-identity';
 import type { Gallery } from '@/payload-types';
 
@@ -9,6 +10,21 @@ const localizedSlugSchema = z.partialRecord(z.enum(locales), z.string().nullish(
 const galleryRecordsSchema = z.array(
     z.object({ id: z.string(), slug: z.union([z.string(), localizedSlugSchema]).nullish() }),
 );
+
+/** Validate the effective values on partial updates as well as full admin submissions. */
+export const validateGalleryDate: CollectionBeforeValidateHook<Gallery> = ({ data, originalDoc, req }) => {
+    if (!data) return data;
+    const precision = data.datePrecision === undefined ? originalDoc?.datePrecision : data.datePrecision;
+    const year = data.year === undefined ? originalDoc?.year : data.year;
+    if (precision === 'year' && !isGalleryYear(year)) {
+        throw new ValidationError({
+            collection: 'galleries',
+            errors: [{ path: 'year', message: 'Enter a four-digit year when using Year only.' }],
+            req,
+        });
+    }
+    return data;
+};
 
 /** Generates draft show slugs and admin names; public URLs only change after explicitly unlocking. */
 export const prepareGalleryIdentity: CollectionBeforeValidateHook<Gallery> = async ({
@@ -34,11 +50,42 @@ export const prepareGalleryIdentity: CollectionBeforeValidateHook<Gallery> = asy
                       req: { ...req },
                   })
                 : location;
-        const identity = formatGalleryIdentity(
-            data.title ?? originalDoc?.title,
-            venue?.name,
-            data.date === undefined ? originalDoc?.date : data.date,
-        );
+        const gallery = {
+            title: data.title ?? originalDoc?.title,
+            date: data.date === undefined ? originalDoc?.date : data.date,
+            datePrecision: data.datePrecision === undefined ? originalDoc?.datePrecision : data.datePrecision,
+            year: data.year === undefined ? originalDoc?.year : data.year,
+            tagGroup: data.tagGroup === undefined ? originalDoc?.tagGroup : data.tagGroup,
+            tags: data.tags === undefined ? originalDoc?.tags : data.tags,
+        };
+        const group = gallery.tagGroup;
+        const tagGroup =
+            typeof group === 'string'
+                ? await req.payload.findByID({
+                      collection: 'tag-groups',
+                      id: group,
+                      depth: 0,
+                      overrideAccess: true,
+                      req: { ...req },
+                  })
+                : group;
+        // Main groups determine classification; only legacy ungrouped galleries need populated tag groups.
+        const tags = tagGroup
+            ? gallery.tags
+            : await Promise.all(
+                  (gallery.tags ?? []).map(async (tag) =>
+                      typeof tag === 'string'
+                          ? req.payload.findByID({
+                                collection: 'tags',
+                                id: tag,
+                                depth: 1,
+                                overrideAccess: true,
+                                req: { ...req },
+                            })
+                          : tag,
+                  ),
+              );
+        const identity = formatGalleryIdentity({ ...gallery, location: venue, tagGroup, tags });
         if (shouldGenerateSlug) data.slug = identity.slug;
         if (shouldGenerateName) data.name = identity.name;
     }
@@ -101,7 +148,7 @@ export const validateGallerySlug: CollectionBeforeValidateHook<Gallery> = async 
         if (hasConflict) {
             errors.push({
                 path: 'slug',
-                message: `The gallery slug "${slug}" is already used in ${galleryLocale}. Add the venue and show date, or unlock and choose a different slug.`,
+                message: `The gallery slug "${slug}" is already used in ${galleryLocale}. Check the location and date or year, or unlock and choose a different slug.`,
             });
         }
     }

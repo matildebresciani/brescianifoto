@@ -5,6 +5,8 @@ import GalleryHero from '@/components/molecules/frontend/GalleryHero';
 import BaseBlock from '@/components/organisms/blocks/base-block/BaseBlock';
 import { getCachedEntryBySlug } from '@/lib/data/payload/get-cached-entry-by-slug';
 import { assertLocale } from '@/lib/utilities/assert-locale';
+import { formatLinkByCollection } from '@/lib/utilities/format-link';
+import { payloadRedirects } from '@/lib/utilities/payload-redirects';
 
 type Props = {
     params: Promise<{
@@ -20,7 +22,11 @@ export default async function GallerySinglePage({ params: paramsPromise }: Props
     setRequestLocale(locale);
 
     const gallery = await getCachedEntryBySlug({ collection: 'galleries', slug, locale });
-    if (!gallery) return notFound();
+    if (!gallery) {
+        const path = formatLinkByCollection(slug, 'galleries', locale);
+        if (path) await payloadRedirects(path);
+        return notFound();
+    }
 
     return (
         <article>

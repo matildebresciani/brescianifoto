@@ -5,7 +5,7 @@ export const payloadRedirects = async (url: string) => {
     const redirects = await getCachedRedirects();
 
     const formattedUrl = url.startsWith('/') ? url : `/${url}`;
-    const redirectItem = redirects.find((redirect) => redirect.redirectFrom === formattedUrl);
+    const redirectItem = redirects.find((redirect) => redirect.active && redirect.redirectFrom === formattedUrl);
 
     if (redirectItem?.redirectTo && redirectItem?.active) {
         if (redirectItem.redirectType === '308') {

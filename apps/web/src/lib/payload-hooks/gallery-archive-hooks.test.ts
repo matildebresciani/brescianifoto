@@ -17,11 +17,12 @@ beforeAll(async () => {
             { slug: 'tags', fields: [{ name: 'slug', type: 'text', localized: true }] },
             { slug: 'tag-groups', fields: [{ name: 'name', type: 'text' }] },
             { slug: 'navigation', fields: [{ name: 'title', type: 'text' }] },
+            { slug: 'redirects', fields: [{ name: 'redirectFrom', type: 'text' }] },
         ],
     });
 });
 
-const getCollection = (slug: 'tags' | 'tag-groups' | 'navigation') => {
+const getCollection = (slug: 'tags' | 'tag-groups' | 'navigation' | 'redirects') => {
     const collection = payload.config.collections.find((entry) => entry.slug === slug);
     if (!collection) throw new Error('Missing test collection');
     return collection;
@@ -63,7 +64,11 @@ describe('gallery archive Payload hooks', () => {
         }
     });
 
-    it.each(['tags', 'tag-groups'] as const)('invalidates %s edits even without a publish status', async (slug) => {
+    it.each([
+        'tags',
+        'tag-groups',
+        'redirects',
+    ] as const)('invalidates %s edits even without a publish status', async (slug) => {
         const req = await createLocalReq({ locale: 'da' }, payload);
         const doc = { id: 'archive', slug: 'festivals', hasArchivePage: false };
         await createAfterChangeRevalidateHook(slug)({

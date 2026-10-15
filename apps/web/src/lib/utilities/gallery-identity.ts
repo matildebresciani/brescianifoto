@@ -1,13 +1,26 @@
-import { DateTime } from 'luxon';
 import { formatSlug } from '@/components/molecules/admin/fields/slug/formatSlug';
+import { payloadObject } from './composables';
+import {
+    type GalleryIdentityInput,
+    getGalleryExactDate,
+    isFestivalGallery,
+    isGalleryYear,
+    resolveFestivalIdentity,
+} from './festival-gallery';
 
-/** Identifies a show using its venue and calendar date in the site's time zone. */
-export const formatGalleryIdentity = (
-    title: string | null | undefined,
-    venue: string | null | undefined,
-    date: string | null | undefined,
-): { name: string; slug: string } => {
-    const showDate = date ? DateTime.fromISO(date, { zone: 'Europe/Copenhagen' }) : undefined;
-    const parts = [title?.trim(), venue?.trim(), showDate?.isValid ? showDate.toISODate() : undefined].filter(Boolean);
+/** Identifies festivals by location and edition; concerts retain their venue and exact calendar date. */
+export const formatGalleryIdentity = (gallery: GalleryIdentityInput): { name: string; slug: string } => {
+    if (isFestivalGallery(gallery)) {
+        const { festival, year, isOverview } = resolveFestivalIdentity(gallery);
+        const parts = [isOverview ? undefined : gallery.title?.trim(), festival, year].filter(Boolean);
+        return { name: parts.join(' · '), slug: formatSlug(parts.join('-')) };
+    }
+    const date =
+        gallery.datePrecision === 'year'
+            ? isGalleryYear(gallery.year)
+                ? gallery.year
+                : undefined
+            : getGalleryExactDate(gallery)?.toISODate();
+    const parts = [gallery.title?.trim(), payloadObject(gallery.location)?.name.trim(), date].filter(Boolean);
     return { name: parts.join(' · '), slug: formatSlug(parts.join('-')) };
 };

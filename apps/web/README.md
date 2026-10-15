@@ -60,6 +60,23 @@ git clone -n --depth=1 --filter=tree:0 https://github.com/payloadcms/payload my-
 
 That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
 
+## Festival galleries
+
+Set **Location** to the festival name (for example, `Copenhell`). Festival captions and URLs always use this location, never the tag name. Under Meta, choose **Exact date** or **Year only**; year-only dates require a four-digit year and do not add a day or month.
+
+Artist galleries use `Artist / Copenhell / 2026` and `artist-copenhell-2026`. A title matching the location, optionally ending in its year, is treated as an overview: `Copenhell 2026` and `copenhell-2026`. Published URLs stay stable during ordinary edits.
+
+To update existing festival URLs, run these commands from `apps/web` against a running app with this code and the same environment configuration:
+
+```bash
+pnpm festival-urls --dry-run
+pnpm festival-urls --apply
+```
+
+The default is dry-run. `NEXT_PUBLIC_SERVER_URL` selects the app to contact; the command signs its request using the configured Payload secret without transmitting that secret. The app preflights all gallery URLs and redirects in both locales before writing. Missing locations, missing years, conflicting years and URL collisions return a report and prevent all changes. Fix those entries in the CMS and repeat the dry-run. A legacy year may be recovered from the location or a matching overview title, never from tags.
+
+Apply updates URLs, preserves exact dates, recovers year-only dates when possible, creates permanent redirects for old public URLs (including inherited English URLs), and refreshes gallery, sitemap and redirect caches through the normal save hooks. Repeat runs leave already migrated galleries unchanged. Run against the local app first, then deploy this code before running against production.
+
 ## How it works
 
 The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:

@@ -25,6 +25,7 @@ import { Redirects } from './collections/tools-settings/redirects/config';
 import { Translations } from './collections/tools-settings/translations/config';
 import { Users } from './collections/tools-settings/users/config';
 import { defaultLocale, locales } from './i18n/localized-collections';
+import { festivalURLMaintenance } from './lib/endpoints/festival-url-maintenance';
 import { plugins } from './lib/plugins';
 import { getServerSideURL } from './lib/utilities/get-url';
 
@@ -87,10 +88,15 @@ export default buildConfig({
     ],
     bin: [
         {
+            scriptPath: path.resolve(dirname, 'scripts/festival-urls.ts'),
+            key: 'festival-urls',
+        },
+        {
             scriptPath: path.resolve(dirname, 'scripts/seeds/index.ts'),
             key: 'seed',
         },
     ],
+    endpoints: [festivalURLMaintenance],
     cors: [getServerSideURL()].filter(Boolean),
     globals: [Options, Translations],
     plugins: [

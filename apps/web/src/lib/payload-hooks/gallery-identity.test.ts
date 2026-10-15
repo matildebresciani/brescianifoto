@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { slugField } from '@/components/molecules/admin/fields/slug';
 import { formatGalleryIdentity } from '@/lib/utilities/gallery-identity';
 import type { Gallery } from '@/payload-types';
-import { prepareGalleryIdentity, validateGallerySlug } from './gallery-identity';
+import { prepareGalleryIdentity, validateGalleryDate, validateGallerySlug } from './gallery-identity';
 
 beforeAll(async () => {
     payload.config = await buildConfig({
@@ -80,10 +80,17 @@ describe('gallery show identity', () => {
     });
 
     it('distinguishes the same artist by venue and date and uses the Copenhagen calendar date', () => {
-        expect(formatGalleryIdentity('Fontaines D.C.', 'VEGA', '2026-10-13T23:30:00Z').slug).toBe(original.slug);
-        expect(formatGalleryIdentity(original.title, 'Royal Arena', original.date).slug).not.toBe(original.slug);
-        expect(formatGalleryIdentity(original.title, 'VEGA', '2026-10-15').slug).not.toBe(original.slug);
-        expect(formatGalleryIdentity(original.title, null, 'invalid').slug).toBe('fontaines-dc');
+        const venue = { id: 'vega', name: 'VEGA', createdAt: '', updatedAt: '' };
+        expect(formatGalleryIdentity({ ...original, location: venue, date: '2026-10-13T23:30:00Z' }).slug).toBe(
+            original.slug,
+        );
+        expect(formatGalleryIdentity({ ...original, location: { ...venue, name: 'Royal Arena' } }).slug).not.toBe(
+            original.slug,
+        );
+        expect(formatGalleryIdentity({ ...original, location: venue, date: '2026-10-15' }).slug).not.toBe(
+            original.slug,
+        );
+        expect(formatGalleryIdentity({ ...original, location: null, date: 'invalid' }).slug).toBe('fontaines-dc');
     });
 
     it('updates automatic draft slugs using unchanged fields from the existing gallery', async () => {
@@ -148,6 +155,53 @@ describe('gallery show identity', () => {
                 value: undefined,
             }),
         ).toBeUndefined();
+    });
+});
+
+describe('gallery date precision', () => {
+    it.each([null, undefined, 26, 2026.5, 10000])('rejects an invalid year-only year: %s', async (year) => {
+        const args = await hookArgs({ datePrecision: 'year', year });
+        expect(() => validateGalleryDate(args)).toThrow(ValidationError);
+    });
+
+    it('validates the effective year on partial updates without requiring a hidden exact date', async () => {
+        const args = await hookArgs({ year: 2027 }, { ...original, datePrecision: 'year', year: 2026 });
+        expect(validateGalleryDate(args)).toEqual({ year: 2027 });
+        expect(validateGalleryDate(await hookArgs({ datePrecision: 'day' }))).toEqual({ datePrecision: 'day' });
+    });
+
+    it('resolves festival relationship IDs and generates artist-location-year on partial draft saves', async () => {
+        const festival = { id: 'festivals', name: 'Festivals', slug: 'festivals', createdAt: '', updatedAt: '' };
+        const location = { id: 'copenhell', name: 'Copenhell', createdAt: '', updatedAt: '' };
+        vi.spyOn(payload, 'findByID').mockImplementation(async ({ collection }) =>
+            collection === 'locations' ? location : festival,
+        );
+        const args = await hookArgs(
+            { year: 2026 },
+            {
+                ...original,
+                name: '',
+                title: 'Neckbreakker',
+                tagGroup: 'festivals',
+                location: 'copenhell',
+                datePrecision: 'year',
+                year: 2025,
+            },
+        );
+        expect(await prepareGalleryIdentity(args)).toMatchObject({
+            slug: 'neckbreakker-copenhell-2026',
+            name: 'Neckbreakker · Copenhell · 2026',
+        });
+    });
+
+    it('uses only the edition year for festivals with an exact show date', async () => {
+        const args = await hookArgs({
+            title: 'Neckbreakker',
+            date: '2026-06-20',
+            tagGroup: { id: 'festivals', name: 'Festivals', createdAt: '', updatedAt: '' },
+            location: { id: 'copenhell', name: 'Copenhell 2026', createdAt: '', updatedAt: '' },
+        });
+        expect(await prepareGalleryIdentity(args)).toMatchObject({ slug: 'neckbreakker-copenhell-2026' });
     });
 });
 

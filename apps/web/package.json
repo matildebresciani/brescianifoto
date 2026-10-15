@@ -16,6 +16,7 @@
         "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation biome check . --fix",
         "migrate:fresh": "pnpm run payload migrate:fresh",
         "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+        "festival-urls": "pnpm payload festival-urls",
         "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
         "test:unit": "vitest --project=unit",
         "typecheck": "tsc --noEmit",
