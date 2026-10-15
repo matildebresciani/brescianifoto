@@ -9,6 +9,7 @@ import Portal from '@/components/molecules/Portal';
 import { cn } from '@/lib/utilities/ui';
 import { wrapIndex } from '@/lib/utilities/wrap-index';
 import type { Media } from '@/payload-types';
+import LightboxImage from './LightboxImage';
 
 type Props = {
     items: Media[];
@@ -18,7 +19,7 @@ type Props = {
 };
 
 const arrowClasses =
-    'focus-ring-tight flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-none border border-border-base bg-bg-subtle text-fg-base transition-colors duration-200 hover:bg-bg-pressed md:size-12';
+    'focus-ring-tight hidden size-12 shrink-0 cursor-pointer items-center justify-center rounded-none border border-border-base bg-bg-subtle text-fg-base transition-colors duration-200 hover:bg-bg-pressed md:flex';
 
 const Lightbox = ({ items, index, onClose, onNavigate }: Props) => {
     const current = items[index];
@@ -74,14 +75,11 @@ const Lightbox = ({ items, index, onClose, onNavigate }: Props) => {
                         </button>
                     )}
 
-                    <div className="flex h-full min-h-0 min-w-0 flex-1 items-center justify-center">
-                        <ImageMedia
-                            resource={current}
-                            className="h-auto max-h-full w-auto max-w-full object-contain"
-                            size="100vw"
-                            priority
-                        />
-                    </div>
+                    <LightboxImage
+                        key={`${current.id}:${index}`}
+                        image={current}
+                        onNavigate={(direction) => onNavigate(wrapIndex(index, direction, items.length))}
+                    />
 
                     {items.length > 1 && (
                         <button

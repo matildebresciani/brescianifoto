@@ -41,6 +41,23 @@ export default defineConfig({
             },
             {
                 extends: true,
+                esbuild: { jsx: 'automatic' },
+                optimizeDeps: {
+                    include: ['react/jsx-runtime', 'react/jsx-dev-runtime', '@storybook/react', 'storybook/test'],
+                },
+                test: {
+                    name: 'browser',
+                    include: ['src/**/*.stories.test.{ts,tsx}'],
+                    browser: {
+                        enabled: true,
+                        headless: true,
+                        provider: playwright({ contextOptions: { viewport: { width: 1280, height: 1000 } } }),
+                        instances: [{ browser: 'chromium' }],
+                    },
+                },
+            },
+            {
+                extends: true,
                 plugins: [
                     // The plugin will run tests for the stories defined in your Storybook config
                     // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
