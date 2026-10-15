@@ -123,6 +123,36 @@ describe('shared gallery archive pages', () => {
         expect(html).toContain('Ungrouped show');
     });
 
+    it.each(['concerts', 'band'])('renders %s newest concert first and undated last', async (tag) => {
+        const docs = [
+            { id: 'undated', title: 'Undated concert', date: null },
+            {
+                id: 'older',
+                title: 'Older concert',
+                date: '2025-10-14T00:00:00Z',
+                createdAt: '2026-10-15T00:00:00Z',
+            },
+            {
+                id: 'newest',
+                title: 'Newest concert',
+                date: '2026-10-14T00:00:00Z',
+                createdAt: '2026-10-14T00:00:00Z',
+            },
+            { id: 'invalid', title: 'Invalid concert date', date: 'invalid' },
+            { id: 'recent', title: 'Recent concert', date: '2026-06-20T00:00:00Z' },
+        ];
+        mocks.getCachedCollection.mockImplementation(({ collection }: { collection: string }) =>
+            Promise.resolve({ docs: collection === 'tag-groups' ? groups : collection === 'tags' ? tags : docs }),
+        );
+
+        const html = renderToStaticMarkup(await GalleryArchivePage({ params: params(tag) }));
+        const titles = ['Newest concert', 'Recent concert', 'Older concert', 'Undated concert', 'Invalid concert date'];
+        const positions = titles.map((title) => html.indexOf(title));
+        expect(positions.every((position) => position >= 0)).toBe(true);
+        expect(positions).toEqual([...positions].sort((first, second) => first - second));
+        expect(docs[0]?.id).toBe('undated');
+    });
+
     it('falls back to a tag when the matching group is disabled', async () => {
         expect(await getGalleryArchive('artists', 'da')).toMatchObject({ kind: 'tag', title: 'Artist tag' });
     });

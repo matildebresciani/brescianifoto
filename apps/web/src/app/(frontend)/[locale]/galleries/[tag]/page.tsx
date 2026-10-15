@@ -33,6 +33,13 @@ export default async function GalleryArchivePage({ params: paramsPromise }: Prop
         depth: 2,
         sort: '-date',
     });
+    const sortedGalleries = [...galleries.docs].sort((first, second) => {
+        const firstDate = Date.parse(first.date ?? '');
+        const secondDate = Date.parse(second.date ?? '');
+        if (Number.isNaN(firstDate)) return Number.isNaN(secondDate) ? 0 : 1;
+        if (Number.isNaN(secondDate)) return -1;
+        return secondDate - firstDate;
+    });
 
     return (
         <article>
@@ -40,7 +47,7 @@ export default async function GalleryArchivePage({ params: paramsPromise }: Prop
                 <h1 className="heading-1">{archive.title}</h1>
                 {galleries.docs.length === 0 && <p className="body-md">{t('empty')}</p>}
                 <ul className="grid gap-x-base gap-y-lg sm:grid-cols-2 lg:grid-cols-3">
-                    {galleries.docs.map((gallery) => (
+                    {sortedGalleries.map((gallery) => (
                         <li key={gallery.id}>
                             <GalleryCard data={gallery} locale={locale} />
                         </li>

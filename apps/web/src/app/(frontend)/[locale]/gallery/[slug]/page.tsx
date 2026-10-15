@@ -24,7 +24,7 @@ export default async function GallerySinglePage({ params: paramsPromise }: Props
 
     return (
         <article>
-            <GalleryHero data={gallery} locale={locale} />
+            <GalleryHero data={gallery} />
 
             <BaseBlock classNameOuter="pt-0">
                 <Gallery images={gallery.gallery} />
