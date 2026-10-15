@@ -9,7 +9,7 @@ const Logo: FC<LogoProps> = ({ className }) => {
     return (
         <span
             className={cn(
-                'inline-block max-w-full wrap-anywhere font-primary text-[length:var(--logo-font-size)] leading-none font-black tracking-[var(--logo-letter-spacing)] text-fg-base normal-case',
+                'inline-block max-w-full wrap-anywhere font-primary text-[length:var(--logo-font-size)] leading-none font-black tracking-[var(--logo-letter-spacing)] text-inherit normal-case',
                 className,
             )}
         >

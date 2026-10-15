@@ -3,13 +3,12 @@
 import { useEffect } from 'react';
 import Close from '@/components/atoms/frontend/buttons/Close';
 import ArrowIcon from '@/components/atoms/frontend/icons/ArrowIcon';
-import { ImageMedia } from '@/components/atoms/frontend/media/ImageMedia';
 import RichText from '@/components/molecules/admin/RichText';
 import Portal from '@/components/molecules/Portal';
-import { cn } from '@/lib/utilities/ui';
 import { wrapIndex } from '@/lib/utilities/wrap-index';
 import type { Media } from '@/payload-types';
 import LightboxImage from './LightboxImage';
+import LightboxThumbnails from './LightboxThumbnails';
 import ModalDialog from './ModalDialog';
 
 type Props = {
@@ -88,33 +87,7 @@ const Lightbox = ({ items, index, onClose, onNavigate }: Props) => {
                     )}
                 </div>
 
-                {items.length > 1 && (
-                    <div className="flex gap-xs overflow-x-auto p-base">
-                        {items.map((item, i) => (
-                            <button
-                                key={item.id}
-                                type="button"
-                                title={item.alt || `Photo ${i + 1}`}
-                                aria-label={`Go to photo ${i + 1}`}
-                                aria-current={i === index}
-                                className={cn(
-                                    'relative size-12 shrink-0 cursor-pointer overflow-hidden rounded-none border transition-colors duration-200 motion-reduce:transition-none md:size-14',
-                                    i === index
-                                        ? 'border-border-highlight'
-                                        : 'border-border-subtle hover:border-border-strong',
-                                )}
-                                onClick={() => onNavigate(i)}
-                            >
-                                <ImageMedia
-                                    resource={item}
-                                    fill
-                                    className="object-cover transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
-                                    size="56px"
-                                />
-                            </button>
-                        ))}
-                    </div>
-                )}
+                {items.length > 1 && <LightboxThumbnails items={items} index={index} onNavigate={onNavigate} />}
             </ModalDialog>
         </Portal>
     );

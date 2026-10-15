@@ -160,26 +160,14 @@ body:has(.modal--open) {
 
 @layer base {
     .logo-link {
-        position: relative;
         display: inline-block;
+        color: var(--fg-base);
+        transition: color 200ms ease;
     }
 
-    .logo-link::after {
-        position: absolute;
-        right: 0;
-        bottom: -6px;
-        left: 0;
-        height: 1px;
-        background: var(--fg-base);
-        content: "";
-        transform: scaleX(0);
-        transform-origin: left;
-        transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .logo-link:hover::after,
-    .logo-link:focus-visible::after {
-        transform: scaleX(1);
+    .logo-link:hover,
+    .logo-link:focus-visible {
+        color: var(--fg-highlight);
     }
 
     :where(
@@ -257,7 +245,7 @@ body:has(.modal--open) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .logo-link::after {
+    .logo-link {
         transition: none;
     }
 

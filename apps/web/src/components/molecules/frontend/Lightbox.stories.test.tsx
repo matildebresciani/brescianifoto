@@ -112,13 +112,45 @@ afterEach(async () => {
 });
 
 describe('desktop lightbox', () => {
+    it('drags the thumbnail strip both ways without selecting a photo, then allows clicks and keyboard selection', async () => {
+        await ManyPhotos.run();
+        await expectPhoto('Concert stage');
+        const firstThumbnail = page.getByRole('button', { name: 'Go to photo 1', exact: true });
+        const strip = firstThumbnail.element().parentElement;
+        if (!strip) throw new Error('Thumbnail strip is missing');
+        expect(strip.scrollWidth).toBeGreaterThan(strip.clientWidth);
+        expect(getComputedStyle(strip).scrollBehavior).toBe('auto');
+
+        await userEvent.dragAndDrop(strip, strip, {
+            sourcePosition: { x: 340, y: 28 },
+            targetPosition: { x: 140, y: 28 },
+        });
+        await expect.poll(() => strip.scrollLeft).toBeGreaterThan(150);
+        await expect.element(firstThumbnail).toHaveAttribute('aria-current', 'true');
+        expect(getComputedStyle(strip).cursor).toBe('grab');
+
+        await userEvent.dragAndDrop(strip, strip, {
+            sourcePosition: { x: 140, y: 28 },
+            targetPosition: { x: 340, y: 28 },
+        });
+        await expect.poll(() => strip.scrollLeft).toBe(0);
+        await expect.element(firstThumbnail).toHaveAttribute('aria-current', 'true');
+
+        const secondThumbnail = page.getByRole('button', { name: 'Go to photo 2', exact: true });
+        await secondThumbnail.click();
+        await expect.element(secondThumbnail).toHaveAttribute('aria-current', 'true');
+        firstThumbnail.element().focus();
+        await userEvent.keyboard('{Enter}');
+        await expect.element(firstThumbnail).toHaveAttribute('aria-current', 'true');
+    });
+
     it('traps focus, locks the background, and restores the opener on Escape', async () => {
         await WithOpener.run();
         const opener = page.getByRole('button', { name: 'Open viewer' }).element();
         await userEvent.click(opener);
         await expect.element(page.getByRole('dialog')).toBeVisible();
-        expect(document.body.style.overflow).toBe('hidden');
-        expect(opener.closest('[inert]')).not.toBeNull();
+        await expect.poll(() => document.body.style.overflow).toBe('hidden');
+        await expect.poll(() => opener.closest('[inert]')).not.toBeNull();
         await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
         expect(document.activeElement?.getAttribute('aria-label')).toBe('Go to photo 2');
         await userEvent.keyboard('{Tab}');
@@ -236,6 +268,12 @@ describe('mobile lightbox', () => {
         await expect.poll(() => getPhoto().getBoundingClientRect().width).toBeCloseTo(viewportRect.width);
         await page.getByRole('button', { name: 'Go to photo 2' }).click();
         await expectPhoto('Artist portrait');
+        await expect
+            .poll(() => {
+                const rect = getPhoto().getBoundingClientRect();
+                return rect.width / rect.height;
+            })
+            .toBeCloseTo(900 / 1200);
         const photoRect = getPhoto().getBoundingClientRect();
         expect(photoRect.width).toBeLessThanOrEqual(viewportRect.width);
         expect(photoRect.height).toBeLessThanOrEqual(viewportRect.height);

@@ -45,7 +45,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 export const SinglePhoto: Story = { args: { items: [portrait] } };
 export const ManyPhotos: Story = {
-    args: { items: Array.from({ length: 12 }, (_, index) => ({ ...landscape, id: `photo-${index}` })) },
+    args: { items: Array.from({ length: 24 }, (_, index) => ({ ...landscape, id: `photo-${index}` })) },
 };
 
 export const WithOpener: Story = {
