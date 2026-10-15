@@ -45,11 +45,7 @@
     }
 
     .base-block-outer {
-        padding-bottom: 2rem;
-
-        &:not(:first-of-type) {
-            padding-top: 2rem;
-        }
+        padding-block: var(--space-lg);
     }
 
     .base-block {
@@ -63,11 +59,7 @@
 
     @media (min-width: 768px) {
         .base-block-outer {
-            padding-bottom: 3rem;
-
-            &:not(:first-of-type) {
-                padding-top: 3rem;
-            }
+            padding-block: var(--space-xl);
         }
 
         .base-block {

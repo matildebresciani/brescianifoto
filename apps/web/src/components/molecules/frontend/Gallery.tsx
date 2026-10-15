@@ -64,11 +64,16 @@ const Gallery = ({ images, className, priorityCount = 3 }: Props) => {
                                 animate={shouldReduceMotion ? { opacity: 1, y: 0 } : undefined}
                                 whileInView="visible"
                                 viewport={{ once: true, amount: 0.2 }}
-                                transition={{ duration: 0.6, ease: 'easeOut' }}
+                                transition={{
+                                    duration: shouldReduceMotion ? 0 : 0.6,
+                                    delay: shouldReduceMotion ? 0 : (index % columnCount) * 0.06,
+                                    ease: [0.22, 1, 0.36, 1],
+                                }}
                             >
                                 <button
                                     type="button"
-                                    className="group block w-full cursor-pointer overflow-hidden bg-bg-subtle text-left"
+                                    className="focus-ring-tight group block w-full cursor-pointer overflow-hidden bg-bg-subtle text-left"
+                                    aria-label={`Open photo ${index + 1} of ${items.length}${item.alt ? `: ${item.alt}` : ''}`}
                                     style={{
                                         aspectRatio:
                                             item.width && item.height ? `${item.width} / ${item.height}` : undefined,
@@ -77,7 +82,7 @@ const Gallery = ({ images, className, priorityCount = 3 }: Props) => {
                                 >
                                     <ImageMedia
                                         resource={item}
-                                        className="w-full h-auto align-bottom transition-opacity duration-300 ease-out group-hover:opacity-80"
+                                        className="w-full h-auto align-bottom transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
                                         size={`(min-width: ${cssVariables.breakpoints.lg}px) 33vw, 50vw`}
                                         priority={isAboveFold}
                                         fetchPriority={isAboveFold ? 'high' : undefined}

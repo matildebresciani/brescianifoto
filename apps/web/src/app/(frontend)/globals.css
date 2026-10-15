@@ -158,6 +158,29 @@ body:has(.modal--open) {
     overflow: hidden;
 }
 
+@layer base {
+    :where(
+            a[href],
+            button,
+            summary,
+            select,
+            label[for],
+            input[type="button"],
+            input[type="submit"],
+            input[type="reset"],
+            input[type="checkbox"],
+            input[type="radio"],
+            input[type="file"],
+            input[type="range"],
+            input[type="image"],
+            input[type="color"],
+            [role="button"],
+            [role="link"]
+        ):not(:disabled):not([aria-disabled="true"]) {
+        cursor: pointer;
+    }
+}
+
 .focus-ring,
 .focus-ring-tight {
     outline: 0 solid transparent;
@@ -175,4 +198,45 @@ body:has(.modal--open) {
 
 .focus-ring-tight:focus-visible {
     outline-offset: 2px;
+}
+
+/* Contact links share the uppercase mono treatment used for photographic metadata. */
+.footer-contact {
+    font-family: var(--font-metadata);
+    font-size: var(--text-metadata);
+    font-weight: var(--weight-regular);
+    line-height: var(--leading-ui);
+    text-transform: uppercase;
+}
+
+.wysiwyg a[href$="/contact"],
+.wysiwyg a[href^="mailto:"],
+.wysiwyg a[href*="instagram.com/"] {
+    font-family: var(--font-metadata);
+    font-size: var(--text-metadata);
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+}
+
+.skip-link {
+    position: fixed;
+    top: var(--space-xs);
+    left: var(--space-base);
+    z-index: 100;
+    padding: var(--space-base);
+    background: var(--bg-base);
+    color: var(--fg-base);
+    transform: translateY(-200%);
+}
+
+.skip-link:focus {
+    transform: none;
+    outline: 2px solid var(--border-focused);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    html[data-scroll-behavior="smooth"] {
+        scroll-behavior: auto;
+    }
 }

@@ -47,3 +47,19 @@ export const SinglePhoto: Story = { args: { items: [portrait] } };
 export const ManyPhotos: Story = {
     args: { items: Array.from({ length: 12 }, (_, index) => ({ ...landscape, id: `photo-${index}` })) },
 };
+
+export const WithOpener: Story = {
+    render: function Viewer(args) {
+        const [isOpen, setIsOpen] = useState(false);
+        const [index, setIndex] = useState(0);
+        return (
+            <>
+                <button type="button" onClick={() => setIsOpen(true)}>
+                    Open viewer
+                </button>
+                <a href="#outside">Outside link</a>
+                {isOpen && <Lightbox {...args} index={index} onNavigate={setIndex} onClose={() => setIsOpen(false)} />}
+            </>
+        );
+    },
+};

@@ -1,34 +1,39 @@
-import PayloadLink from '@/components/atoms/frontend/links/PayloadLink';
+import Link from 'next/link';
 import { ImageMedia } from '@/components/atoms/frontend/media/ImageMedia';
 import RichText from '@/components/molecules/admin/RichText';
 import type { BC } from '@/lib/types/block-props';
+import { getLinkTarget } from '@/lib/utilities/composables';
+import { formatLink } from '@/lib/utilities/format-link';
 import { cn } from '@/lib/utilities/ui';
 import type { TextImage as TextImageProps } from '@/payload-types';
 import BaseBlock from '../base-block/BaseBlock';
 
 const TextImageBlock: BC<TextImageProps> = ({ block, locale }) => {
     const { order, image, richText, addLink, link } = block;
+    const href = formatLink(link, locale);
 
     return (
         <BaseBlock>
-            <div className="oakgrid">
+            <div className="grid items-center gap-lg lg:grid-cols-2 lg:gap-xl">
                 <div
                     className={cn(
-                        'col-span-12 relative min-h-[400px] max-h-[600px] lg:sticky top-6 lg:col-span-6 lg:min-h-[500px] xl:col-span-5',
-                        order === 'image-right' && 'xl:col-start-8',
+                        'relative aspect-4/5 w-full overflow-hidden bg-bg-subtle',
+                        order === 'image-right' && 'lg:col-start-2 lg:row-start-1',
                     )}
                 >
-                    <ImageMedia resource={image} className="object-cover absolute h-full w-full rounded-2xl" />
+                    <ImageMedia resource={image} fill className="object-cover" size="(min-width: 1024px) 50vw, 100vw" />
                 </div>
-                <div
-                    className={cn(
-                        'col-span-12 py-16 lg:col-span-6',
-                        order === 'image-right' && 'lg:order-first',
-                        order === 'image-left' && 'xl:col-start-7 xl:col-span-5',
+                <div className={cn('min-w-0', order === 'image-right' && 'lg:order-first')}>
+                    {richText && <RichText data={richText} enableGutter={false} />}
+                    {addLink && href && (
+                        <Link
+                            href={href}
+                            target={getLinkTarget(link)}
+                            className="focus-ring ui-text mt-md inline-block underline underline-offset-4"
+                        >
+                            {link?.label}
+                        </Link>
                     )}
-                >
-                    {richText && <RichText data={richText} />}
-                    {addLink && <PayloadLink link={link} locale={locale} className="md:mt-10" />}
                 </div>
             </div>
         </BaseBlock>

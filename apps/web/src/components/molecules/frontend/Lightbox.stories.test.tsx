@@ -18,7 +18,7 @@ vi.mock('next/image', () => ({
     ),
 }));
 
-const { Default, SinglePhoto, ManyPhotos } = composeStories(stories);
+const { Default, SinglePhoto, ManyPhotos, WithOpener } = composeStories(stories);
 
 function getViewport() {
     const viewport = document.querySelector('button[aria-pressed], button[aria-label="Photo viewer"]');
@@ -112,6 +112,24 @@ afterEach(async () => {
 });
 
 describe('desktop lightbox', () => {
+    it('traps focus, locks the background, and restores the opener on Escape', async () => {
+        await WithOpener.run();
+        const opener = page.getByRole('button', { name: 'Open viewer' }).element();
+        await userEvent.click(opener);
+        await expect.element(page.getByRole('dialog')).toBeVisible();
+        expect(document.body.style.overflow).toBe('hidden');
+        expect(opener.closest('[inert]')).not.toBeNull();
+        await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
+        expect(document.activeElement?.getAttribute('aria-label')).toBe('Go to photo 2');
+        await userEvent.keyboard('{Tab}');
+        expect(document.activeElement?.getAttribute('aria-label')).toBe('Close');
+        await userEvent.keyboard('{Escape}');
+        await expect.element(page.getByRole('dialog')).not.toBeInTheDocument();
+        expect(opener.closest('[inert]')).toBeNull();
+        expect(document.activeElement).toBe(opener);
+        expect(document.body.style.overflow).not.toBe('hidden');
+    });
+
     it('toggles zoom, pans within bounds without navigating, and suppresses the drag click', async () => {
         await Default.run();
         await expectPhoto('Concert stage');

@@ -11,7 +11,10 @@ const Close = ({ onClick, className }: Props) => {
             type="button"
             title="Close"
             aria-label="Close"
-            className={cn('focus-ring-tight group relative size-10 cursor-pointer', className)}
+            className={cn(
+                'focus-ring-tight group relative size-12 cursor-pointer rounded-full border border-border-base',
+                className,
+            )}
             onClick={() => onClick()}
         >
             <span className="absolute h-[1px] w-5 bg-fg-base -translate-x-1/2 -translate-y-1/2 rotate-45 transition-colors duration-200 group-hover:bg-fg-highlight" />

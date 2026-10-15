@@ -56,10 +56,11 @@ export const generateMetadata = async ({ params: paramsPromise }: Props): Promis
 
     const page = await isHomepage(slug, locale);
 
-    if (!page?.slug) return {};
+    if (!page) return {};
 
-    const metadata = await generateEntryMetadata(page.slug, collection, locale);
+    const metadata = await generateEntryMetadata(page.slug ?? slug, collection, locale);
     if (slug === '' && !page.meta?.title?.trim()) metadata.title = presentationCopy.homepageTitle;
+    if (slug === '') metadata.alternates = { canonical: locale === defaultLocale ? '/' : `/${locale}` };
     return metadata;
 };
 

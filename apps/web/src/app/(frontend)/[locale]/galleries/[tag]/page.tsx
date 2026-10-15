@@ -41,13 +41,13 @@ export default async function GalleryArchivePage({ params: paramsPromise }: Prop
 
     return (
         <article>
-            <BaseBlock className="mt-md flex flex-col gap-md md:gap-lg lg:mt-2xl">
+            <BaseBlock className="flex flex-col gap-md md:gap-lg">
                 <h1 className="heading-1">{archive.title}</h1>
                 {galleries.docs.length === 0 && <p className="body-md">{t('empty')}</p>}
                 <ul className="grid gap-x-base gap-y-lg sm:grid-cols-2 lg:grid-cols-3">
-                    {sortedGalleries.map((gallery) => (
+                    {sortedGalleries.map((gallery, index) => (
                         <li key={gallery.id}>
-                            <GalleryCard data={gallery} locale={locale} />
+                            <GalleryCard data={gallery} locale={locale} revealIndex={index} />
                         </li>
                     ))}
                 </ul>

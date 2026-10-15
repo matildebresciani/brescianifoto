@@ -60,8 +60,13 @@ export default async function RootLayout({ children, params }: Props) {
             <body>
                 <StartBodyScripts scripts={options.scriptInjection} />
                 <Providers>
+                    <a href="#main-content" className="skip-link ui-text">
+                        Skip to content
+                    </a>
                     <Header locale={locale} />
-                    {children}
+                    <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
+                        {children}
+                    </main>
                     <Footer locale={locale} />
                 </Providers>
                 <EndBodyScripts scripts={options.scriptInjection} />

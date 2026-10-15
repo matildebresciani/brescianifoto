@@ -45,3 +45,13 @@ export const formatGalleryCardCaption = (gallery: GalleryIdentityInput): string 
     if (isOverview) return [festival, year].filter(Boolean).join(' ');
     return [gallery.title, festival, year].filter(Boolean).join(' / ');
 };
+
+/** Keeps artist titles in Archivo and photographic details in the metadata row. */
+export const formatGalleryCardDetails = (gallery: Gallery): string => {
+    const count = `${gallery.gallery.length} ${gallery.gallery.length === 1 ? 'image' : 'images'}`;
+    if (!isFestivalGallery(gallery)) {
+        return [payloadObject(gallery.location)?.name, formatGalleryDate(gallery), count].filter(Boolean).join(' · ');
+    }
+    const { festival, year, isOverview } = resolveFestivalIdentity(gallery);
+    return [!isOverview && festival, !isOverview && year, count].filter(Boolean).join(' · ');
+};

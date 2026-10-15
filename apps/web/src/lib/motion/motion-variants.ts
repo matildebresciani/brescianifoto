@@ -41,7 +41,7 @@ export const topDownToggle = {
 
 export const downUpToggle = {
     hidden: {
-        y: 30,
+        y: 16,
         opacity: 0,
     },
     visible: {
@@ -49,7 +49,7 @@ export const downUpToggle = {
         opacity: 1,
     },
     exit: {
-        y: 30,
+        y: 16,
         opacity: 0,
     },
 };

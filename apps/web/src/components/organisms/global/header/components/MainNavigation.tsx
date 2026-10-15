@@ -27,12 +27,11 @@ const MainNavigation = ({ data, locale }: Props) => {
                         key={item.id ?? i}
                         href={itemLink}
                         className={cn(
-                            'focus-ring eyebrow relative py-micro text-fg-base transition-colors after:absolute after:-bottom-1 after:left-0 after:h-px after:bg-fg-highlight after:transition-all after:duration-300 after:content-[""]',
-                            isActive
-                                ? 'text-fg-highlight after:w-full'
-                                : 'after:w-0 hover:text-fg-highlight hover:after:w-full focus-visible:text-fg-highlight focus-visible:after:w-full',
+                            'focus-ring eyebrow relative py-micro text-fg-base after:absolute after:-bottom-1 after:left-0 after:h-px after:bg-fg-base after:transition-all after:duration-300 motion-reduce:after:transition-none after:content-[""]',
+                            isActive ? 'after:w-full' : 'after:w-0 hover:after:w-full focus-visible:after:w-full',
                         )}
                         target={getLinkTarget(item.link)}
+                        aria-current={isActive ? 'page' : undefined}
                     >
                         {item.link?.label}
                     </Link>
