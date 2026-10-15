@@ -23,6 +23,11 @@ export const payloadGallery = (props: PayloadBaseProps = {}): Field => {
         label: 'Gallery',
         relationTo: 'media',
         hasMany: true,
+        admin: {
+            components: {
+                Field: '@/components/molecules/admin/photos/GalleryField#GalleryField',
+            },
+        },
         localized,
         required,
     };

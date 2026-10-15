@@ -86,6 +86,9 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.2.4
         version: 1.2.4(@types/react@19.0.7)(react@19.2.4)
+      '@sitebytom/payload-media-gallery':
+        specifier: 1.2.0
+        version: 1.2.0(@payloadcms/ui@3.79.0(@types/react@19.0.7)(monaco-editor@0.52.2)(next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.93.2))(payload@3.79.0(graphql@16.11.0)(typescript@5.7.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.7.3))(next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.93.2))(payload@3.79.0(graphql@16.11.0)(typescript@5.7.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-query':
         specifier: ^5.90.2
         version: 5.90.2(react@19.2.4)
@@ -3036,6 +3039,20 @@ packages:
 
   '@schummar/icu-type-parser@1.21.5':
     resolution: {integrity: sha512-bXHSaW5jRTmke9Vd0h5P7BtWZG9Znqb8gSDxZnxaGSJnGwPLDPfS+3g0BKzeWqzgZPsIVZkM7m2tbo18cm5HBw==}
+
+  '@sitebytom/payload-media-gallery@1.2.0':
+    resolution: {integrity: sha512-J5bTPJJhgWu/oh8eF2HBthYZcEBX0v71HvSGw6Uhk8AM8tlNqCRno3nri30Y/lxUYGYWc3bBJi9RfRS7vtkomg==}
+    engines: {node: ^18.20.2 || >=20.9.0, pnpm: ^9 || ^10}
+    peerDependencies:
+      '@payloadcms/ui': ^3.73.0
+      next: ^15.0.0 || ^16.0.0
+      payload: ^3.73.0
+      react: ^18.0.0 || ^19.0.0
+
+  '@sitebytom/use-zoom-pan@1.0.5':
+    resolution: {integrity: sha512-CQTGVHAWWkWKR/eiEZEzmKcPqFQcHFkkJnulKBt2rxclxqaB+RVseENlPhWeN8bcyQXXNrsqIsYaiPtUoaCnBQ==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   '@smithy/abort-controller@4.2.0':
     resolution: {integrity: sha512-PLUYa+SUKOEZtXFURBu/CNxlsxfaFGxSBPcStL13KpVeVWIfdezWyDqkz7iDLmwnxojXD0s5KzuB5HGHvt4Aeg==}
@@ -10751,6 +10768,23 @@ snapshots:
     optional: true
 
   '@schummar/icu-type-parser@1.21.5': {}
+
+  '@sitebytom/payload-media-gallery@1.2.0(@payloadcms/ui@3.79.0(@types/react@19.0.7)(monaco-editor@0.52.2)(next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.93.2))(payload@3.79.0(graphql@16.11.0)(typescript@5.7.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.7.3))(next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.93.2))(payload@3.79.0(graphql@16.11.0)(typescript@5.7.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      '@dnd-kit/core': 6.3.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@dnd-kit/sortable': 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
+      '@dnd-kit/utilities': 3.2.2(react@19.2.4)
+      '@payloadcms/ui': 3.79.0(@types/react@19.0.7)(monaco-editor@0.52.2)(next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.93.2))(payload@3.79.0(graphql@16.11.0)(typescript@5.7.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.7.3)
+      '@sitebytom/use-zoom-pan': 1.0.5(react@19.2.4)
+      next: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.93.2)
+      payload: 3.79.0(graphql@16.11.0)(typescript@5.7.3)
+      react: 19.2.4
+    transitivePeerDependencies:
+      - react-dom
+
+  '@sitebytom/use-zoom-pan@1.0.5(react@19.2.4)':
+    dependencies:
+      react: 19.2.4
 
   '@smithy/abort-controller@4.2.0':
     dependencies:

@@ -1,0 +1,108 @@
+@reference "../../../../lib/styles/tailwind.css";
+
+.photo-gallery-field {
+    --photo-grid-min: 14rem;
+    --photo-preview-height: 14rem;
+    --photo-ui-size: clamp(0.75rem, 0.7143rem + 0.1786vw, 0.875rem);
+}
+
+.photo-view-toolbar {
+    @apply mb-4 flex flex-wrap items-center justify-between gap-4;
+    font-size: var(--photo-ui-size);
+}
+
+.photo-view-toolbar p {
+    @apply m-0;
+    color: var(--theme-elevation-700);
+}
+
+.photo-view-toggle {
+    @apply m-0 ml-auto inline-flex min-w-0 shrink-0 gap-1 border-0 p-0;
+}
+
+.photo-view-toggle button {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-[2px] border border-solid bg-transparent px-4 py-2;
+    border-color: var(--theme-border-color);
+    color: var(--theme-text);
+    font: inherit;
+}
+
+.photo-view-toggle button[aria-pressed="true"],
+.photo-view-toggle button:hover {
+    background: var(--theme-elevation-150);
+}
+
+.photo-view-toggle button[aria-pressed="true"] {
+    border-color: var(--theme-text);
+}
+
+.photo-view-toggle button:focus-visible {
+    outline: var(--accessibility-outline);
+    outline-offset: var(--accessibility-outline-offset);
+}
+
+.photo-gallery-field[data-photo-view="grid"] .upload--has-many__draggable-rows {
+    @apply m-0 grid list-none gap-4 p-0;
+    grid-template-columns: repeat(
+            auto-fill,
+            minmax(min(100%, var(--photo-grid-min)), 1fr)
+        );
+}
+
+.photo-gallery-field[data-photo-view="grid"] .upload--has-many__dragItem {
+    @apply relative min-w-0;
+}
+
+.photo-gallery-field[data-photo-view="grid"] .upload-field-card {
+    @apply relative block h-full rounded-none p-3;
+}
+
+.photo-gallery-field[data-photo-view="grid"] .upload--has-many__drag {
+    @apply absolute left-4 top-4 z-10 flex size-8 items-center justify-center rounded-[2px] border border-solid;
+    background: var(--theme-elevation-50);
+    border-color: var(--theme-border-color);
+    color: var(--theme-text);
+    touch-action: none;
+}
+
+.photo-gallery-field[data-photo-view="grid"] .upload-relationship-details,
+.photo-gallery-field[data-photo-view="grid"]
+    .upload-relationship-details__imageAndDetails {
+    @apply block;
+}
+
+.photo-gallery-field[data-photo-view="grid"] .thumbnail {
+    @apply relative mb-3 block w-full min-h-0 max-h-none overflow-hidden rounded-none;
+    height: var(--photo-preview-height);
+    background: var(--theme-elevation-100);
+}
+
+.photo-gallery-field[data-photo-view="grid"] .thumbnail img {
+    @apply size-full object-contain;
+}
+
+.photo-gallery-field[data-photo-view="grid"]
+    .upload-relationship-details__details {
+    @apply m-0 min-h-12 overflow-visible pr-16;
+}
+
+.photo-gallery-field[data-photo-view="grid"]
+    .upload-relationship-details__filename {
+    @apply whitespace-normal;
+    overflow-wrap: anywhere;
+    font-size: var(--photo-ui-size);
+    line-height: 1.4;
+}
+
+.photo-gallery-field[data-photo-view="grid"]
+    .upload-relationship-details__actions {
+    @apply absolute bottom-3 right-3;
+}
+
+.photo-gallery-field[data-photo-view="list"] .upload--has-many .thumbnail {
+    @apply size-20 min-h-0 max-h-none rounded-none;
+}
+
+.photo-gallery-field[data-photo-view="list"] .upload--has-many .thumbnail img {
+    @apply object-contain;
+}

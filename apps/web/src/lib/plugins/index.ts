@@ -1,6 +1,7 @@
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud';
 import { seoPlugin } from '@payloadcms/plugin-seo';
 import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types';
+import { mediaGalleryPlugin } from '@sitebytom/payload-media-gallery';
 import type { Plugin } from 'payload';
 
 import { isLocale } from '@/i18n/localized-collections';
@@ -21,6 +22,17 @@ const generateURL: GenerateURL<Post | Page> = ({ doc, locale }) => {
 };
 
 export const plugins: Plugin[] = [
+    mediaGalleryPlugin({
+        collections: ['media'],
+        defaultView: 'grid',
+        layouts: {
+            grid: { enabled: true, footer: 'always' },
+            justified: false,
+            masonry: false,
+        },
+        lightbox: true,
+        edit: true,
+    }),
     seoPlugin({
         generateTitle,
         generateURL,
