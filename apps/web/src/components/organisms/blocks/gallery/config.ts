@@ -12,10 +12,19 @@ export const Gallery = createBlock('gallery', {
             name: 'selectionMode',
             label: 'Photo selection',
             type: 'radio',
-            defaultValue: 'random',
+            // A dynamic default keeps MongoDB from applying Random to legacy stored blocks.
+            defaultValue: () => 'random',
             hooks: {
                 // Documents saved before this field existed must retain their manual selection.
                 afterRead: [({ value }) => value ?? 'custom'],
+                beforeValidate: [
+                    ({ value, siblingData, previousSiblingDoc }) => {
+                        // Payload supplies new defaults when an omitted field is saved in another locale.
+                        if (siblingData.selectionMode !== undefined || previousSiblingDoc?.blockType !== 'gallery')
+                            return value;
+                        return previousSiblingDoc.selectionMode ?? 'custom';
+                    },
+                ],
             },
             options: [
                 { label: 'Random', value: 'random' },
