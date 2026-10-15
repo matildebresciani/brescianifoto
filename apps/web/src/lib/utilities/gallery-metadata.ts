@@ -26,7 +26,7 @@ export const formatGalleryMetadata = (
     const count = gallery.gallery.length;
     return [venue, formatGalleryDate(gallery), `${count} ${count === 1 ? 'image' : 'images'}`]
         .filter(Boolean)
-        .join(' · ');
+        .join(' / ');
 };
 
 /** Displays only the precision selected in the editor, even if an older exact date is retained. */

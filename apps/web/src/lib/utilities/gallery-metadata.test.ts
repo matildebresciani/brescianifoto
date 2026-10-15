@@ -11,7 +11,7 @@ describe('gallery presentation metadata', () => {
                 date: '2026-04-26T12:00:00Z',
                 gallery: ['one', 'two'],
             }),
-        ).toBe('Royal Arena, Copenhagen · 26 Apr 2026 · 2 images');
+        ).toBe('Royal Arena, Copenhagen / 26 Apr 2026 / 2 images');
     });
     it('omits unresolved venues and invalid dates, retaining singular counts', () => {
         expect(formatGalleryMetadata({ location: 'unpopulated', date: '2026-02-30', gallery: ['one'] })).toBe(
@@ -134,7 +134,7 @@ describe('compact gallery card captions', () => {
         };
         expect(formatGalleryCardCaption(gallery)).toBe('Neckbreakker / Copenhell / 2026');
         expect(formatGalleryIdentity(gallery).slug).toBe('neckbreakker-copenhell-2026');
-        expect(formatGalleryMetadata(gallery)).toBe('Copenhell · 2026 · 1 image');
+        expect(formatGalleryMetadata(gallery)).toBe('Copenhell / 2026 / 1 image');
     });
 
     it('separates location years once and reports conflicting legacy sources', () => {
