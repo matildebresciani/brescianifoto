@@ -17,6 +17,7 @@
         "migrate:fresh": "pnpm run payload migrate:fresh",
         "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
         "festival-urls": "pnpm payload festival-urls",
+        "portfolio-setup": "pnpm payload portfolio-setup",
         "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
         "test:unit": "vitest --project=unit",
         "typecheck": "tsc --noEmit",

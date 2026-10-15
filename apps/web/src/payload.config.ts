@@ -26,6 +26,7 @@ import { Translations } from './collections/tools-settings/translations/config';
 import { Users } from './collections/tools-settings/users/config';
 import { defaultLocale, locales } from './i18n/localized-collections';
 import { festivalURLMaintenance } from './lib/endpoints/festival-url-maintenance';
+import { portfolioSetup } from './lib/endpoints/portfolio-setup';
 import { plugins } from './lib/plugins';
 import { getServerSideURL } from './lib/utilities/get-url';
 
@@ -88,6 +89,10 @@ export default buildConfig({
     ],
     bin: [
         {
+            scriptPath: path.resolve(dirname, 'scripts/portfolio-setup.ts'),
+            key: 'portfolio-setup',
+        },
+        {
             scriptPath: path.resolve(dirname, 'scripts/festival-urls.ts'),
             key: 'festival-urls',
         },
@@ -96,7 +101,7 @@ export default buildConfig({
             key: 'seed',
         },
     ],
-    endpoints: [festivalURLMaintenance],
+    endpoints: [festivalURLMaintenance, portfolioSetup],
     cors: [getServerSideURL()].filter(Boolean),
     globals: [Options, Translations],
     plugins: [

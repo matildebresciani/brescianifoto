@@ -338,3 +338,18 @@ You can also deploy your app manually, check out the [deployment documentation](
 ## Questions
 
 If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+
+## Portfolio content setup
+
+For a local preview on port 3001, start the app with `NEXT_PUBLIC_SERVER_URL=http://localhost:3001 pnpm dev --port 3001` so image optimization uses the same origin.
+
+After deploying the portfolio changes, initialize the saved automatic photo mix and editable starter pages against the running app:
+
+```bash
+pnpm portfolio-setup --url http://localhost:3001
+pnpm portfolio-setup --url http://localhost:3001 --apply
+```
+
+Use the deployment URL for a production run and configure the matching Payload secret locally. The default command is read-only; requests are signed without sending the secret. Apply sets the confirmed email and Instagram text link in Options, initializes each locale's automatic mix, supplies temporary About/Contact text and existing images, fills missing browsing groups/empty menus, and publishes a gallery-only homepage. Review the dry run first. Existing populated About/Contact pages and custom gallery selections are preserved. Replace the temporary text and photos in Payload whenever ready. Legacy boilerplate social links are replaced with the confirmed Instagram account when their old nested schema requires migration.
+
+A gallery block's **Random** mode uses up to 24 deduplicated photos, sampled across public galleries. Its saved order changes only when a previously unseen gallery first becomes public. Reloads, edits, deployments, and republishing known galleries preserve it. Deleted or no-longer-public photos are omitted without refilling the mix. **Custom** mode preserves manual ordering and falls back to the same mix when empty. Existing blocks without a mode continue as Custom; new blocks default to Random. Switching modes retains the manual selection.
