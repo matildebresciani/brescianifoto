@@ -14,7 +14,7 @@ export const payloadRichText = (props: PayloadNamingProps = {}): Field => {
             features: ({ rootFeatures }) => {
                 return [
                     ...rootFeatures,
-                    HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
+                    HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
                 ];
