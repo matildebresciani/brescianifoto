@@ -20,7 +20,7 @@ type Props = {
 };
 
 const arrowClasses =
-    'focus-ring-tight hidden size-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border-base bg-bg-subtle text-fg-base transition-colors duration-200 hover:bg-bg-pressed md:flex';
+    'focus-ring-tight hidden size-12 shrink-0 cursor-pointer items-center justify-center rounded-none border border-border-base bg-bg-subtle text-fg-base transition-colors duration-200 hover:bg-bg-pressed motion-reduce:transition-none md:flex';
 
 const Lightbox = ({ items, index, onClose, onNavigate }: Props) => {
     const current = items[index];
@@ -98,7 +98,7 @@ const Lightbox = ({ items, index, onClose, onNavigate }: Props) => {
                                 aria-label={`Go to photo ${i + 1}`}
                                 aria-current={i === index}
                                 className={cn(
-                                    'relative size-12 shrink-0 cursor-pointer overflow-hidden rounded-none border transition-colors duration-200 md:size-14',
+                                    'relative size-12 shrink-0 cursor-pointer overflow-hidden rounded-none border transition-colors duration-200 motion-reduce:transition-none md:size-14',
                                     i === index
                                         ? 'border-border-highlight'
                                         : 'border-border-subtle hover:border-border-strong',
@@ -108,7 +108,7 @@ const Lightbox = ({ items, index, onClose, onNavigate }: Props) => {
                                 <ImageMedia
                                     resource={item}
                                     fill
-                                    className="object-cover transition-opacity duration-200 hover:opacity-80"
+                                    className="object-cover transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
                                     size="56px"
                                 />
                             </button>

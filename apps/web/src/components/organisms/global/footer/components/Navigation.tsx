@@ -27,10 +27,11 @@ const Navigation = ({ data }: Props) => {
                             <Link
                                 href={itemLink}
                                 className={cn(
-                                    'focus-ring ui-text w-fit transition-colors hover:text-fg-base',
-                                    isActive && 'text-fg-highlight',
+                                    'focus-ring ui-text w-fit text-fg-base underline-offset-4 hover:underline focus-visible:underline',
+                                    isActive && 'underline',
                                 )}
                                 target={getLinkTarget(item.link)}
+                                aria-current={isActive ? 'page' : undefined}
                             >
                                 {item.link?.label}
                             </Link>

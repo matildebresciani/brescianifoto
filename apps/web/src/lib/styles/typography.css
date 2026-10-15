@@ -1,5 +1,24 @@
 @layer base {
     h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .heading-1,
+    .heading-2,
+    .heading-3,
+    .heading-4,
+    .heading-5,
+    .heading-6,
+    .statement,
+    .eyebrow,
+    a,
+    a:is(.body-xs, .body-sm, .body-md, .body-lg, .caption, .metadata) {
+        color: var(--fg-base);
+    }
+
+    h1,
     .heading-1,
     .statement {
         font-family: var(--font-statement);
@@ -126,6 +145,11 @@
     .bg-paper,
     .bg-bg-highlight {
         --fg-faded: var(--fog);
+    }
+
+    /* Linked captions and copy use the link color rather than muted body roles. */
+    a :is(.body-xs, .body-sm, .body-md, .body-lg, .caption, .metadata) {
+        color: inherit;
     }
 
     .wysiwyg {

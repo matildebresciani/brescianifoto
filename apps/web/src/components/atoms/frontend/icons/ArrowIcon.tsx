@@ -10,15 +10,18 @@ const ArrowIcon = ({ descriptive, className }: Props) => {
             aria-label="arrow"
             xmlns="http://www.w3.org/2000/svg"
             width="16"
-            height="13"
-            viewBox="0 0 16 13"
+            height="16"
+            viewBox="0 0 16 16"
             fill="none"
             className={className}
             aria-hidden={!descriptive}
         >
             <path
-                d="M10 12.5859L8.6 11.1359L12.15 7.58594L0 7.58594L0 5.58594L12.15 5.58594L8.6 2.03594L10 0.585937L16 6.58594L10 12.5859Z"
-                fill="currentColor"
+                d="M2 8h12M9 3l5 5-5 5"
+                stroke="currentColor"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
         </svg>
     );

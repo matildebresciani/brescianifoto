@@ -31,9 +31,7 @@ const PostCard = ({ data, locale }: Props) => {
                     )}
                 </div>
                 <p className="heading-3">{data.title}</p>
-                {data.contentMeta?.excerpt && (
-                    <p className="body-sm mb-6 text-oak-gray-dark">{data.contentMeta.excerpt}</p>
-                )}
+                {data.contentMeta?.excerpt && <p className="body-sm mb-6">{data.contentMeta.excerpt}</p>}
                 <div className="flex flex-col gap-y-2 gap-x-5 mt-auto sm:justify-between md:flex-row md:items-center">
                     {data.categories && (
                         <div className="relative flex flex-wrap gap-2 overflow-hidden">

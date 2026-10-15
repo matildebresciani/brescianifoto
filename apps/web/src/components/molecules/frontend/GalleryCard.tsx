@@ -7,7 +7,7 @@ import type { Locale } from '@/i18n/localized-collections';
 import { downUpToggle } from '@/lib/motion/motion-variants';
 import { getGalleryCoverImage, payloadObject } from '@/lib/utilities/composables';
 import { formatLinkByCollection } from '@/lib/utilities/format-link';
-import { formatGalleryCardDetails } from '@/lib/utilities/gallery-metadata';
+import { formatGalleryCardCaption } from '@/lib/utilities/gallery-metadata';
 import type { Gallery } from '@/payload-types';
 import Tag from './Tag';
 
@@ -41,7 +41,7 @@ const GalleryCard = ({ data, locale, showTag = false, revealIndex = 0 }: Props) 
                 ease: [0.22, 1, 0.36, 1],
             }}
         >
-            <figure className="border border-border-base">
+            <figure>
                 <Link href={link} className="focus-ring-tight group block">
                     <div className="relative aspect-4/5 w-full overflow-hidden bg-bg-subtle">
                         {cover && (
@@ -54,10 +54,9 @@ const GalleryCard = ({ data, locale, showTag = false, revealIndex = 0 }: Props) 
                         )}
                     </div>
                 </Link>
-                <figcaption className="p-base">
+                <figcaption className="mt-xs">
                     <Link href={link} className="focus-ring-tight block">
-                        <h2 className="heading-3 mb-xs">{data.title}</h2>
-                        <p className="metadata">{formatGalleryCardDetails(data)}</p>
+                        <p className="metadata">{formatGalleryCardCaption(data)}</p>
                     </Link>
                     {showTag && tag && <Tag tag={tag} locale={locale} className="mt-xs" />}
                 </figcaption>

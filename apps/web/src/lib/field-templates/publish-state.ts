@@ -31,8 +31,6 @@ export const payloadPublishedAt: DateField = {
     admin: {
         date: {
             pickerAppearance: 'dayAndTime',
-            displayFormat: 'dd/MM/yyyy HH:mm',
-            timeFormat: 'HH:mm',
         },
         position: 'sidebar',
     },

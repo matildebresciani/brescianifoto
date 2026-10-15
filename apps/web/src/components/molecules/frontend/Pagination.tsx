@@ -66,9 +66,10 @@ const Pagination = ({ totalPages, pageNumber, locale, searchParams, routeDetails
                                     <Link
                                         href={`${formatPaginationLink(page, locale, routeDetails)}${formattedSearchParams ? `${formattedSearchParams}` : ''}`}
                                         className={cn(
-                                            'ui-text focus-ring-tight min-h-12 min-w-8 flex items-center justify-center',
-                                            pageNumber === page ? 'text-fg-base' : 'text-fg-subtle hover:text-fg-base',
+                                            'ui-text focus-ring-tight min-h-12 min-w-8 flex items-center justify-center text-fg-base underline-offset-4 hover:underline focus-visible:underline',
+                                            pageNumber === page && 'underline',
                                         )}
+                                        aria-current={pageNumber === page ? 'page' : undefined}
                                     >
                                         {page}
                                     </Link>

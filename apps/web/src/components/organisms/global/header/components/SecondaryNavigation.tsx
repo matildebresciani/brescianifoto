@@ -30,10 +30,11 @@ const SecondaryNavigation = ({ data, locale }: Props) => {
                         key={item.id ?? i}
                         href={itemLink}
                         className={cn(
-                            'focus-ring-tight eyebrow transition-colors',
-                            isActive ? 'text-fg-highlight' : 'text-fg-subtle hover:text-fg-base',
+                            'focus-ring-tight eyebrow text-fg-base underline-offset-4 hover:underline focus-visible:underline',
+                            isActive && 'underline',
                         )}
                         target={getLinkTarget(item.link)}
+                        aria-current={isActive ? 'page' : undefined}
                     >
                         {item.link?.label}
                     </Link>

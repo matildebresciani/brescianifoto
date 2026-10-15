@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
+import BackLink from '@/components/atoms/frontend/links/BackLink';
 import Gallery from '@/components/molecules/frontend/Gallery';
 import GalleryHero from '@/components/molecules/frontend/GalleryHero';
 import BaseBlock from '@/components/organisms/blocks/base-block/BaseBlock';
@@ -36,11 +36,7 @@ export default async function GallerySinglePage({ params: paramsPromise }: Props
     const archiveLink = group?.hasArchivePage ? formatGalleryArchiveLink(group.slug, locale) : null;
     const archiveLabel =
         group?.slug === 'concerts' ? 'Concerts' : group?.slug === 'festivals' ? 'Festivals' : group?.title;
-    const backLink = archiveLink && (
-        <Link href={archiveLink} className="focus-ring ui-text w-fit underline underline-offset-4">
-            Back to {archiveLabel}
-        </Link>
-    );
+    const backLink = archiveLink && archiveLabel && <BackLink href={archiveLink} label={archiveLabel} />;
 
     return (
         <article>

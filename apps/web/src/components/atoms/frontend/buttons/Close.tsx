@@ -12,13 +12,23 @@ const Close = ({ onClick, className }: Props) => {
             title="Close"
             aria-label="Close"
             className={cn(
-                'focus-ring-tight group relative size-12 cursor-pointer rounded-full border border-border-base',
+                'focus-ring-tight inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-none border-0 bg-transparent p-0 text-fg-base transition-colors duration-200 hover:text-fg-highlight motion-reduce:transition-none',
                 className,
             )}
             onClick={() => onClick()}
         >
-            <span className="absolute h-[1px] w-5 bg-fg-base -translate-x-1/2 -translate-y-1/2 rotate-45 transition-colors duration-200 group-hover:bg-fg-highlight" />
-            <span className="absolute h-[1px] w-5 bg-fg-base -translate-x-1/2 -translate-y-1/2 -rotate-45 transition-colors duration-200 group-hover:bg-fg-highlight" />
+            <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                aria-hidden="true"
+            >
+                <path d="m5 5 14 14M19 5 5 19" />
+            </svg>
         </button>
     );
 };

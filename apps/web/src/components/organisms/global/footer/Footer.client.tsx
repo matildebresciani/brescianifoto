@@ -27,7 +27,7 @@ export const FooterClient: React.FC<FooterClientProps> = ({
     return (
         <footer className="mt-auto bg-bg-base">
             <div className="base-block flex flex-col gap-base py-md md:flex-row md:items-center md:justify-between md:py-lg">
-                <Link href="/" className="focus-ring w-fit">
+                <Link href="/" className="logo-link focus-ring w-fit">
                     <Logo className="text-[length:var(--logo-font-size-footer)]" />
                 </Link>
                 <address className="footer-contact flex flex-col gap-xs not-italic md:flex-row md:flex-wrap md:justify-end md:gap-x-lg">

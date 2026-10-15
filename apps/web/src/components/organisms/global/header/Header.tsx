@@ -13,7 +13,7 @@ export async function Header({ locale }: { locale: Locale }) {
     ]);
 
     return (
-        <header className="sticky top-0 left-0 z-20 w-full border-b border-border-base bg-bg-base/85 backdrop-blur-md">
+        <header className="sticky top-0 left-0 z-20 w-full border-b border-border-base bg-bg-base">
             {secondary && <SecondaryNavigation data={secondary} locale={locale} />}
             <div className="base-block flex flex-wrap min-h-[var(--header-height)] items-center justify-between gap-md md:min-h-[var(--header-height-desktop)]">
                 <LogoLink />
