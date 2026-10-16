@@ -27,7 +27,12 @@ const TextImageBlock: BC<TextImageProps> = ({ block, locale }) => {
                 <div className={cn('min-w-0', order === 'image-right' && 'lg:order-first')}>
                     {richText && <RichText data={richText} enableGutter={false} />}
                     {addLink && href && (
-                        <BaseLink href={href} target={getLinkTarget(link)} theme="secondary" className="ui-text mt-md">
+                        <BaseLink
+                            href={href}
+                            target={getLinkTarget(link)}
+                            theme="secondary"
+                            className="ui-text mt-md font-mono"
+                        >
                             {link?.label}
                             <ArrowIcon className="shrink-0" />
                         </BaseLink>
