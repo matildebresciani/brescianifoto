@@ -116,7 +116,15 @@ async function setupPortfolio(req: PayloadRequest) {
                         order: 'image-left' as const,
                         image: image.id,
                         richText: portfolioPageContent(title),
-                        addLink: false,
+                        addLink: title === 'About',
+                        ...(title === 'About' && {
+                            link: {
+                                type: 'custom' as const,
+                                label: 'Get in touch',
+                                url: '/contact',
+                                openNewTab: false,
+                            },
+                        }),
                     },
                 ],
                 meta: {

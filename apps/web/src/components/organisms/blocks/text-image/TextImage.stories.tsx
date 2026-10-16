@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { imageMock, richTextMock } from '@/__mocks__/storybook-mocks';
+import { portfolioPageContent } from '@/lib/utilities/portfolio-page-content';
 import TextImage from './TextImage';
 
 const meta = {
@@ -9,7 +10,7 @@ const meta = {
         layout: 'centered',
     },
     tags: ['autodocs'],
-    args: {},
+    args: { locale: 'da' },
 } satisfies Meta<typeof TextImage>;
 
 export default meta;
@@ -26,10 +27,42 @@ export const Default: Story = {
             richText: richTextMock,
             addLink: true,
             link: {
-                url: 'https://example.com',
-                label: 'Example Link',
+                type: 'custom',
+                url: '/contact',
+                label: 'Get in touch',
             },
         },
     },
     render: (args) => <TextImage {...args} />,
+};
+
+export const About: Story = {
+    args: {
+        ...Default.args,
+        block: { ...Default.args.block, richText: portfolioPageContent('About') },
+    },
+};
+
+export const ImageRight: Story = {
+    args: {
+        ...Default.args,
+        block: { ...Default.args.block, order: 'image-right' },
+    },
+};
+
+export const WithoutLink: Story = {
+    args: {
+        ...Default.args,
+        block: { ...Default.args.block, addLink: false },
+    },
+};
+
+export const NewTab: Story = {
+    args: {
+        ...Default.args,
+        block: {
+            ...Default.args.block,
+            link: { type: 'custom', url: 'https://example.com', label: 'View publication', openNewTab: true },
+        },
+    },
 };

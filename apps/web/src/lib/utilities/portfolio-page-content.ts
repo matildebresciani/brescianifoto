@@ -61,7 +61,6 @@ export function portfolioPageContent(page: 'About' | 'Contact'): NonNullable<Tex
                           paragraph(
                               'This portfolio brings together live music, artists and the people in the audience.',
                           ),
-                          link('Get in touch', '/contact'),
                       ]
                     : [
                           paragraph('For concert photography, festival coverage or image requests, send me an email.'),

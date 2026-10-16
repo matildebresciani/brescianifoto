@@ -146,4 +146,68 @@ describe('portfolio setup endpoint', () => {
         );
         expect(mocks.syncAutomaticGalleryMix).toHaveBeenCalledTimes(2);
     });
+    it('creates About with the block CTA while keeping Contact links in rich text', async () => {
+        vi.mocked(payload.find).mockImplementation(async ({ collection }) => {
+            const docs =
+                collection === 'pages'
+                    ? [home]
+                    : collection === 'tag-groups'
+                      ? groups
+                      : collection === 'media'
+                        ? [imageMock]
+                        : collection === 'navigation'
+                          ? [menu]
+                          : [];
+            return {
+                docs,
+                totalDocs: docs.length,
+                totalPages: 1,
+                limit: 0,
+                page: 1,
+                pagingCounter: 1,
+                hasNextPage: false,
+                hasPrevPage: false,
+            };
+        });
+
+        expect((await portfolioSetup.handler(await request('apply'))).status).toBe(200);
+        for (const locale of ['da', 'en']) {
+            expect(payload.create).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    collection: 'pages',
+                    locale,
+                    data: expect.objectContaining({
+                        slug: 'about',
+                        layout: [
+                            expect.objectContaining({
+                                blockType: 'text-image',
+                                addLink: true,
+                                link: {
+                                    type: 'custom',
+                                    label: 'Get in touch',
+                                    url: '/contact',
+                                    openNewTab: false,
+                                },
+                                richText: portfolioPageContent('About'),
+                            }),
+                        ],
+                    }),
+                }),
+            );
+            expect(payload.create).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    collection: 'pages',
+                    locale,
+                    data: expect.objectContaining({
+                        slug: 'contact',
+                        layout: [
+                            expect.objectContaining({ addLink: false, richText: portfolioPageContent('Contact') }),
+                        ],
+                    }),
+                }),
+            );
+        }
+        expect(JSON.stringify(portfolioPageContent('About'))).not.toContain('Get in touch');
+        expect(JSON.stringify(portfolioPageContent('Contact'))).toContain('mailto:matildepio@hotmail.dk');
+    });
 });

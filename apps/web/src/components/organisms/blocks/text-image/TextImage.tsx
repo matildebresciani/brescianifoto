@@ -1,4 +1,5 @@
-import Link from 'next/link';
+import ArrowIcon from '@/components/atoms/frontend/icons/ArrowIcon';
+import BaseLink from '@/components/atoms/frontend/links/BaseLink';
 import { ImageMedia } from '@/components/atoms/frontend/media/ImageMedia';
 import RichText from '@/components/molecules/admin/RichText';
 import type { BC } from '@/lib/types/block-props';
@@ -26,13 +27,10 @@ const TextImageBlock: BC<TextImageProps> = ({ block, locale }) => {
                 <div className={cn('min-w-0', order === 'image-right' && 'lg:order-first')}>
                     {richText && <RichText data={richText} enableGutter={false} />}
                     {addLink && href && (
-                        <Link
-                            href={href}
-                            target={getLinkTarget(link)}
-                            className="focus-ring ui-text mt-md inline-block underline underline-offset-4"
-                        >
+                        <BaseLink href={href} target={getLinkTarget(link)} theme="secondary" className="ui-text mt-md">
                             {link?.label}
-                        </Link>
+                            <ArrowIcon className="shrink-0" />
+                        </BaseLink>
                     )}
                 </div>
             </div>
