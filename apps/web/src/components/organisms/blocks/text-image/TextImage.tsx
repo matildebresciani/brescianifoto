@@ -31,7 +31,7 @@ const TextImageBlock: BC<TextImageProps> = ({ block, locale }) => {
                             href={href}
                             target={getLinkTarget(link)}
                             theme="secondary"
-                            className="ui-text mt-md font-mono"
+                            className="ui-text mt-md font-mono text-fg-faded"
                         >
                             {link?.label}
                             <ArrowIcon className="shrink-0" />
