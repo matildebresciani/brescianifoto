@@ -1,4 +1,5 @@
 import type { Field } from 'payload';
+import { payloadLinkInner } from '@/lib/field-templates/links';
 
 export const globalContentFields: Field[] = [
     {
@@ -91,25 +92,11 @@ export const globalContentFields: Field[] = [
         label: 'Social Links',
         type: 'array',
         localized: true,
-        defaultValue: [{ label: 'instagram', link: 'https://www.instagram.com/brescianifoto/' }],
-        fields: [
+        defaultValue: [
             {
-                type: 'row',
-                fields: [
-                    { name: 'label', label: 'Text label', type: 'text' },
-                    {
-                        type: 'upload',
-                        name: 'platform',
-                        label: 'Platform',
-                        relationTo: 'icons',
-                    },
-                    {
-                        type: 'text',
-                        name: 'link',
-                        label: 'Link',
-                    },
-                ],
+                link: { type: 'custom', label: 'instagram', url: 'https://www.instagram.com/brescianifoto/' },
             },
         ],
+        fields: [payloadLinkInner({ localized: false })],
     },
 ];

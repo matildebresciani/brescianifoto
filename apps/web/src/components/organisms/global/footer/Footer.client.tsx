@@ -2,7 +2,6 @@
 import type React from 'react';
 import Logo from '@/components/atoms/frontend/logo/Logo';
 import { Link } from '@/i18n/routing';
-import { payloadObject } from '@/lib/utilities/composables';
 import type { Navigation as NavigationProps, Option } from '@/payload-types';
 import Navigation from './components/Navigation';
 
@@ -32,15 +31,14 @@ export const FooterClient: React.FC<FooterClientProps> = ({
                 </Link>
                 <address className="footer-contact flex flex-col gap-xs not-italic md:flex-row md:flex-wrap md:justify-end md:gap-x-lg">
                     {socialLinks?.map((item) => {
-                        const label = item.label || payloadObject(item.platform)?.alt;
-                        if (!item.link || !label) return null;
+                        if (!item.link?.url || !item.link.label) return null;
                         return (
                             <a
-                                key={item.id ?? item.link}
-                                href={item.link}
+                                key={item.id ?? item.link.url}
+                                href={item.link.url}
                                 className="focus-ring w-fit underline underline-offset-4"
                             >
-                                {label}
+                                {item.link.label}
                             </a>
                         );
                     })}

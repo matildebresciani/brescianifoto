@@ -23,7 +23,7 @@ const home: Page = {
 const options: Option = {
     id: 'options',
     defaultPages: { homepage: 'home' },
-    socialLinks: [{ label: 'instagram', link: 'https://www.instagram.com/brescianifoto/' }],
+    socialLinks: [{ link: { type: 'custom', label: 'instagram', url: 'https://www.instagram.com/brescianifoto/' } }],
 };
 const groups: TagGroup[] = ['concerts', 'festivals'].map((slug) => ({
     id: slug,

@@ -1,5 +1,4 @@
 import type { Endpoint, PayloadRequest } from 'payload';
-import { z } from 'zod';
 import { locales } from '@/i18n/localized-collections';
 import { syncAutomaticGalleryMix } from '@/lib/payload-hooks/automatic-gallery-mix';
 import { isUsablePhoto } from '@/lib/utilities/automatic-gallery-mix';
@@ -26,31 +25,6 @@ async function setupPortfolio(req: PayloadRequest) {
     if (!canRunPortfolioSetup(req.payload.config.secret, mode, req.headers))
         return Response.json({ error: 'Unauthorized.' }, { status: 401 });
     const results: string[] = [];
-    const rawOptions = z
-        .object({ socialLinks: z.record(z.string(), z.array(z.object({ link: z.unknown() }))).optional() })
-        .safeParse(await req.payload.db.findGlobal({ slug: 'options', req }));
-    const hasLegacySocialLinks =
-        rawOptions.success &&
-        Object.values(rawOptions.data.socialLinks ?? {})
-            .flat()
-            .some((item) => typeof item.link === 'object' && item.link !== null);
-    if (mode === 'apply' && hasLegacySocialLinks) {
-        // Older boilerplate databases stored nested link objects. Replace all locales together
-        // before Payload validates the global against the current text-link schema.
-        await req.payload.db.updateGlobal({
-            slug: 'options',
-            req,
-            returning: false,
-            data: {
-                socialLinks: Object.fromEntries(
-                    locales.map((locale) => [
-                        locale,
-                        [{ label: 'instagram', link: 'https://www.instagram.com/brescianifoto/' }],
-                    ]),
-                ),
-            },
-        });
-    }
     for (const locale of locales) {
         const localReq = { ...req, locale };
         const [options, galleries, pages, groups] = await Promise.all([
@@ -95,10 +69,18 @@ async function setupPortfolio(req: PayloadRequest) {
             continue;
         }
 
-        const instagram = options.socialLinks?.find((item) => item.link?.includes('instagram.com/brescianifoto'));
+        const instagram = options.socialLinks?.find((item) => item.link?.url?.includes('instagram.com/brescianifoto'));
         const socialLinks = [
             ...(options.socialLinks ?? []).filter((item) => item !== instagram),
-            { ...instagram, label: 'instagram', link: 'https://www.instagram.com/brescianifoto/' },
+            {
+                ...instagram,
+                link: {
+                    ...instagram?.link,
+                    type: 'custom' as const,
+                    label: 'instagram',
+                    url: 'https://www.instagram.com/brescianifoto/',
+                },
+            },
         ];
         await req.payload.updateGlobal({
             slug: 'options',
