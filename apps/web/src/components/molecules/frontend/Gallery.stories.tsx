@@ -51,3 +51,21 @@ export const Empty: Story = {
         images: [],
     },
 };
+
+/** Reproduces the old short middle column using local assets available in every environment. */
+export const MixedOrientations: Story = {
+    args: {
+        images: Array.from({ length: 9 }, (_, index): Media => {
+            const isLandscape = index % 3 === 1;
+            return {
+                id: `mixed-${index}`,
+                alt: `Gallery photo ${index + 1}`,
+                url: `/images/__mocks__/lightbox-${isLandscape ? 'landscape' : 'portrait'}.svg`,
+                width: isLandscape ? 1600 : 900,
+                height: isLandscape ? 900 : 1200,
+                createdAt: '2026-10-21T00:00:00.000Z',
+                updatedAt: '2026-10-21T00:00:00.000Z',
+            };
+        }),
+    },
+};

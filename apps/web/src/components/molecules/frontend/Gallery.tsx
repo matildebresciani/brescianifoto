@@ -1,12 +1,12 @@
 'use client';
 
 import { motion, useReducedMotion } from 'motion/react';
-import { useState, useSyncExternalStore } from 'react';
+import { useCallback, useState, useSyncExternalStore } from 'react';
 import { ImageMedia } from '@/components/atoms/frontend/media/ImageMedia';
 import { cssVariables } from '@/cssVariables';
 import { downUpToggle } from '@/lib/motion/motion-variants';
 import { payloadObject } from '@/lib/utilities/composables';
-import { getGalleryColumns } from '@/lib/utilities/gallery-columns';
+import { type GalleryLayoutMeasurements, getGalleryColumns } from '@/lib/utilities/gallery-columns';
 import { cn } from '@/lib/utilities/ui';
 import type { Media } from '@/payload-types';
 import Lightbox from './Lightbox';
@@ -39,18 +39,52 @@ const Gallery = ({ images, className, priorityCount = 3 }: Props) => {
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
     const columnCount = useSyncExternalStore(subscribeToColumnCount, getColumnCount, getServerColumnCount);
     const shouldReduceMotion = useReducedMotion();
+    const [measurements, setMeasurements] = useState<GalleryLayoutMeasurements>({ columnWidth: 1, gap: 0 });
+    const measureGallery = useCallback(
+        (element: HTMLDivElement | null) => {
+            if (!element) return;
+
+            const measure = () => {
+                const styles = window.getComputedStyle(element);
+                const columnGap = Number.parseFloat(styles.columnGap) || 0;
+                const gap = Number.parseFloat(styles.rowGap) || 0;
+                const contentWidth =
+                    element.clientWidth -
+                    (Number.parseFloat(styles.paddingLeft) || 0) -
+                    (Number.parseFloat(styles.paddingRight) || 0);
+                const columnWidth = (contentWidth - columnGap * (columnCount - 1)) / columnCount;
+                if (columnWidth <= 0) return;
+
+                setMeasurements((previous) =>
+                    previous.columnWidth === columnWidth && previous.gap === gap ? previous : { columnWidth, gap },
+                );
+            };
+
+            measure();
+            const observer = new ResizeObserver(measure);
+            observer.observe(element);
+            // A responsive gap can change even when the gallery's container width stays fixed.
+            window.addEventListener('resize', measure);
+            return () => {
+                observer.disconnect();
+                window.removeEventListener('resize', measure);
+            };
+        },
+        [columnCount],
+    );
 
     if (!items?.length) return null;
 
     return (
         <div
+            ref={measureGallery}
             className={cn(
                 'grid items-start gap-xs md:gap-base',
                 columnCount === 3 ? 'grid-cols-3' : 'grid-cols-2',
                 className,
             )}
         >
-            {getGalleryColumns(items, columnCount).map((column) => (
+            {getGalleryColumns(items, columnCount, measurements).map((column, columnIndex) => (
                 <div key={column.id} className="flex min-w-0 flex-col gap-xs md:gap-base">
                     {column.items.map(({ item, index }) => {
                         const isAboveFold = index < priorityCount;
@@ -66,7 +100,7 @@ const Gallery = ({ images, className, priorityCount = 3 }: Props) => {
                                 viewport={{ once: true, amount: 0.2 }}
                                 transition={{
                                     duration: shouldReduceMotion ? 0 : 0.6,
-                                    delay: shouldReduceMotion ? 0 : (index % columnCount) * 0.06,
+                                    delay: shouldReduceMotion ? 0 : columnIndex * 0.06,
                                     ease: [0.22, 1, 0.36, 1],
                                 }}
                             >
