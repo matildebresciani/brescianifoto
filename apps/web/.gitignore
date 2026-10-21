@@ -4,10 +4,12 @@ node_modules
 .DS_Store
 .env
 .next
+.next-*
 .vercel
 
 # Payload default media upload directory
 public/uploads/
+public/images/client-delivery-qa/
 
 public/robots.txt
 public/sitemap*.xml

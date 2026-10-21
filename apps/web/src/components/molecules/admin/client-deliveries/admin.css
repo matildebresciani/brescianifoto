@@ -1,0 +1,55 @@
+.delivery-admin {
+    border: 1px solid var(--theme-elevation-200);
+    padding: 20px;
+    margin: 16px 0;
+}
+.delivery-admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.delivery-admin button {
+    color: var(--theme-text);
+    border: 1px solid var(--theme-elevation-300);
+    background: var(--theme-elevation-50);
+    padding: 6px 12px;
+    cursor: pointer;
+}
+.delivery-admin button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+.delivery-admin input[type="file"] {
+    display: block;
+    margin-top: 8px;
+    max-width: 100%;
+}
+.delivery-upload-list {
+    max-height: 400px;
+    overflow: auto;
+    padding: 0;
+    list-style: none;
+}
+.delivery-upload-list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+}
+.delivery-upload-list progress {
+    accent-color: var(--theme-text);
+}
+.delivery-upload-panel {
+    margin-block: 16px;
+    padding: 16px;
+    border: 1px solid var(--theme-elevation-200);
+    background: var(--theme-elevation-50);
+}
+.delivery-upload-panel input[type="file"] {
+    display: block;
+    margin-top: 8px;
+    max-width: 100%;
+}

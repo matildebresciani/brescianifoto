@@ -13,6 +13,8 @@ import { Locations } from './collections/categories/locations/config';
 import { PostCategories } from './collections/categories/post-categories/config';
 import { TagGroups } from './collections/categories/tag-groups/config';
 import { Tags } from './collections/categories/tags/config';
+import { ClientDownloads, ClientPhotos } from './collections/client-deliveries/assets';
+import { ClientGalleries } from './collections/client-deliveries/galleries';
 import { Galleries } from './collections/content/galleries/config';
 import { Pages } from './collections/content/pages/config';
 import { Posts } from './collections/content/posts/config';
@@ -25,6 +27,7 @@ import { Redirects } from './collections/tools-settings/redirects/config';
 import { Translations } from './collections/tools-settings/translations/config';
 import { Users } from './collections/tools-settings/users/config';
 import { defaultLocale, locales } from './i18n/localized-collections';
+import { deliveryUploadEndpoint } from './lib/client-deliveries/upload-endpoint';
 import { festivalURLMaintenance } from './lib/endpoints/festival-url-maintenance';
 import { portfolioSetup } from './lib/endpoints/portfolio-setup';
 import { plugins } from './lib/plugins';
@@ -71,6 +74,9 @@ export default buildConfig({
         url: process.env.DATABASE_URI,
     }),
     collections: [
+        ClientGalleries,
+        ClientPhotos,
+        ClientDownloads,
         Pages,
         Posts,
         PostCategories,
@@ -101,7 +107,7 @@ export default buildConfig({
             key: 'seed',
         },
     ],
-    endpoints: [festivalURLMaintenance, portfolioSetup],
+    endpoints: [festivalURLMaintenance, portfolioSetup, deliveryUploadEndpoint],
     cors: [getServerSideURL()].filter(Boolean),
     globals: [Options, Translations],
     plugins: [

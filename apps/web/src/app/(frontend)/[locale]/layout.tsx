@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Archivo, IBM_Plex_Mono, Instrument_Serif } from 'next/font/google';
 import { setRequestLocale } from 'next-intl/server';
 import EndBodyScripts from '@/components/organisms/global/body/EndBodyScripts';
 import StartBodyScripts from '@/components/organisms/global/body/StartBodyScripts';
@@ -10,33 +9,13 @@ import { presentationLanguage } from '@/i18n/presentation';
 import { getDefaultOgImage, metadataIcons } from '@/lib/data/metadata';
 import { getCachedOptions } from '@/lib/data/payload/get-cached-options';
 import { Providers } from '@/lib/providers/Providers';
+import { archivo, ibmPlexMono, instrumentSerif } from '@/lib/styles/fonts';
 import { assertLocale } from '@/lib/utilities/assert-locale';
 import { getServerSideURL } from '@/lib/utilities/get-url';
 import { cn } from '@/lib/utilities/ui';
 import '../globals.css';
 
 type Props = LayoutProps<'/[locale]'>;
-
-const archivo = Archivo({
-    weight: ['400', '500', '700', '900'],
-    variable: '--font-loaded-archivo',
-    style: ['normal'],
-    subsets: ['latin'],
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-    weight: ['400', '500'],
-    variable: '--font-loaded-metadata',
-    style: ['normal'],
-    subsets: ['latin'],
-});
-
-const instrumentSerif = Instrument_Serif({
-    weight: '400',
-    variable: '--font-loaded-statement',
-    style: ['normal'],
-    subsets: ['latin'],
-});
 
 export default async function RootLayout({ children, params }: Props) {
     const { locale } = await params;

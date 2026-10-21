@@ -353,3 +353,11 @@ pnpm portfolio-setup --url http://localhost:3001 --apply
 Use the deployment URL for a production run and configure the matching Payload secret locally. The default command is read-only; requests are signed without sending the secret. Apply sets the confirmed email and Instagram text link in Options, initializes each locale's automatic mix, supplies temporary About/Contact text and existing images, fills missing browsing groups/empty menus, and publishes a gallery-only homepage. Review the dry run first. Existing populated About/Contact pages and custom gallery selections are preserved. Replace the temporary text and photos in Payload whenever ready. Legacy boilerplate social links are replaced with the confirmed Instagram account when their old nested schema requires migration.
 
 A gallery block's **Random** mode uses up to 24 deduplicated photos, sampled across public galleries. Its saved order changes only when a previously unseen gallery first becomes public. Reloads, edits, deployments, and republishing known galleries preserve it. Deleted or no-longer-public photos are omitted without refilling the mix. **Custom** mode preserves manual ordering and falls back to the same mix when empty. Existing blocks without a mode continue as Custom; new blocks default to Random. Switching modes retains the manual selection.
+
+## Client gallery delivery
+
+Client galleries live in **Client delivery → Client galleries** in Payload. They use separate collections and never enter the public portfolio. Create and save a draft, upload JPEGs, choose the cover, add text/photo sections, preview, and publish. Copy the link from the gallery editor; no portfolio navigation entry is created.
+
+The persistent implementation plan, task status, remaining production checks, and cross-chat handover are in [`docs/client-galleries/PLAN.md`](../../docs/client-galleries/PLAN.md). Open [`dashboard.html`](../../docs/client-galleries/dashboard.html) locally for the visual task view. After editing task records, run `node scripts/render-client-gallery-plan.mjs` from the repository root.
+
+See the [delivery operations guide](../../docs/client-galleries/OPERATIONS.md) before publishing the first client gallery. It covers R2 CORS, multipart cleanup, noindex headers, original downloads, ZIP replacement, and production verification.

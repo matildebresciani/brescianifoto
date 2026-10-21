@@ -1,0 +1,48 @@
+diff --git a/dist/components/ColorPicker/Input.jsx b/dist/components/ColorPicker/Input.jsx
+index 246e1cfdebdb9037116437a7d976ffaef76852bf..e3618be079ca515726bb1da277edc4da0ec13449 100644
+--- a/dist/components/ColorPicker/Input.jsx
++++ b/dist/components/ColorPicker/Input.jsx
+@@ -48,10 +48,10 @@ export const ColorPickerInput = (props) => {
+           <div className={`
+             ${baseClass}__color-picker-modal 
+             ${rtl ? `${baseClass}__color-picker-modal--rtl` : ''}
+-            ${fieldIsFocused ? `${baseClass}__color-picker-modal--focused` : ''}
++            ${fieldIsFocused && !readOnly ? `${baseClass}__color-picker-modal--focused` : ''}
+           `}>
+             {colors && (<div className={`${baseClass}__color-picker-modal__predefined-colors`}>
+-                {colors.map((color, index) => (<Button buttonStyle="none" className={`${baseClass}__color-picker-modal__button`} key={index} onClick={() => {
++                {colors.map((color, index) => (<Button aria-label={`Choose ${color}`} disabled={readOnly} buttonStyle="none" className={`${baseClass}__color-picker-modal__button`} key={index} onClick={() => {
+                     if (color !== value) {
+                         onChange?.({
+                             target: {
+diff --git a/dist/components/ColorPicker/index.jsx b/dist/components/ColorPicker/index.jsx
+index 462dfdba4b8e04bcff39f488789f47ef9ab4499a..9ad95ca871ae3758d2a6b28a4d4da9fb144a2749 100644
+--- a/dist/components/ColorPicker/index.jsx
++++ b/dist/components/ColorPicker/index.jsx
+@@ -7,7 +7,7 @@ import { mergeFieldStyles } from '../../utils/mergeFieldStyles.js';
+ // eslint-disable-next-line payload/no-jsx-import-statements
+ import { ColorPickerInput } from './Input.jsx';
+ const ColorPickerField = (props) => {
+-    const { colors, field, field: { admin: { className, description, placeholder, rtl } = {}, label, localized, maxLength, minLength, required, }, inputRef, path, readOnly, validate, } = props;
++    const { colors, field, field: { admin: { className, description, placeholder, rtl } = {}, label, localized, maxLength, minLength, required, }, inputRef, path: pathFromProps, readOnly, validate, } = props;
+     const locale = useLocale();
+     const { config: { localization } } = useConfig();
+     const memoizedValidate = useCallback((value, options) => {
+@@ -15,8 +15,8 @@ const ColorPickerField = (props) => {
+             return validate(value, { ...options, maxLength, minLength, required });
+         }
+     }, [validate, minLength, maxLength, required]);
+-    const { customComponents: { AfterInput, BeforeInput, Description, Error, Label } = {}, setValue, showError, value, } = useField({
+-        path,
++    const { customComponents: { AfterInput, BeforeInput, Description, Error, Label } = {}, setValue, showError, value, path, } = useField({
++        potentiallyStalePath: pathFromProps,
+         validate: memoizedValidate,
+     });
+     const renderRTL = isFieldRTL({
+diff --git a/dist/components/index.js b/dist/components/index.js
+index 2a3592dfd16ed72ef7919c5a6ec343a554b3530b..b1734304fd5202170effc06230b3a844de201453 100644
+--- a/dist/components/index.js
++++ b/dist/components/index.js
+@@ -1 +1 @@
+-export * from './ColorPicker';
++export * from './ColorPicker/index.jsx';

@@ -12,7 +12,12 @@ const isHttpOrHttps = (proto: string) => proto === 'http' || proto === 'https';
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
+    // The color-picker package ships JSX source rather than compiled JavaScript.
+    transpilePackages: ['@innovixx/payload-color-picker-field'],
+    // Allows isolated QA previews alongside the photographer's normal development server.
+    distDir: process.env.NEXT_BUILD_DIR || '.next',
     images: {
+        formats: ['image/webp'],
         remotePatterns: [
             ...[NEXT_PUBLIC_SERVER_URL, process.env.R2_PUBLIC_URL]
                 .filter((item): item is string => Boolean(item))
@@ -34,6 +39,23 @@ const nextConfig: NextConfig = {
         dangerouslyAllowLocalIP: process.env.NODE_ENV !== 'production',
     },
     reactStrictMode: true,
+    async headers() {
+        return [
+            {
+                source: '/_next/image',
+                has: [{ type: 'query', key: 'url', value: '.*client-deliveries.*' }],
+                headers: [{ key: 'X-Robots-Tag', value: 'noindex, noimageindex' }],
+            },
+            {
+                source: '/deliveries/:path*',
+                headers: [
+                    { key: 'X-Robots-Tag', value: 'noindex, nofollow, noimageindex' },
+                    { key: 'Referrer-Policy', value: 'no-referrer' },
+                    { key: 'Cache-Control', value: 'private, no-store' },
+                ],
+            },
+        ];
+    },
     redirects,
 };
 
