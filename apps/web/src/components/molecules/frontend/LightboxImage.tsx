@@ -3,11 +3,14 @@
 import { type MouseEvent, type PointerEvent, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { ImageMedia } from '@/components/atoms/frontend/media/ImageMedia';
 import { cssVariables } from '@/cssVariables';
+import { getLightboxImageSize, type LightboxViewport } from '@/lib/utilities/lightbox-images';
 import { cn } from '@/lib/utilities/ui';
 import type { Media } from '@/payload-types';
 
 type Props = {
     image: Media;
+    onViewportChange?: (viewport: LightboxViewport) => void;
+    onReady?: () => void;
     onNavigate: (direction: -1 | 1) => void;
 };
 
@@ -47,7 +50,7 @@ function clampPan(point: Point, limits: Point): Point {
 }
 
 /** Owns the photo's pointer gestures; remount for each photo to reset zoom and pan. */
-const LightboxImage = ({ image, onNavigate }: Props) => {
+const LightboxImage = ({ image, onViewportChange, onReady, onNavigate }: Props) => {
     const viewportRef = useRef<HTMLButtonElement>(null);
     const gestureRef = useRef<Gesture | null>(null);
     const pointersRef = useRef(new Set<number>());
@@ -57,22 +60,33 @@ const LightboxImage = ({ image, onNavigate }: Props) => {
     const [isZoomed, setIsZoomed] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [pan, setPan] = useState(origin);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [viewport, setViewport] = useState<LightboxViewport | null>(null);
     const canZoom = useSyncExternalStore(subscribeToDesktop, getIsDesktop, getServerIsDesktop);
 
     useEffect(() => {
-        const viewport = viewportRef.current;
-        if (!viewport) return;
+        const element = viewportRef.current;
+        if (!element) return;
 
-        const observer = new ResizeObserver(() => {
+        const measure = () => {
+            const { width, height } = element.getBoundingClientRect();
+            if (width > 0 && height > 0) {
+                setViewport((previous) =>
+                    previous?.width === width && previous.height === height ? previous : { width, height },
+                );
+                onViewportChange?.({ width, height });
+            }
             setIsZoomed(false);
             setIsDragging(false);
             setPan(origin);
             gestureRef.current = null;
             shouldSuppressClickRef.current = true;
-        });
-        observer.observe(viewport);
+        };
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(element);
         return () => observer.disconnect();
-    }, []);
+    }, [onViewportChange]);
 
     const handlePointerDown = (event: PointerEvent<HTMLButtonElement>) => {
         if (event.pointerType === 'mouse' && event.button !== 0) return;
@@ -208,20 +222,36 @@ const LightboxImage = ({ image, onNavigate }: Props) => {
         >
             <span
                 className={cn(
-                    'pointer-events-none flex h-full w-full items-center justify-center motion-reduce:transition-none',
+                    'pointer-events-none relative flex h-full w-full items-center justify-center motion-reduce:transition-none',
                     !isDragging && 'transition-transform duration-150 ease-out',
                 )}
                 style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${isZoomed ? zoomScale : 1})` }}
             >
-                <ImageMedia
-                    resource={image}
-                    className={cn(
-                        'h-auto max-h-full w-auto max-w-full object-contain',
-                        canZoom && isZoomed && !isDragging && 'pointer-events-auto cursor-zoom-out',
-                    )}
-                    size={isZoomed ? '200vw' : '100vw'}
-                    priority
-                />
+                {viewport && (
+                    <ImageMedia
+                        resource={image}
+                        className={cn(
+                            'relative z-10 h-auto max-h-full w-auto max-w-full object-contain',
+                            canZoom && isZoomed && !isDragging && 'pointer-events-auto cursor-zoom-out',
+                        )}
+                        size={getLightboxImageSize(image, viewport, isZoomed ? zoomScale : 1)}
+                        loading="eager"
+                        fetchPriority="high"
+                        onLoad={() => {
+                            setIsLoaded(true);
+                            onReady?.();
+                        }}
+                    />
+                )}
+                {!isLoaded && (
+                    <ImageMedia
+                        resource={image}
+                        alt=""
+                        className="absolute h-auto max-h-full w-auto max-w-full object-contain"
+                        size="56px"
+                        loading="eager"
+                    />
+                )}
             </span>
         </button>
     );

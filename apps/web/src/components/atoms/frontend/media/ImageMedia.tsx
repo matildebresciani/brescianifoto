@@ -21,6 +21,8 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         loading: loadingFromProps,
         quality: qualityFromProps,
         fetchPriority,
+        onLoad,
+        onError,
     } = props;
 
     let width: number | undefined;
@@ -33,7 +35,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
 
         width = fullWidth ?? undefined;
         height = fullHeight ?? undefined;
-        alt = altFromResource || '';
+        alt = altFromProps ?? altFromResource ?? '';
 
         const cacheTag = resource.updatedAt;
 
@@ -66,6 +68,8 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
             src={src}
             width={!fill ? width : undefined}
             fetchPriority={fetchPriority}
+            onLoad={onLoad}
+            onError={onError}
         />
     );
 };

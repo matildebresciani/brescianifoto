@@ -48,6 +48,17 @@ export const ManyPhotos: Story = {
     args: { items: Array.from({ length: 24 }, (_, index) => ({ ...landscape, id: `photo-${index}` })) },
 };
 
+export const LoadingSequence: Story = {
+    args: {
+        items: Array.from({ length: 6 }, (_, index) => ({
+            ...(index % 2 === 0 ? portrait : landscape),
+            id: `loading-${index}`,
+            alt: `Photo ${index + 1}`,
+            url: `${index % 2 === 0 ? portrait.url : landscape.url}?photo=${index + 1}`,
+        })),
+    },
+};
+
 export const WithOpener: Story = {
     render: function Viewer(args) {
         const [isOpen, setIsOpen] = useState(false);

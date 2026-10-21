@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Close from '@/components/atoms/frontend/buttons/Close';
 import ArrowIcon from '@/components/atoms/frontend/icons/ArrowIcon';
 import RichText from '@/components/molecules/admin/RichText';
 import Portal from '@/components/molecules/Portal';
+import { getLightboxImageKey, type LightboxViewport } from '@/lib/utilities/lightbox-images';
 import { wrapIndex } from '@/lib/utilities/wrap-index';
 import type { Media } from '@/payload-types';
 import LightboxImage from './LightboxImage';
+import LightboxPreloader from './LightboxPreloader';
 import LightboxThumbnails from './LightboxThumbnails';
 import ModalDialog from './ModalDialog';
 
@@ -23,6 +25,13 @@ const arrowClasses =
 
 const Lightbox = ({ items, index, onClose, onNavigate }: Props) => {
     const current = items[index];
+    const [viewport, setViewport] = useState<LightboxViewport | null>(null);
+    const [readyKey, setReadyKey] = useState<string | null>(null);
+    const measureViewport = useCallback((size: LightboxViewport) => {
+        setViewport((previous) =>
+            previous?.width === size.width && previous.height === size.height ? previous : size,
+        );
+    }, []);
 
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
@@ -71,6 +80,8 @@ const Lightbox = ({ items, index, onClose, onNavigate }: Props) => {
                     <LightboxImage
                         key={`${current.id}:${index}`}
                         image={current}
+                        onViewportChange={measureViewport}
+                        onReady={() => setReadyKey(getLightboxImageKey(current))}
                         onNavigate={(direction) => onNavigate(wrapIndex(index, direction, items.length))}
                     />
 
@@ -88,6 +99,12 @@ const Lightbox = ({ items, index, onClose, onNavigate }: Props) => {
                 </div>
 
                 {items.length > 1 && <LightboxThumbnails items={items} index={index} onNavigate={onNavigate} />}
+                <LightboxPreloader
+                    items={items}
+                    index={index}
+                    viewport={viewport}
+                    isCurrentReady={readyKey === getLightboxImageKey(current)}
+                />
             </ModalDialog>
         </Portal>
     );
