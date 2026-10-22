@@ -93,6 +93,20 @@ afterEach(async () => {
 });
 
 describe('client gallery masonry', () => {
+    it('requests enough resolution for each cropped photo in the phone layout', async () => {
+        await page.viewport(393, 852);
+        await MixedPhotos.run();
+        await expectMeasured();
+        for (const tile of getTiles()) {
+            const image = tile.querySelector('img');
+            if (!image) throw new Error('Photo missing');
+            const bounds = tile.getBoundingClientRect();
+            const aspectRatio = Number(image.getAttribute('width')) / Number(image.getAttribute('height'));
+            const requestedWidth = Number.parseFloat(image.sizes);
+            expect(requestedWidth).toBeGreaterThanOrEqual(bounds.width);
+            expect(requestedWidth / aspectRatio).toBeGreaterThanOrEqual(bounds.height);
+        }
+    });
     it('keeps every spacing choice aligned on dark backgrounds across mobile, tablet and desktop', async () => {
         await DarkSpacing.run();
         for (const width of [375, 768, 1440]) {

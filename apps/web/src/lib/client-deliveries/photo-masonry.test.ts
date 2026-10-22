@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getPhotoMasonry, type PhotoMasonryMeasurements } from './photo-masonry';
+import { getPhotoImageSize, getPhotoMasonry, type PhotoMasonryMeasurements } from './photo-masonry';
 
 const measurements: PhotoMasonryMeasurements = {
     width: 1000,
@@ -12,6 +12,26 @@ const mixedPhotos = Array.from({ length: 17 }, (_, index) => ({
     width: [900, 1600, 1000][index % 3] ?? 1000,
     height: [1200, 900, 1000][index % 3] ?? 1000,
 }));
+
+describe('client grid image resolution', () => {
+    it('requests the full covered image width rather than just its visible crop', () => {
+        expect(getPhotoImageSize({ width: 6000, height: 4000 }, { width: 179, height: 134.25 })).toBe('202px');
+        expect(getPhotoImageSize({ width: 4000, height: 4000 }, { width: 179, height: 238.67 })).toBe('239px');
+        expect(getPhotoImageSize({ width: 4000, height: 6000 }, { width: 179, height: 238.67 })).toBe('179px');
+    });
+
+    it('supplies enough source pixels for both crop axes on a 3× phone display, including taller bottom tiles', () => {
+        const { tiles } = getPhotoMasonry(mixedPhotos, { ...measurements, width: 361, columns: 2 });
+        for (const tile of tiles) {
+            const photo = mixedPhotos[tile.index];
+            if (!photo) throw new Error('Missing photo');
+            const sourceWidth = Number.parseInt(getPhotoImageSize(photo, tile), 10) * 3;
+            const sourceHeight = sourceWidth * (photo.height / photo.width);
+            expect(sourceWidth).toBeGreaterThanOrEqual(tile.width * 3);
+            expect(sourceHeight).toBeGreaterThanOrEqual(tile.height * 3);
+        }
+    });
+});
 
 describe('client photo masonry', () => {
     it('keeps saved order and fills the shortest column from left to right', () => {

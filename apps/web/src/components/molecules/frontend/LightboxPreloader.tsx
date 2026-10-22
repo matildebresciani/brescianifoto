@@ -16,8 +16,9 @@ type Props = {
     index: number;
     viewport: LightboxViewport | null;
     isCurrentReady: boolean;
+    quality?: number;
 };
-type Request = { image: Media; size: string; key: string };
+type Request = { image: Media; size: string; quality: number; key: string };
 
 function remember(cache: Set<string>, key: string) {
     cache.delete(key);
@@ -27,20 +28,23 @@ function remember(cache: Set<string>, key: string) {
 }
 
 /** Warms only the next slide after the selected photo has loaded. */
-export default function LightboxPreloader({ items, index, viewport, isCurrentReady }: Props) {
+export default function LightboxPreloader({ items, index, viewport, isCurrentReady, quality = 75 }: Props) {
     const completedRef = useRef(new Set<string>());
     const [request, setRequest] = useState<Request | null>(null);
 
     useEffect(() => {
         const current = items[index];
         if (!current || !viewport || !isCurrentReady) return;
-        remember(completedRef.current, `${getLightboxImageKey(current)}:${getLightboxImageSize(current, viewport)}`);
+        remember(
+            completedRef.current,
+            `${getLightboxImageKey(current)}:${getLightboxImageSize(current, viewport)}:${quality}`,
+        );
         if (request || !canPreloadLightboxImages()) return;
 
         const next = getLightboxNeighbors(items, index)
             .map((image) => {
                 const size = getLightboxImageSize(image, viewport);
-                return { image, size, key: `${getLightboxImageKey(image)}:${size}` };
+                return { image, size, quality, key: `${getLightboxImageKey(image)}:${size}:${quality}` };
             })
             .find(({ key }) => !completedRef.current.has(key));
         if (!next) return;
@@ -48,7 +52,7 @@ export default function LightboxPreloader({ items, index, viewport, isCurrentRea
         // Navigation cancels this timer. An existing request is allowed to finish before another starts.
         const timer = window.setTimeout(() => setRequest(next), 200);
         return () => window.clearTimeout(timer);
-    }, [items, index, viewport, isCurrentReady, request]);
+    }, [items, index, viewport, isCurrentReady, request, quality]);
 
     if (!request) return null;
     const finish = () => {
@@ -61,6 +65,7 @@ export default function LightboxPreloader({ items, index, viewport, isCurrentRea
         <ImageMedia
             key={request.key}
             resource={request.image}
+            quality={request.quality}
             alt=""
             className="hidden"
             size={request.size}

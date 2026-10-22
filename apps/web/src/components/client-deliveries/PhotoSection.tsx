@@ -4,7 +4,11 @@ import { motion, useReducedMotion } from 'motion/react';
 import Image from 'next/image';
 import { type CSSProperties, useCallback, useContext, useMemo, useState } from 'react';
 import RichText from '@/components/molecules/admin/RichText';
-import { getPhotoMasonry, type PhotoMasonryMeasurements } from '@/lib/client-deliveries/photo-masonry';
+import {
+    getPhotoImageSize,
+    getPhotoMasonry,
+    type PhotoMasonryMeasurements,
+} from '@/lib/client-deliveries/photo-masonry';
 import { themeStyle } from '@/lib/client-deliveries/shared';
 import type { DeliveryBlock, PhotoSpacing } from '@/lib/client-deliveries/view';
 import { GalleryLightboxContext } from './GalleryLightbox';
@@ -126,7 +130,7 @@ export function PhotoSection({
                                         quality={90}
                                         sizes={
                                             tile
-                                                ? `${Math.ceil(tile.width)}px`
+                                                ? getPhotoImageSize(photo, tile)
                                                 : `(min-width: 1280px) ${desktopColumns === 3 ? '33vw' : '25vw'}, (min-width: 768px) 33vw, 50vw`
                                         }
                                         loading="lazy"

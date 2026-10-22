@@ -13,6 +13,7 @@ import type { Media } from '@/payload-types';
 
 type Props = {
     image: Media;
+    quality?: number;
     isActive?: boolean;
     onViewportChange?: (viewport: LightboxViewport) => void;
     onReady?: (size: string) => void;
@@ -67,6 +68,7 @@ function clampPan(point: Point, limits: Point): Point {
 /** Owns the photo's pointer gestures; remount for each photo to reset zoom and pan. */
 const LightboxImage = ({
     image,
+    quality,
     isActive = true,
     onViewportChange,
     onReady,
@@ -263,6 +265,7 @@ const LightboxImage = ({
                         <ImageMedia
                             key={retryCount}
                             resource={image}
+                            quality={quality}
                             style={{ width: fitted.width, height: fitted.height }}
                             className={cn(
                                 'relative z-10 max-h-full max-w-full shrink-0 object-contain',
