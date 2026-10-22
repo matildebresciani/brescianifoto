@@ -27,6 +27,8 @@ const gallery: ClientGallery = {
     id: 'gallery-1',
     name: 'INTERNAL PRIVATE NAME',
     title: 'Alex & Jamie',
+    date: '2026-10-17T00:00:00.000Z',
+    location: 'København',
     shareId: 'a'.repeat(32),
     cover: photo.id,
     blocks: [],
@@ -46,7 +48,14 @@ describe('delivery social previews', () => {
         const metadata = await deliveryMetadata('a'.repeat(32), false);
         expect(metadata).toMatchObject({
             title: 'Alex & Jamie · brescianifoto',
+            description: '17. oktober 2026 · København',
+            alternates: { canonical: `https://example.test/deliveries/${'a'.repeat(32)}` },
             openGraph: {
+                title: 'Alex & Jamie',
+                description: '17. oktober 2026 · København',
+                siteName: 'brescianifoto',
+                locale: 'da_DK',
+                url: `https://example.test/deliveries/${'a'.repeat(32)}`,
                 images: [
                     {
                         width: 1200,
@@ -58,13 +67,24 @@ describe('delivery social previews', () => {
                     },
                 ],
             },
-            twitter: { card: 'summary_large_image' },
+            twitter: {
+                card: 'summary_large_image',
+                title: 'Alex & Jamie',
+                description: '17. oktober 2026 · København',
+            },
         });
         expect(JSON.stringify(metadata)).not.toContain(gallery.name);
         expect(mocks.url).not.toHaveBeenCalled();
         expect(await deliveryMetadata('a'.repeat(32), false)).toEqual(metadata);
         mocks.read.mockResolvedValue({ ...data, gallery: { ...gallery, focalX: 100 } });
         expect((await deliveryMetadata('a'.repeat(32), false)).openGraph).not.toEqual(metadata.openGraph);
+    });
+    it('uses the gallery title when no date or location is published', async () => {
+        mocks.read.mockResolvedValue({ ...data, gallery: { ...gallery, date: null, location: null } });
+        expect(await deliveryMetadata('a'.repeat(32), false)).toMatchObject({
+            description: 'Billedgalleri med Alex & Jamie.',
+            openGraph: { title: 'Alex & Jamie', description: 'Billedgalleri med Alex & Jamie.' },
+        });
     });
     it('never queries or exposes draft content in preview metadata', async () => {
         expect(await deliveryMetadata('a'.repeat(32), true)).toMatchObject({ openGraph: null, twitter: null });
@@ -99,5 +119,20 @@ describe('delivery social previews', () => {
         expect(channels[0]?.mean).toBeGreaterThan(200);
         expect(channels[1]?.mean).toBeLessThan(50);
         expect(createHash('sha256').update(source).digest('hex')).toBe(checksum);
+    });
+    it('reuses a derived preview but regenerates it when its image or focal point changes', async () => {
+        const source = await sharp({ create: { width: 1800, height: 900, channels: 3, background: '#da2345' } })
+            .jpeg()
+            .toBuffer();
+        const fetchImage = vi.fn().mockImplementation(async () => new Response(new Uint8Array(source)));
+        vi.stubGlobal('fetch', fetchImage);
+        mocks.url.mockResolvedValue('https://storage.test/signed');
+        const featured = { ...photo, checksum: 'cached-preview' };
+        const first = await renderSocialImage(featured, 50, 50);
+        expect(await renderSocialImage(featured, 50, 50)).toBe(first);
+        expect(fetchImage).toHaveBeenCalledTimes(1);
+        await renderSocialImage(featured, 0, 50);
+        await renderSocialImage({ ...featured, checksum: 'updated-preview' }, 50, 50);
+        expect(fetchImage).toHaveBeenCalledTimes(3);
     });
 });

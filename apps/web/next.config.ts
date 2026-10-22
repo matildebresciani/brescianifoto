@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
         qualities: [75, 90],
         remotePatterns: [
             ...clientImagePatterns,
-            ...[NEXT_PUBLIC_SERVER_URL, process.env.R2_PUBLIC_URL]
+            ...[...new Set([NEXT_PUBLIC_SERVER_URL, process.env.NEXT_PUBLIC_SERVER_URL, process.env.R2_PUBLIC_URL])]
                 .filter((item): item is string => Boolean(item))
                 .map((item): { hostname: string; protocol: 'http' | 'https'; port: string } => {
                     const url = new URL(item);
