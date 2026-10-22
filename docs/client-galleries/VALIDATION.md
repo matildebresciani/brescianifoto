@@ -1,5 +1,12 @@
 # Client gallery validation — 2026-10-22
 
+## Masonry with aligned bottom — 2026-10-22
+
+- Following the photographer's reference and permission to crop grid previews, client sections now use equal-width masonry instead of justified rows. Both gaps are 2px. Columns switch from two to three at 768px and four at 1280px. Normal previews use 4:3 for landscapes/squares and 3:4 for portraits; object-cover preserves photo colors without stretching. Only final tile heights change to create a common bottom, keeping at least 75% of their normal height. Full viewer images and originals retain their source proportions. Public portfolio galleries are unchanged.
+- Nine focused masonry unit tests pass, covering shortest-column order, equal widths, gaps, normal tile ratios, bottom alignment, single images, small/empty/unmeasured galleries, wide panoramas, original dimension preservation and 500-photo sequences.
+- Five Chromium browser tests pass at 320, 375, 768, 1024, 1280 and 1440px. They verify equal column widths, normal crop ratios, straight bottom, horizontal/vertical gaps, saved DOM order, no overflow, container resizing, a breakpoint change at fixed container width, single-photo sizing, keyboard order, correct lightbox/download indices, focus return and 500 lazy photos with static reduced-motion states. Native image fixtures isolate layout from the Next image server and remote storage.
+- TypeScript and scoped Biome lint/format checks pass. The test runner still emits the existing missing Storybook Webpack preset warnings; the selected unit and browser suites complete successfully.
+
 ## Editor cleanup — 2026-10-22
 
 - Palette rows and selectors show swatches and uppercase hex values; internal color variables are hidden. Only semantic names such as `bg-base` and `fg-base` remain visible. Names are hidden and optional; legacy names and references remain compatible. Semantic assignments are grouped as Background, Text and Border. Section labels use live titles/counts or text excerpts.

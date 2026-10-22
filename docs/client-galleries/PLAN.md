@@ -20,7 +20,7 @@ Each photo section also has an optional Lexical introduction above its photograp
 
 ### Presentation
 
-Default bone/void palette, customizable background/surface/text/muted/border roles via validated CSS variables. Buttons derive from the palette. Scoped theme includes portal lightboxes. Show contrast feedback and prevent unreadable published combinations. Preserve original photo colors/proportions. Uncropped masonry-style two-column mobile/three-column desktop grid; cover alone may crop. Sticky desktop menu with active section, expandable mobile menu showing current section, anchor deep links, keyboard navigation, sticky offset and reduced motion. Minimal branding/footer, no portfolio navigation.
+Default bone/void palette, customizable background/surface/text/muted/border roles via validated CSS variables. Buttons derive from the palette. Scoped theme includes portal lightboxes. Show contrast feedback and prevent unreadable published combinations. Preserve original photo colors and full images in the viewer/downloads. Client grids use equal-width masonry columns with 2px horizontal/vertical gaps: two columns below 768px, three below 1280px, four on wide screens. Landscape/square previews use 4:3 and portrait previews use 3:4, with object-cover cropping. Place saved photos into the shortest column, resolving ties left to right; retain saved DOM, keyboard and viewer order. Only the last tile in each occupied column changes height to share a straight bottom edge, retaining at least 75% of its normal height. Reflow on container resize. This supersedes the earlier justified-row proposal. Public portfolio galleries retain their separate layout. Sticky desktop menu with active section, expandable mobile menu showing current section, anchor deep links, keyboard navigation, sticky offset and reduced motion. Minimal branding/footer, no portfolio navigation.
 
 ### Uploads and downloads
 
@@ -216,7 +216,7 @@ See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPE
   {
     "id": "CG-07",
     "title": "Sections and navigation",
-    "description": "Uncropped two/three-column grid; lazy WebP previews. Stable anchors; sticky desktop menu and expandable active mobile section menu.",
+    "description": "Equal-width masonry with 4:3/3:4 cropped previews, 2px gaps, an aligned gallery bottom and lazy loading. Stable saved order and anchors; sticky desktop menu and expandable active mobile section menu.",
     "dependencies": [
       "CG-03",
       "CG-04",
@@ -224,18 +224,19 @@ See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPE
     ],
     "status": "Done",
     "acceptance": [
-      "Uncropped two/three-column grid; lazy WebP previews.",
+      "Equal-width masonry uses 4:3 landscapes and 3:4 portraits, adjusting only final tile heights for an aligned bottom; preserve 2px gaps, saved order, lazy previews and full viewer images.",
       "Stable anchors; sticky desktop menu and expandable active mobile section menu."
     ],
     "notes": [
-      "Two/three-column uncropped photo sections, stable menu anchors, active section and expandable mobile menu.",
+      "2026-10-22: Photographer replaced the justified-row proposal with reference-style masonry and authorized object-cover grid crops. CSS variables define 2px gaps, 2/3/4 columns and 4:3/3:4 ratios. Only final tiles adjust for the common bottom; DOM and lightbox retain saved indices. Portfolio galleries are unchanged.",
       "Section introductions render above the photos. Colors are scoped to their block and lightbox; adjacent sections inherit the gallery normally."
     ],
     "evidence": [
       "500-photo browser fixture: 501 images including cover, 500 lazy images, 15 initially loaded, zero original images loaded directly; mobile anchor navigation passed.",
-      "Browser checked dark section/light text, centered bold introduction, unaffected neighbor, lightbox palette, and 375px two-column layout without horizontal overflow."
+      "Earlier masonry browser checks covered dark section/light text, centered bold introduction, unaffected neighbor, lightbox palette, and 375px layout without horizontal overflow.",
+      "2026-10-22: Nine masonry unit tests and five Chromium browser tests pass. Verified 320/375/768/1024/1280/1440px layouts, equal widths, 2px gaps, normal tile ratios, straight bottom, saved order, single-photo sizing, container/breakpoint resize, lightbox indices/download links/focus return, and 500 lazy photos with reduced motion. TypeScript passes."
     ],
-    "updatedAt": "2026-10-21"
+    "updatedAt": "2026-10-22"
   },
   {
     "id": "CG-08",
