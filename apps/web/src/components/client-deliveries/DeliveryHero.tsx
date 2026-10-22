@@ -1,5 +1,4 @@
 import { hasText } from '@payloadcms/richtext-lexical/shared';
-import { ArrowDown } from 'lucide-react';
 import Image from 'next/image';
 import RichText from '@/components/molecules/admin/RichText';
 import type { DeliveryView } from '@/lib/client-deliveries/view';
@@ -31,10 +30,9 @@ export function DeliveryHero({ gallery }: { gallery: DeliveryView }) {
                 <div className="mt-md">
                     <a
                         href="#main-content"
-                        className="delivery-hero-link focus-ring ui-text inline-flex min-h-12 items-center justify-center gap-xs rounded-[var(--btn-radius)] border border-current px-md py-xs no-underline"
+                        className="delivery-hero-link focus-ring ui-text inline-flex min-h-12 items-center justify-center px-xs py-xs underline"
                     >
                         Se galleriet
-                        <ArrowDown aria-hidden="true" size={16} strokeWidth={1.5} />
                     </a>
                 </div>
             )}

@@ -139,14 +139,15 @@
     margin-top: var(--space-md);
 }
 .delivery-hero-link {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
     transition:
-        background-color 280ms ease,
-        color 280ms ease;
+        text-underline-offset 280ms var(--delivery-ease),
+        text-decoration-thickness 280ms ease;
 }
-.delivery-hero-link:hover {
-    background: var(--fg-base);
-    color: var(--bg-base);
-    border-color: var(--fg-base);
+.delivery-hero-link:is(:hover, :focus-visible) {
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.5em;
 }
 .delivery-hero-link:focus-visible {
     outline-color: currentColor;
