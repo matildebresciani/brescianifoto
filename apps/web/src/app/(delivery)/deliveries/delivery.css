@@ -223,7 +223,7 @@
     border-color: var(--border-base);
 }
 .delivery-photo-grid {
-    --delivery-photo-gap: 2px;
+    --delivery-photo-gap: var(--delivery-photo-spacing, 2px);
     --delivery-photo-columns: 2;
     --delivery-photo-landscape-ratio: 1.3333333333333333;
     --delivery-photo-portrait-ratio: 0.75;
@@ -285,7 +285,7 @@
 }
 @media (min-width: 1280px) {
     .delivery-photo-grid {
-        --delivery-photo-columns: 4;
+        --delivery-photo-columns: var(--delivery-photo-desktop-columns, 4);
     }
 }
 @media (prefers-reduced-motion: reduce) {

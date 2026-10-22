@@ -60,6 +60,51 @@ beforeEach(() => {
 
 describe('unlisted delivery reads', () => {
     it.each([
+        { savedSpacing: undefined, expectedSpacing: 2 },
+        { savedSpacing: null, expectedSpacing: 2 },
+        { savedSpacing: '0', expectedSpacing: 0 },
+        { savedSpacing: '2', expectedSpacing: 2 },
+        { savedSpacing: '4', expectedSpacing: 4 },
+        { savedSpacing: '8', expectedSpacing: 8 },
+    ] satisfies {
+        savedSpacing: ClientGallery['photoSpacing'];
+        expectedSpacing: number;
+    }[])('resolves photo spacing: $savedSpacing → $expectedSpacing', async ({ savedSpacing, expectedSpacing }) => {
+        const view = await deliveryView(
+            {
+                gallery: { ...gallery, photoSpacing: savedSpacing },
+                photos: [photo],
+                archive: undefined,
+                isArchiveCurrent: false,
+            },
+            false,
+        );
+        expect(view.photoSpacing).toBe(expectedSpacing);
+    });
+    it.each([
+        { savedColumns: undefined, expectedColumns: 4 },
+        { savedColumns: null, expectedColumns: 4 },
+        { savedColumns: '3', expectedColumns: 3 },
+        { savedColumns: '4', expectedColumns: 4 },
+    ] satisfies {
+        savedColumns: ClientGallery['desktopColumns'];
+        expectedColumns: number;
+    }[])('resolves desktop photo columns: $savedColumns → $expectedColumns', async ({
+        savedColumns,
+        expectedColumns,
+    }) => {
+        const view = await deliveryView(
+            {
+                gallery: { ...gallery, desktopColumns: savedColumns },
+                photos: [photo],
+                archive: undefined,
+                isArchiveCurrent: false,
+            },
+            false,
+        );
+        expect(view.desktopColumns).toBe(expectedColumns);
+    });
+    it.each([
         { preferences: {}, color: '#151611', opacity: 72 },
         { preferences: { overlayColor: '#25261F', overlayOpacity: 35 }, color: '#25261F', opacity: 35 },
         { preferences: { overlayColor: '#151611', overlayOpacity: 0 }, color: '#151611', opacity: 0 },

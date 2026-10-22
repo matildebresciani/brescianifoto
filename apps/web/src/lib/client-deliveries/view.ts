@@ -1,6 +1,9 @@
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import type { DeliveryTheme } from './shared';
 
+/** Supported gallery-wide spacing choices, in CSS pixels. */
+export type PhotoSpacing = 0 | 2 | 4 | 8;
+
 export type DeliveryPhoto = {
     id: string;
     src: string;
@@ -30,6 +33,8 @@ export type DeliveryView = {
     details?: SerializedEditorState | null;
     cover?: DeliveryPhoto;
     coverLayout: 'editorial' | 'overlay';
+    desktopColumns: 3 | 4;
+    photoSpacing: PhotoSpacing;
     overlayColor: string;
     overlayOpacity: number;
     alignment: 'left' | 'center' | 'right';

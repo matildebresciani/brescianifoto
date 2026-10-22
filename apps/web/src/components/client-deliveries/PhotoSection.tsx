@@ -6,53 +6,70 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import RichText from '@/components/molecules/admin/RichText';
 import { getPhotoMasonry, type PhotoMasonryMeasurements } from '@/lib/client-deliveries/photo-masonry';
 import { themeStyle } from '@/lib/client-deliveries/shared';
-import type { DeliveryBlock } from '@/lib/client-deliveries/view';
+import type { DeliveryBlock, PhotoSpacing } from '@/lib/client-deliveries/view';
 import { GalleryLightboxContext } from './GalleryLightbox';
 
-export function PhotoSection({ block }: { block: Extract<DeliveryBlock, { type: 'photos' }> }) {
+export function PhotoSection({
+    block,
+    desktopColumns = 4,
+    photoSpacing = 2,
+}: {
+    block: Extract<DeliveryBlock, { type: 'photos' }>;
+    desktopColumns?: 3 | 4;
+    photoSpacing?: PhotoSpacing;
+}) {
     const openPhoto = useContext(GalleryLightboxContext);
     const shouldReduceMotion = useReducedMotion();
     const [measurements, setMeasurements] = useState<PhotoMasonryMeasurements | null>(null);
-    const measureGrid = useCallback((element: HTMLDivElement | null) => {
-        if (!element) return;
-        const measure = () => {
-            const styles = window.getComputedStyle(element);
-            const width = element.getBoundingClientRect().width;
-            const gap = Number.parseFloat(styles.gap);
-            const columns = Number.parseInt(styles.getPropertyValue('--delivery-photo-columns'), 10);
-            const landscapeRatio = Number.parseFloat(styles.getPropertyValue('--delivery-photo-landscape-ratio'));
-            const portraitRatio = Number.parseFloat(styles.getPropertyValue('--delivery-photo-portrait-ratio'));
-            if (width <= 0) return;
-            setMeasurements((previous) =>
-                previous?.width === width &&
-                previous.gap === gap &&
-                previous.columns === columns &&
-                previous.landscapeRatio === landscapeRatio &&
-                previous.portraitRatio === portraitRatio
-                    ? previous
-                    : { width, gap, columns, landscapeRatio, portraitRatio },
-            );
-        };
-        measure();
-        const observer = new ResizeObserver(measure);
-        observer.observe(element);
-        // Breakpoints can change the column count without changing a constrained container's width.
-        window.addEventListener('resize', measure);
-        return () => {
-            observer.disconnect();
-            window.removeEventListener('resize', measure);
-        };
-    }, []);
+    const measureGrid = useCallback(
+        (element: HTMLDivElement | null) => {
+            if (!element) return;
+            const measure = () => {
+                const styles = window.getComputedStyle(element);
+                const width = element.getBoundingClientRect().width;
+                const gap = photoSpacing;
+                const columns = Math.min(
+                    Number.parseInt(styles.getPropertyValue('--delivery-photo-columns'), 10),
+                    desktopColumns,
+                );
+                const landscapeRatio = Number.parseFloat(styles.getPropertyValue('--delivery-photo-landscape-ratio'));
+                const portraitRatio = Number.parseFloat(styles.getPropertyValue('--delivery-photo-portrait-ratio'));
+                if (width <= 0) return;
+                setMeasurements((previous) =>
+                    previous?.width === width &&
+                    previous.gap === gap &&
+                    previous.columns === columns &&
+                    previous.landscapeRatio === landscapeRatio &&
+                    previous.portraitRatio === portraitRatio
+                        ? previous
+                        : { width, gap, columns, landscapeRatio, portraitRatio },
+                );
+            };
+            measure();
+            const observer = new ResizeObserver(measure);
+            observer.observe(element);
+            // Breakpoints can change the column count without changing a constrained container's width.
+            window.addEventListener('resize', measure);
+            return () => {
+                observer.disconnect();
+                window.removeEventListener('resize', measure);
+            };
+        },
+        [desktopColumns, photoSpacing],
+    );
     const layout = useMemo(
         () => (measurements ? getPhotoMasonry(block.photos, measurements) : null),
         [block.photos, measurements],
     );
+    const sectionStyle = themeStyle(block.theme);
+    sectionStyle['--delivery-photo-desktop-columns'] = String(desktopColumns);
+    sectionStyle['--delivery-photo-spacing'] = `${photoSpacing}px`;
     return (
         <section
             id={block.anchor}
             tabIndex={-1}
             className="delivery-section bg-bg-base text-fg-base outline-none"
-            style={themeStyle(block.theme)}
+            style={sectionStyle}
             aria-label={block.menuLabel}
         >
             <div className="delivery-section-inner">
@@ -107,7 +124,7 @@ export function PhotoSection({ block }: { block: Extract<DeliveryBlock, { type: 
                                         sizes={
                                             tile
                                                 ? `${Math.ceil(tile.width)}px`
-                                                : '(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw'
+                                                : `(min-width: 1280px) ${desktopColumns === 3 ? '33vw' : '25vw'}, (min-width: 768px) 33vw, 50vw`
                                         }
                                         loading="lazy"
                                         className="block h-full w-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"

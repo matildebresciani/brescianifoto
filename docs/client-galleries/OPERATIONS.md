@@ -12,6 +12,8 @@
 
 Publishing requires a **Featured image** and at least one photo selected in a **Photo section**, in addition to the marked name/title fields and readable color contrast. Featured image and Page sections use Payload’s standard red required asterisk. Uploading to the Photo library alone does not satisfy the section requirement. Empty drafts can still be saved; a failed publish points to the missing fields.
 
+Under **Overview → Appearance → Desktop photo columns**, choose **3 columns** for larger photos or **4 columns** for a denser gallery. Four is the default. The choice applies to all photo sections on wide desktop screens; mobile/tablet retain their existing layout. **Photo spacing** offers **0px — No gap**, **2px**, **4px** or **8px** between photos on every screen size. Two pixels is the default; try 4px on dark backgrounds or 0px for a seamless grid. Save draft to preview these choices, then Publish to update the shared gallery. All combinations retain an aligned gallery bottom. Changing columns or spacing does not invalidate the ZIP or change the gallery link.
+
 The sidebar **Slug** is generated once and forms the final part of the gallery URL. It stays fixed when the title changes, preserving shared links. The stored API field remains `shareId` for compatibility. Use **Copy client link** for the public URL; draft previews use Payload’s native controls.
 
 Changing selected photos marks the archive stale and hides Download all. Upload a replacement ZIP, or check **I confirm this ZIP contains exactly the currently selected photos** and save if the archive is still correct. Confirmation applies only to that photo revision. Rearranging photos does not invalidate the archive.

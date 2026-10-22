@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { useState } from 'react';
 import { themeDefaults } from '@/lib/client-deliveries/theme';
-import type { DeliveryBlock, DeliveryPhoto } from '@/lib/client-deliveries/view';
+import type { DeliveryBlock, DeliveryPhoto, PhotoSpacing } from '@/lib/client-deliveries/view';
 import { GalleryLightbox } from './GalleryLightbox';
 import { PhotoSection } from './PhotoSection';
 import '@/app/(frontend)/globals.css';
@@ -52,6 +53,59 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const MixedPhotos: Story = {};
+export const ThreeColumns: Story = { args: { desktopColumns: 3 } };
+
+function ColumnComparison({ block }: { block: Extract<DeliveryBlock, { type: 'photos' }> }) {
+    const [desktopColumns, setDesktopColumns] = useState<3 | 4>(4);
+    const [photoSpacing, setPhotoSpacing] = useState<PhotoSpacing>(2);
+    return (
+        <>
+            <div className="flex gap-xs p-base">
+                <button
+                    type="button"
+                    className="delivery-outline ui-text focus-ring"
+                    aria-pressed={desktopColumns === 3}
+                    onClick={() => setDesktopColumns(3)}
+                >
+                    3 columns
+                </button>
+                <button
+                    type="button"
+                    className="delivery-outline ui-text focus-ring"
+                    aria-pressed={desktopColumns === 4}
+                    onClick={() => setDesktopColumns(4)}
+                >
+                    4 columns
+                </button>
+            </div>
+            <fieldset className="flex gap-xs px-base" aria-label="Photo spacing">
+                {([0, 2, 4, 8] satisfies PhotoSpacing[]).map((spacing) => (
+                    <button
+                        key={spacing}
+                        type="button"
+                        className="delivery-outline ui-text focus-ring"
+                        aria-pressed={photoSpacing === spacing}
+                        onClick={() => setPhotoSpacing(spacing)}
+                    >
+                        {spacing}px
+                    </button>
+                ))}
+            </fieldset>
+            <PhotoSection block={block} desktopColumns={desktopColumns} photoSpacing={photoSpacing} />
+        </>
+    );
+}
+
+export const ChooseColumns: Story = { render: ({ block }) => <ColumnComparison block={block} /> };
+export const DarkSpacing: Story = {
+    args: {
+        block: {
+            ...block,
+            theme: { ...themeDefaults, background: '#151611', surface: '#25261F', text: '#FAFFEF', muted: '#FAFFEF' },
+        },
+    },
+    render: ({ block }) => <ColumnComparison block={block} />,
+};
 export const SinglePhoto: Story = {
     args: { block: { ...block, photos: photos.slice(0, 1) } },
 };

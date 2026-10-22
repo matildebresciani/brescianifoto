@@ -22,6 +22,10 @@ Each photo section also has an optional Lexical introduction above its photograp
 
 Default bone/void palette, customizable background/surface/text/muted/border roles via validated CSS variables. Buttons derive from the palette. Scoped theme includes portal lightboxes. Show contrast feedback and prevent unreadable published combinations. Preserve original photo colors and full images in the viewer/downloads. Client grids use equal-width masonry columns with 2px horizontal/vertical gaps: two columns below 768px, three below 1280px, four on wide screens. Landscape/square previews use 4:3 and portrait previews use 3:4, with object-cover cropping. Place saved photos into the shortest column, resolving ties left to right; retain saved DOM, keyboard and viewer order. Only the last tile in each occupied column changes height to share a straight bottom edge, retaining at least 75% of its normal height. Reflow on container resize. This supersedes the earlier justified-row proposal. Public portfolio galleries retain their separate layout. Sticky desktop menu with active section, expandable mobile menu showing current section, anchor deep links, keyboard navigation, sticky offset and reduced motion. Minimal branding/footer, no portfolio navigation.
 
+Desktop photo density is selectable per gallery under **Overview → Appearance → Desktop photo columns**: three or four columns at 1280px and above. Four remains the default for new and legacy galleries. The choice applies to every photo section; below 1280px the existing two-column mobile/three-column tablet layout remains. Changing the preference remeasures without requiring a viewport resize and does not change photo order, the shared link, or ZIP revision. No database migration is required.
+
+The adjacent **Photo spacing** select offers 0, 2, 4 or 8px, applied horizontally and vertically to every photo section at every viewport. Two pixels remains the default for new/legacy galleries. Zero means no gap and must not fall back to the default. Changing spacing remeasures immediately and retains the straight bottom edge, gallery link, and ZIP revision. The earlier fixed-2px requirement is now the default, rather than the only spacing.
+
 ### Uploads and downloads
 
 Unpredictable isolated R2 object keys; original names retained for attachment downloads. Original JPEG bytes never resized/recompressed/rewritten; generate admin thumbnail separately. Responsive Next image optimization with WebP, dimensions and lazy loading; prioritize cover; load lightbox previews on demand. Bulk upload bounded concurrency, progress, per-file errors and idempotent retries. Direct R2 multipart ZIP upload with retry/cancel/completion verification and abandoned-upload cleanup. Original/ZIP downloads go straight to storage with attachment headers, never buffered in browser JS or Vercel. Preserve existing EXIF/IPTC/XMP/color profiles. Show ZIP size; bind ZIP to a photo-set revision. Photo add/replace/remove makes ZIP stale and hides Download all until replacement or explicit photographer confirmation. Reordering alone does not invalidate the archive.
@@ -224,7 +228,7 @@ See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPE
     ],
     "status": "Done",
     "acceptance": [
-      "Equal-width masonry uses 4:3 landscapes and 3:4 portraits, adjusting only final tile heights for an aligned bottom; preserve 2px gaps, saved order, lazy previews and full viewer images.",
+      "Equal-width masonry uses 4:3 landscapes and 3:4 portraits, adjusting only final tile heights for an aligned bottom; preserve saved order, lazy previews and full viewer images. Payload offers per-gallery choices of three/four desktop columns and 0/2/4/8px spacing, defaulting to four columns and 2px.",
       "Stable anchors; sticky desktop menu and expandable active mobile section menu."
     ],
     "notes": [
@@ -234,7 +238,9 @@ See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPE
     "evidence": [
       "500-photo browser fixture: 501 images including cover, 500 lazy images, 15 initially loaded, zero original images loaded directly; mobile anchor navigation passed.",
       "Earlier masonry browser checks covered dark section/light text, centered bold introduction, unaffected neighbor, lightbox palette, and 375px layout without horizontal overflow.",
-      "2026-10-22: Nine masonry unit tests and five Chromium browser tests pass. Verified 320/375/768/1024/1280/1440px layouts, equal widths, 2px gaps, normal tile ratios, straight bottom, saved order, single-photo sizing, container/breakpoint resize, lightbox indices/download links/focus return, and 500 lazy photos with reduced motion. TypeScript passes."
+      "2026-10-22: Nine masonry unit tests and five Chromium browser tests pass. Verified 320/375/768/1024/1280/1440px layouts, equal widths, 2px gaps, normal tile ratios, straight bottom, saved order, single-photo sizing, container/breakpoint resize, lightbox indices/download links/focus return, and 500 lazy photos with reduced motion. TypeScript passes.",
+      "2026-10-22: Added per-gallery Desktop photo columns select in Overview/Appearance. Twenty-three focused unit tests and seven Chromium tests pass, including legacy defaults and changing three/four without resizing. Dedicated loopback Payload QA verifies default four, save/reload both choices, visitor projection and stable share IDs/photo revisions. Types regenerated; typecheck and scoped Biome checks pass.",
+      "2026-10-22: Added Photo spacing select (0/2/4/8px, default 2). Twenty-nine unit tests and eight Chromium tests pass, including every gap on dark mobile/tablet/desktop layouts, no-gap handling, immediate remeasurement and aligned bottoms. Native Payload QA saves/reloads all eight column/spacing combinations with stable share IDs and photo revisions."
     ],
     "updatedAt": "2026-10-22"
   },

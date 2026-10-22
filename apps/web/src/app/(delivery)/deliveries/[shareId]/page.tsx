@@ -80,7 +80,12 @@ export default async function ClientGalleryPage({
                                 </div>
                             </div>
                         ) : (
-                            <PhotoSection key={block.id} block={block} />
+                            <PhotoSection
+                                key={block.id}
+                                block={block}
+                                desktopColumns={gallery.desktopColumns}
+                                photoSpacing={gallery.photoSpacing}
+                            />
                         ),
                     )}
                 </GalleryLightbox>

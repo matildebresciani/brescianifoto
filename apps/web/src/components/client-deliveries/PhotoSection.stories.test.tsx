@@ -16,7 +16,7 @@ vi.mock('next/image', () => ({
     ),
 }));
 
-const { MixedPhotos, SinglePhoto, ManyPhotos } = composeStories(stories);
+const { MixedPhotos, ThreeColumns, ChooseColumns, DarkSpacing, SinglePhoto, ManyPhotos } = composeStories(stories);
 
 function getGrid() {
     const grid = document.querySelector('.delivery-photo-grid');
@@ -36,17 +36,18 @@ async function expectMeasured() {
                 getComputedStyle(getGrid()).getPropertyValue('--delivery-photo-columns'),
                 10,
             );
+            const gap = Number.parseFloat(getComputedStyle(getGrid()).gap);
             return Math.abs(
                 (Number.parseFloat(firstTile?.style.width ?? '') || 0) -
-                    (getGrid().getBoundingClientRect().width - 2 * (columns - 1)) / columns,
+                    (getGrid().getBoundingClientRect().width - gap * (columns - 1)) / columns,
             );
         })
         .toBeLessThan(1);
 }
 
-function expectAlignedMasonry() {
+function expectAlignedMasonry(expectedGap = 2) {
     const grid = getGrid();
-    expect(getComputedStyle(grid).gap).toBe('2px');
+    expect(getComputedStyle(grid).gap).toBe(`${expectedGap}px`);
     expect(grid.scrollWidth).toBeLessThanOrEqual(grid.clientWidth);
     const tiles = getTiles();
     const columns = new Map<number, HTMLElement[]>();
@@ -65,9 +66,12 @@ function expectAlignedMasonry() {
             expect(bounds.width).toBeCloseTo(firstWidth, 1);
             expect(getComputedStyle(image).objectFit).toBe('cover');
             expect(image.getBoundingClientRect().height).toBeCloseTo(bounds.height, 1);
-            expect(bounds.left - grid.getBoundingClientRect().left).toBeCloseTo(columnIndex * (firstWidth + 2), 1);
+            expect(bounds.left - grid.getBoundingClientRect().left).toBeCloseTo(
+                columnIndex * (firstWidth + expectedGap),
+                1,
+            );
             const previous = column[index - 1];
-            if (previous) expect(bounds.top - previous.getBoundingClientRect().bottom).toBeCloseTo(2, 1);
+            if (previous) expect(bounds.top - previous.getBoundingClientRect().bottom).toBeCloseTo(expectedGap, 1);
             else expect(bounds.top).toBeCloseTo(grid.getBoundingClientRect().top, 1);
             if (index === column.length - 1) expect(bounds.bottom).toBeCloseTo(grid.getBoundingClientRect().bottom, 1);
             else {
@@ -89,6 +93,43 @@ afterEach(async () => {
 });
 
 describe('client gallery masonry', () => {
+    it('keeps every spacing choice aligned on dark backgrounds across mobile, tablet and desktop', async () => {
+        await DarkSpacing.run();
+        for (const width of [375, 768, 1440]) {
+            await page.viewport(width, 900);
+            for (const gap of [0, 2, 4, 8]) {
+                await page.getByRole('button', { name: `${gap}px`, exact: true }).click();
+                await expectMeasured();
+                expectAlignedMasonry(gap);
+            }
+        }
+        await page.getByRole('button', { name: '3 columns', exact: true }).click();
+        await expectMeasured();
+        expectAlignedMasonry(8);
+        const section = getGrid().closest('section');
+        if (!section) throw new Error('Photo section missing');
+        expect(getComputedStyle(section).backgroundColor).toBe('rgb(21, 22, 17)');
+    });
+    it('reflows when the saved desktop preference changes without a resize', async () => {
+        await ChooseColumns.run();
+        await expectMeasured();
+        expect(new Set(getTiles().map((tile) => tile.style.left)).size).toBe(4);
+        await page.getByRole('button', { name: '3 columns', exact: true }).click();
+        await expect.poll(() => new Set(getTiles().map((tile) => tile.style.left)).size).toBe(3);
+        expectAlignedMasonry();
+        await page.getByRole('button', { name: '4 columns', exact: true }).click();
+        await expect.poll(() => new Set(getTiles().map((tile) => tile.style.left)).size).toBe(4);
+        expectAlignedMasonry();
+    });
+    it('uses the selected desktop count while preserving mobile and tablet layouts', async () => {
+        await ThreeColumns.run();
+        for (const width of [375, 768, 1280, 1440]) {
+            await page.viewport(width, 900);
+            await expectMeasured();
+            expectAlignedMasonry();
+            expect(new Set(getTiles().map((tile) => tile.style.left)).size).toBe(width < 768 ? 2 : 3);
+        }
+    });
     it('uses equal-width columns, normal tile ratios, 2px gaps and a straight bottom at every breakpoint', async () => {
         await MixedPhotos.run();
         for (const width of [320, 375, 768, 1024, 1280, 1440]) {

@@ -10,7 +10,9 @@ import {
     themeSchema,
 } from './shared';
 import { assetURL } from './storage';
-import type { DeliveryBlock, DeliveryPhoto, DeliveryView } from './view';
+import type { DeliveryBlock, DeliveryPhoto, DeliveryView, PhotoSpacing } from './view';
+
+const photoSpacingByOption = { '0': 0, '2': 2, '4': 4, '8': 8 } satisfies Record<string, PhotoSpacing>;
 
 /** This is the only anonymous document read; never use client collections in generic public queries. */
 export async function readDelivery(shareId: string, isPreview = false, requestHeaders?: Headers) {
@@ -124,6 +126,8 @@ export async function deliveryView(
         details: gallery.details,
         cover,
         coverLayout: gallery.coverLayout || 'editorial',
+        desktopColumns: gallery.desktopColumns === '3' ? 3 : 4,
+        photoSpacing: photoSpacingByOption[gallery.photoSpacing ?? '2'],
         overlayColor: gallery.overlayColor || themeDefaults.text,
         overlayOpacity: gallery.overlayOpacity ?? 72,
         alignment: gallery.alignment || 'center',

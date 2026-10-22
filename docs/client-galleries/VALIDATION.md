@@ -1,5 +1,17 @@
 # Client gallery validation — 2026-10-22
 
+## Photo spacing preference — 2026-10-22
+
+- Added **Overview → Appearance → Photo spacing** with native options 0, 2, 4 and 8px. The choice applies horizontally and vertically to all photo sections at every viewport. Missing/null legacy values retain 2px; zero remains zero. A saved preference change immediately remeasures the grid while retaining normal tile ratios and a straight bottom edge.
+- Twenty-nine focused unit tests and eight Chromium tests pass. Dark-background browser coverage switches through every gap at mobile, tablet and desktop widths, then combines 8px with three desktop columns. Existing order, viewer, resizing and 500-photo checks still pass. Payload types regenerate; TypeScript and scoped Biome checks pass.
+- The isolated `scripts/check-client-gallery-layout.mts` fixture saves/reloads all eight desktop-column/spacing combinations and checks visitor projection, stable share IDs, unchanged photo revisions and the four-column/2px defaults. No production records or original images were modified.
+
+## Desktop column preference — 2026-10-22
+
+- Added **Overview → Appearance → Desktop photo columns**, with native Payload options for three or four columns. Four remains the new/legacy default. The gallery-wide choice applies from 1280px, preserving existing mobile/tablet layouts, 2px gaps, normal crop ratios and the straight bottom edge.
+- Twenty-three focused unit tests and seven Chromium tests pass, including null/missing legacy preferences, both saved values, responsive behavior and switching both directions without resizing the container. Payload types regenerate successfully; TypeScript and scoped Biome lint/format checks pass.
+- The repeatable `scripts/check-client-gallery-layout.mts` fixture passes against the dedicated loopback database `brescianifoto_client_layout_qa`: native default four, save/reload three and four, frontend projection, unchanged share IDs and photo/ZIP revision. No production records or original files were modified. No data migration is needed.
+
 ## Masonry with aligned bottom — 2026-10-22
 
 - Following the photographer's reference and permission to crop grid previews, client sections now use equal-width masonry instead of justified rows. Both gaps are 2px. Columns switch from two to three at 768px and four at 1280px. Normal previews use 4:3 for landscapes/squares and 3:4 for portraits; object-cover preserves photo colors without stretching. Only final tile heights change to create a common bottom, keeping at least 75% of their normal height. Full viewer images and originals retain their source proportions. Public portfolio galleries are unchanged.

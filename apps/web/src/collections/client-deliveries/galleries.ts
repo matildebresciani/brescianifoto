@@ -371,6 +371,34 @@ export const ClientGalleries: CollectionConfig = {
                             admin: { initCollapsed: true },
                             fields: [
                                 {
+                                    name: 'desktopColumns',
+                                    label: 'Desktop photo columns',
+                                    type: 'select',
+                                    defaultValue: '4',
+                                    options: [
+                                        { label: '3 columns', value: '3' },
+                                        { label: '4 columns', value: '4' },
+                                    ],
+                                    admin: {
+                                        description: 'Applies to all photo sections on wide screens.',
+                                    },
+                                },
+                                {
+                                    name: 'photoSpacing',
+                                    label: 'Photo spacing',
+                                    type: 'select',
+                                    defaultValue: '2',
+                                    options: [
+                                        { label: '0px — No gap', value: '0' },
+                                        { label: '2px', value: '2' },
+                                        { label: '4px', value: '4' },
+                                        { label: '8px', value: '8' },
+                                    ],
+                                    admin: {
+                                        description: 'Space between photos in all sections, on every screen size.',
+                                    },
+                                },
+                                {
                                     name: 'coverLayout',
                                     label: 'Layout',
                                     type: 'select',
