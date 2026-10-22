@@ -7,7 +7,7 @@ import './delivery.css';
 import '@/lib/client-deliveries/typography.css';
 
 export const metadata: Metadata = {
-    title: 'Client gallery · brescianifoto',
+    title: 'Billedgalleri · brescianifoto',
     icons: metadataIcons,
     robots: { index: false, follow: false, googleBot: { index: false, follow: false, noimageindex: true } },
     referrer: 'no-referrer',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function DeliveryLayout({ children }: { children: ReactNode }) {
     return (
         <html
-            lang="en"
+            lang="da"
             data-scroll-behavior="smooth"
             className={`${archivo.variable} ${ibmPlexMono.variable} ${instrumentSerif.variable}`}
         >

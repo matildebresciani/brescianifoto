@@ -115,14 +115,15 @@ export function PhotoSection({
                                 <button
                                     type="button"
                                     className="group focus-ring-tight block h-full w-full overflow-hidden bg-bg-subtle"
-                                    aria-label={`Open photo ${photoIndex + 1}: ${photo.name}`}
-                                    onClick={() => openPhoto?.(photo, block.theme)}
+                                    aria-label={`Åbn billede ${photoIndex + 1}: ${photo.name}`}
+                                    onClick={() => openPhoto?.(photo)}
                                 >
                                     <Image
                                         src={photo.src}
                                         alt={photo.name}
                                         width={photo.width}
                                         height={photo.height}
+                                        quality={90}
                                         sizes={
                                             tile
                                                 ? `${Math.ceil(tile.width)}px`

@@ -10,44 +10,33 @@ import { LightboxStage } from '@/components/molecules/frontend/LightboxStage';
 import LightboxThumbnails from '@/components/molecules/frontend/LightboxThumbnails';
 import ModalDialog from '@/components/molecules/frontend/ModalDialog';
 import Portal from '@/components/molecules/Portal';
-import { type DeliveryTheme, themeStyle } from '@/lib/client-deliveries/shared';
+import { themeDefaults, themeStyle } from '@/lib/client-deliveries/shared';
 import type { DeliveryPhoto } from '@/lib/client-deliveries/view';
 import { getLightboxImageKey, getLightboxImageSize, type LightboxViewport } from '@/lib/utilities/lightbox-images';
 import type { Media } from '@/payload-types';
 
 /** Lets photo sections open the same viewer without moving server-rendered content into the client bundle. */
-export const GalleryLightboxContext = createContext<((photo: DeliveryPhoto, theme: DeliveryTheme) => void) | null>(
-    null,
-);
+export const GalleryLightboxContext = createContext<((photo: DeliveryPhoto) => void) | null>(null);
 
-/** Shares one ordered photo sequence across all sections, retaining the opening section's colors. */
+/** Shares one ordered sequence and a neutral viewing surface across all gallery sections. */
 export function GalleryLightbox({ photos, children }: { photos: DeliveryPhoto[]; children: ReactNode }) {
     const items = useMemo(() => [...new Map(photos.map((photo) => [photo.id, photo])).values()], [photos]);
-    const [viewer, setViewer] = useState<{ index: number; theme: DeliveryTheme } | null>(null);
+    const [viewerIndex, setViewerIndex] = useState<number | null>(null);
     const openPhoto = useCallback(
-        (photo: DeliveryPhoto, theme: DeliveryTheme) => {
+        (photo: DeliveryPhoto) => {
             const index = items.findIndex((item) => item.id === photo.id);
-            if (index >= 0) setViewer({ index, theme });
+            if (index >= 0) setViewerIndex(index);
         },
         [items],
     );
-    const navigate = useCallback((index: number) => {
-        setViewer((current) => (current ? { ...current, index } : null));
-    }, []);
-    const close = useCallback(() => setViewer(null), []);
+    const close = useCallback(() => setViewerIndex(null), []);
 
     return (
         <GalleryLightboxContext.Provider value={openPhoto}>
             {children}
             <AnimatePresence>
-                {viewer && (
-                    <DeliveryLightbox
-                        photos={items}
-                        index={viewer.index}
-                        setIndex={navigate}
-                        close={close}
-                        theme={viewer.theme}
-                    />
+                {viewerIndex !== null && (
+                    <DeliveryLightbox photos={items} index={viewerIndex} setIndex={setViewerIndex} close={close} />
                 )}
             </AnimatePresence>
         </GalleryLightboxContext.Provider>
@@ -57,18 +46,28 @@ export function GalleryLightbox({ photos, children }: { photos: DeliveryPhoto[];
 const arrowClasses =
     'delivery-lightbox-control focus-ring-tight hidden size-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border-base bg-transparent text-fg-base md:flex';
 
+const mobileArrowClasses =
+    'delivery-lightbox-control focus-ring-tight inline-flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border-base bg-transparent text-fg-base';
+const imageLabels = {
+    zoomIn: 'Zoom ind',
+    zoomOut: 'Zoom ud',
+    viewer: 'Billedvisning',
+    loading: 'Indlæser billede',
+    error: 'Billedet kunne ikke indlæses.',
+    retry: 'Prøv igen',
+};
+const thumbnailLabels = { group: 'Miniaturer', photo: 'Billede', goToPhoto: 'Gå til billede' };
+
 function DeliveryLightbox({
     photos,
     index,
     setIndex,
     close,
-    theme,
 }: {
     photos: DeliveryPhoto[];
     index: number;
     setIndex: (index: number) => void;
     close: () => void;
-    theme: DeliveryTheme;
 }) {
     const current = photos[index];
     const [viewport, setViewport] = useState<LightboxViewport | null>(null);
@@ -117,8 +116,8 @@ function DeliveryLightbox({
             <ModalDialog
                 onClose={close}
                 shouldAnimate
-                aria-label="Gallery photo viewer"
-                style={themeStyle(theme)}
+                aria-label="Billedvisning"
+                style={themeStyle(themeDefaults)}
                 className="delivery-lightbox modal--open fixed inset-0 z-50 flex flex-col bg-bg-base text-fg-base outline-none"
             >
                 <div className="flex shrink-0 items-center justify-between gap-base p-base">
@@ -130,13 +129,14 @@ function DeliveryLightbox({
                             <a
                                 className="delivery-lightbox-control focus-ring-tight inline-flex size-12 shrink-0 items-center justify-center rounded-full border border-border-base bg-transparent p-0 text-fg-base"
                                 href={current.downloadHref}
-                                aria-label="Download original"
-                                title="Download original"
+                                aria-label="Download originalbillede"
+                                title="Download originalbillede"
                             >
                                 <Download size={20} strokeWidth={1.25} aria-hidden="true" />
                             </a>
                         )}
                         <Close
+                            label="Luk billedvisning"
                             onClick={close}
                             className="delivery-lightbox-control size-12 rounded-full border border-border-base hover:text-fg-base"
                         />
@@ -147,8 +147,8 @@ function DeliveryLightbox({
                         <button
                             type="button"
                             className={arrowClasses}
-                            aria-label="Previous photo"
-                            title="Previous photo"
+                            aria-label="Forrige billede"
+                            title="Forrige billede"
                             onClick={() => navigate(-1)}
                         >
                             <ArrowIcon className="rotate-180" />
@@ -156,6 +156,7 @@ function DeliveryLightbox({
                     )}
                     <LightboxStage
                         image={image}
+                        labels={imageLabels}
                         onNavigate={navigate}
                         onViewportChange={measureViewport}
                         onReady={(size) => setReadyKey(`${getLightboxImageKey(image)}:${size}`)}
@@ -164,15 +165,43 @@ function DeliveryLightbox({
                         <button
                             type="button"
                             className={arrowClasses}
-                            aria-label="Next photo"
-                            title="Next photo"
+                            aria-label="Næste billede"
+                            title="Næste billede"
                             onClick={() => navigate(1)}
                         >
                             <ArrowIcon />
                         </button>
                     )}
                 </div>
-                {photos.length > 1 && <LightboxThumbnails items={items} index={index} onNavigate={setIndex} />}
+                {photos.length > 1 && (
+                    <>
+                        <div className="flex shrink-0 items-center justify-center gap-base px-base py-xs md:hidden">
+                            <button
+                                type="button"
+                                className={mobileArrowClasses}
+                                aria-label="Forrige billede"
+                                onClick={() => navigate(-1)}
+                            >
+                                <ArrowIcon className="rotate-180" />
+                            </button>
+                            <p className="body-xs">Stryg for at se flere</p>
+                            <button
+                                type="button"
+                                className={mobileArrowClasses}
+                                aria-label="Næste billede"
+                                onClick={() => navigate(1)}
+                            >
+                                <ArrowIcon />
+                            </button>
+                        </div>
+                        <LightboxThumbnails
+                            items={items}
+                            index={index}
+                            onNavigate={setIndex}
+                            labels={thumbnailLabels}
+                        />
+                    </>
+                )}
                 <LightboxPreloader
                     items={items}
                     index={index}

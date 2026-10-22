@@ -1,15 +1,36 @@
 .delivery-page {
+    width: 100%;
+    min-width: 0;
     --delivery-ease: cubic-bezier(0.22, 1, 0.36, 1);
     --delivery-color-duration: 600ms;
     --delivery-nav-height: 80px;
     --delivery-overlay-color: var(--void);
-    --delivery-overlay-opacity: 72%;
-    --delivery-overlay: color-mix(
+    --delivery-overlay-opacity: 42%;
+    --delivery-cover-text: #faffef;
+    --delivery-overlay-light: color-mix(
         in srgb,
-        var(--delivery-overlay-color) var(--delivery-overlay-opacity),
+        var(--delivery-overlay-color)
+            calc(var(--delivery-overlay-opacity) * 0.35),
         transparent
     );
-    --delivery-cover-text: #faffef;
+    --delivery-overlay-top: color-mix(
+        in srgb,
+        var(--delivery-overlay-color)
+            calc(var(--delivery-overlay-opacity) * 0.65),
+        transparent
+    );
+    --delivery-overlay-text: color-mix(
+        in srgb,
+        var(--delivery-overlay-color)
+            min(90%, calc(var(--delivery-overlay-opacity) * 1.2)),
+        transparent
+    );
+    --delivery-overlay-bottom: color-mix(
+        in srgb,
+        var(--delivery-overlay-color)
+            min(90%, calc(var(--delivery-overlay-opacity) * 1.6)),
+        transparent
+    );
 }
 .delivery-cover-area-overlay .delivery-masthead {
     position: absolute;
@@ -68,10 +89,12 @@
 .delivery-hero-overlay {
     position: relative;
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     padding: 0;
 }
 .delivery-hero-overlay > * {
     grid-area: 1 / 1;
+    min-width: 0;
 }
 .delivery-hero-overlay .delivery-cover-frame {
     min-height: 0;
@@ -87,14 +110,21 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-end;
     max-width: none;
     width: 100%;
-    min-height: 100svh;
+    min-height: 0;
+    aspect-ratio: 4 / 5;
     margin: 0;
-    padding: var(--space-section-wide) var(--space-md);
+    padding: var(--space-section-wide) var(--space-md) var(--space-xl);
     color: var(--delivery-cover-text);
-    background: var(--delivery-overlay);
+    background: linear-gradient(
+        180deg,
+        var(--delivery-overlay-top) 0%,
+        var(--delivery-overlay-light) 38%,
+        var(--delivery-overlay-text) 68%,
+        var(--delivery-overlay-bottom) 100%
+    );
     --fg-base: var(--delivery-cover-text);
     --fg-subtle: var(--delivery-cover-text);
     --fg-faded: var(--delivery-cover-text);
@@ -105,6 +135,12 @@
 }
 .delivery-hero-overlay .statement {
     max-width: 16ch;
+}
+.delivery-hero-overlay .metadata {
+    margin-top: var(--space-md);
+}
+.delivery-welcome .delivery-rich-text > :last-child {
+    margin-bottom: 0;
 }
 .delivery-nav {
     position: sticky;
@@ -149,6 +185,7 @@
 .delivery-nav-toggle {
     display: flex;
     width: 100%;
+    min-width: 0;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-base);
@@ -175,6 +212,8 @@
 .delivery-nav-link {
     position: relative;
     width: fit-content;
+    max-width: 100%;
+    overflow-wrap: anywhere;
     padding-block: var(--space-xs);
     text-decoration: none;
 }
@@ -359,10 +398,10 @@
 .delivery-lightbox-control svg {
     transition: translate 320ms var(--delivery-ease);
 }
-.delivery-lightbox-control[aria-label="Next photo"]:hover svg {
+.delivery-lightbox-control[aria-label="Næste billede"]:hover svg {
     translate: 3px 0;
 }
-.delivery-lightbox-control[aria-label="Previous photo"]:hover svg {
+.delivery-lightbox-control[aria-label="Forrige billede"]:hover svg {
     translate: -3px 0;
 }
 .delivery-lightbox .lightbox-thumbnail[aria-current="true"]::after {
@@ -406,6 +445,8 @@
         padding: 0;
     }
     .delivery-hero-overlay .delivery-hero-copy {
+        min-height: 100svh;
+        aspect-ratio: auto;
         padding-inline: var(--space-2xl);
     }
     .delivery-section-inner {
@@ -481,8 +522,8 @@
         .delivery-download-icon,
     .delivery-lightbox-control,
     .delivery-lightbox-control svg,
-    .delivery-lightbox-control[aria-label="Next photo"]:hover svg,
-    .delivery-lightbox-control[aria-label="Previous photo"]:hover svg,
+    .delivery-lightbox-control[aria-label="Næste billede"]:hover svg,
+    .delivery-lightbox-control[aria-label="Forrige billede"]:hover svg,
     .delivery-back-to-top span,
     .delivery-back-to-top:hover span,
     .delivery-back-to-top:focus-visible span {

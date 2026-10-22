@@ -16,9 +16,9 @@ export function featuredPhoto(data: NonNullable<Awaited<ReturnType<typeof readDe
 
 /** Social metadata never reads draft content, even in an authenticated preview. */
 export async function deliveryMetadata(shareId: string, isPreview: boolean): Promise<Metadata> {
-    if (isPreview) return { title: 'Gallery preview · brescianifoto', openGraph: null, twitter: null };
+    if (isPreview) return { title: 'Forhåndsvisning · brescianifoto', openGraph: null, twitter: null };
     const data = await readDelivery(shareId);
-    if (!data) return { title: 'Gallery unavailable · brescianifoto', openGraph: null, twitter: null };
+    if (!data) return { title: 'Galleriet er ikke tilgængeligt · brescianifoto', openGraph: null, twitter: null };
     const { gallery } = data;
     const photo = featuredPhoto(data);
     const title = gallery.title;
@@ -32,7 +32,7 @@ export async function deliveryMetadata(shareId: string, isPreview: boolean): Pro
               {
                   url: `${url}/social-image?v=${revision}`,
                   ...socialImageSize,
-                  alt: `${title} — featured photograph`,
+                  alt: `${title} — forsidebillede`,
                   type: 'image/jpeg',
               },
           ]

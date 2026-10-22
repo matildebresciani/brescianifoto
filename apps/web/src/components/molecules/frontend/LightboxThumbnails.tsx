@@ -9,6 +9,7 @@ type Props = {
     items: Media[];
     index: number;
     onNavigate: (index: number) => void;
+    labels?: typeof defaultLabels;
 };
 
 type DragGesture = {
@@ -20,9 +21,10 @@ type DragGesture = {
 };
 
 const dragThreshold = 6;
+const defaultLabels = { group: 'Photo thumbnails', photo: 'Photo', goToPhoto: 'Go to photo' };
 
 /** Adds mouse dragging without replacing native touch scrolling or thumbnail clicks. */
-const LightboxThumbnails = ({ items, index, onNavigate }: Props) => {
+const LightboxThumbnails = ({ items, index, onNavigate, labels = defaultLabels }: Props) => {
     const stripRef = useRef<HTMLFieldSetElement>(null);
     const activeRef = useRef<HTMLButtonElement>(null);
     const gestureRef = useRef<DragGesture | null>(null);
@@ -121,7 +123,7 @@ const LightboxThumbnails = ({ items, index, onNavigate }: Props) => {
     return (
         <fieldset
             ref={stripRef}
-            aria-label="Photo thumbnails"
+            aria-label={labels.group}
             className={cn(
                 'flex min-w-0 gap-xs select-none overflow-x-auto scroll-auto! border-0 p-base',
                 isDragging ? 'cursor-grabbing' : 'cursor-grab',
@@ -139,8 +141,8 @@ const LightboxThumbnails = ({ items, index, onNavigate }: Props) => {
                     key={item.id}
                     ref={i === index ? activeRef : undefined}
                     type="button"
-                    title={item.alt || `Photo ${i + 1}`}
-                    aria-label={`Go to photo ${i + 1}`}
+                    title={item.alt || `${labels.photo} ${i + 1}`}
+                    aria-label={`${labels.goToPhoto} ${i + 1}`}
                     aria-current={i === index}
                     className={cn(
                         'lightbox-thumbnail focus-ring group relative size-12 shrink-0 cursor-[inherit] overflow-hidden rounded-none border transition-colors duration-200 motion-reduce:transition-none md:size-14',

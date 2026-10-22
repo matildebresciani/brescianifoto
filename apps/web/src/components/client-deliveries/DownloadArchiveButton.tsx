@@ -52,20 +52,20 @@ export function DownloadArchiveButton({
         setState('started');
     }
 
-    const label = isPreparing ? 'Preparing…' : state === 'started' ? 'Download again' : 'Download all';
+    const label = isPreparing ? 'Klargør…' : state === 'started' ? 'Hent igen' : 'Hent alle';
     const status = hasError
-        ? 'Could not start the download. Please try again or refresh the gallery.'
+        ? 'Download kunne ikke startes. Prøv igen, eller genindlæs galleriet.'
         : state === 'started'
-          ? 'Download started. Follow progress in your browser’s downloads.'
+          ? 'Download er startet. Følg overførslen i din browsers downloads.'
           : isPreparing
-            ? 'Preparing your gallery download.'
+            ? 'Klargør dine billeder til download.'
             : '';
 
     return (
         <div className="relative shrink-0">
             <button
                 type="button"
-                className="delivery-download metadata focus-ring inline-flex min-h-12 items-center justify-center gap-xs rounded-[var(--btn-radius)] border border-bg-invert bg-bg-invert px-base py-xs text-fg-on-color transition-[background-color,color,border-color] duration-[360ms] ease-[var(--delivery-ease)] enabled:cursor-pointer enabled:active:bg-bg-pressed disabled:cursor-not-allowed disabled:border-border-base disabled:bg-bg-subtle disabled:text-fg-subtle aria-busy:cursor-wait motion-reduce:transition-none"
+                className="delivery-download ui-text focus-ring inline-flex min-h-12 items-center justify-center gap-xs rounded-[var(--btn-radius)] border border-bg-invert bg-bg-invert px-xs py-xs text-fg-on-color transition-[background-color,color,border-color] duration-[360ms] ease-[var(--delivery-ease)] enabled:cursor-pointer enabled:active:bg-bg-pressed disabled:cursor-not-allowed disabled:border-border-base disabled:bg-bg-subtle disabled:text-fg-subtle aria-busy:cursor-wait motion-reduce:transition-none md:px-base"
                 disabled={isDisabled || isPreparing}
                 aria-busy={isPreparing}
                 aria-describedby={statusId}
@@ -87,11 +87,11 @@ export function DownloadArchiveButton({
                         </>
                     )}
                 </span>
-                <span className="flex flex-col items-start gap-2xs sm:flex-row sm:items-center sm:gap-xs">
+                <span className="flex items-center gap-xs">
                     <span className="sr-only">{label}</span>
-                    <span className="grid h-[1lh] overflow-hidden text-left" aria-hidden="true">
+                    <span className="hidden h-[1lh] overflow-hidden text-left md:grid" aria-hidden="true">
                         <span className="invisible col-start-1 row-start-1" aria-hidden="true">
-                            Download again
+                            Hent igen
                         </span>
                         <span className="col-start-1 row-start-1 whitespace-nowrap">
                             {Array.from(label).map((character, index) => {
@@ -109,7 +109,7 @@ export function DownloadArchiveButton({
                             })}
                         </span>
                     </span>
-                    <span className="whitespace-nowrap sm:border-l sm:border-current/30 sm:pl-xs">
+                    <span className="whitespace-nowrap md:border-l md:border-current/30 md:pl-xs">
                         {formatBytes(byteSize)}
                     </span>
                 </span>

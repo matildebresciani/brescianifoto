@@ -3,14 +3,15 @@ import { cn } from '@/lib/utilities/ui';
 type Props = {
     onClick: () => void;
     className?: string;
+    label?: string;
 };
 
-const Close = ({ onClick, className }: Props) => {
+const Close = ({ onClick, className, label = 'Close' }: Props) => {
     return (
         <button
             type="button"
-            title="Close"
-            aria-label="Close"
+            title={label}
+            aria-label={label}
             className={cn(
                 'focus-ring-tight inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-none border-0 bg-transparent p-0 text-fg-base transition-colors duration-200 hover:text-fg-highlight motion-reduce:transition-none',
                 className,

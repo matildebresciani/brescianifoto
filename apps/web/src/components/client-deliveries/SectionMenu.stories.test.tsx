@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { cdp, page } from 'vitest/browser';
 import * as stories from './SectionMenu.stories';
 
-const { GallerySections, WithTextSection } = composeStories(stories);
+const { GallerySections, WithTextSection, WithDownload, LongLabels } = composeStories(stories);
 
 function gallerySurface() {
     const surface = document.querySelector('.delivery-sections');
@@ -24,6 +24,45 @@ afterEach(async () => {
 });
 
 describe('delivery section navigation', () => {
+    it.each([320, 390])('keeps long chapter labels and the download control inside a %ipx phone', async (width) => {
+        await page.viewport(width, 740);
+        await LongLabels.run();
+        const toggle = page.getByRole('button', { name: 'Frederiksberg Have', exact: true });
+        const label = toggle.element().querySelector('span');
+        if (!label) throw new Error('Chapter label is missing');
+        expect(label.getBoundingClientRect().right).toBeLessThanOrEqual(toggle.element().getBoundingClientRect().right);
+        expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(width);
+        await toggle.click();
+        await expect.element(page.getByRole('link', { name: 'Familie og venner', exact: true })).toBeVisible();
+        expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(width);
+    });
+
+    it('jumps to the selected mobile chapter with motion enabled and keeps focus there', async () => {
+        await page.viewport(320, 740);
+        await cdp().send('Emulation.setEmulatedMedia', {
+            features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }],
+        });
+        await WithDownload.run();
+        await page.getByRole('button', { name: 'Vielsen', exact: true }).click();
+        await page.getByRole('link', { name: 'Efter vielsen', exact: true }).click();
+        await expect
+            .poll(() => document.getElementById('after-ceremony')?.getBoundingClientRect().top)
+            .toBeLessThan(150);
+        await expect
+            .element(page.getByRole('button', { name: 'Efter vielsen', exact: true }))
+            .toHaveAttribute('aria-expanded', 'false');
+        expect(document.activeElement).toBe(document.getElementById('after-ceremony'));
+        expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(innerWidth);
+        await page.getByRole('button', { name: 'Efter vielsen', exact: true }).click();
+        await page.getByRole('link', { name: 'Vielsen', exact: true }).click();
+        await expect
+            .poll(() => document.getElementById('ceremony')?.getBoundingClientRect().top)
+            .toBeGreaterThanOrEqual(0);
+        await expect
+            .element(page.getByRole('button', { name: 'Vielsen', exact: true }))
+            .toHaveAttribute('aria-expanded', 'false');
+    });
+
     it('animates a uniform gallery background with the menu, without gradients or divider borders', async () => {
         await cdp().send('Emulation.setEmulatedMedia', {
             features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }],

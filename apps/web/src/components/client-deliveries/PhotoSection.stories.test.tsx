@@ -138,7 +138,7 @@ describe('client gallery masonry', () => {
             expectAlignedMasonry();
             expect(
                 Array.from(getGrid().querySelectorAll('button'), (button) => button.getAttribute('aria-label')),
-            ).toEqual(Array.from({ length: 17 }, (_, index) => `Open photo ${index + 1}: Photo ${index + 1}`));
+            ).toEqual(Array.from({ length: 17 }, (_, index) => `Åbn billede ${index + 1}: Photo ${index + 1}`));
         }
     });
 
@@ -173,14 +173,14 @@ describe('client gallery masonry', () => {
         buttons[0]?.focus();
         await userEvent.keyboard('{Tab}');
         expect(document.activeElement).toBe(buttons[1]);
-        await page.getByRole('button', { name: 'Open photo 8: Photo 8', exact: true }).click();
-        await expect.element(page.getByRole('dialog', { name: 'Gallery photo viewer' })).toBeVisible();
+        await page.getByRole('button', { name: 'Åbn billede 8: Photo 8', exact: true }).click();
+        await expect.element(page.getByRole('dialog', { name: 'Billedvisning' })).toBeVisible();
         await expect
-            .element(page.getByRole('link', { name: 'Download original' }))
+            .element(page.getByRole('link', { name: 'Download originalbillede' }))
             .toHaveAttribute('href', '/test-original/photo-7.jpg');
         await userEvent.keyboard('{ArrowRight}');
         await expect
-            .element(page.getByRole('link', { name: 'Download original' }))
+            .element(page.getByRole('link', { name: 'Download originalbillede' }))
             .toHaveAttribute('href', '/test-original/photo-8.jpg');
         await userEvent.keyboard('{ArrowLeft}{Escape}');
         await expect.element(page.getByRole('dialog')).not.toBeInTheDocument();
@@ -195,7 +195,7 @@ describe('client gallery masonry', () => {
         expect(figures).toHaveLength(500);
         figures.forEach((figure, index) => {
             expect(figure.querySelector('button')?.getAttribute('aria-label')).toBe(
-                `Open photo ${index + 1}: Photo ${index + 1}`,
+                `Åbn billede ${index + 1}: Photo ${index + 1}`,
             );
             expect(figure.querySelector('img')?.getAttribute('loading')).toBe('lazy');
             expect(getComputedStyle(figure).opacity).toBe('1');

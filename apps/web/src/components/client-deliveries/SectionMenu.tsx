@@ -25,16 +25,27 @@ export function SectionMenu({
             href={`#${section.anchor}`}
             className="delivery-nav-link focus-ring ui-text"
             aria-current={activeAnchor === section.anchor ? 'location' : undefined}
-            onClick={() => {
+            onClick={(event) => {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                event.preventDefault();
                 setIsOpen(false);
-                requestAnimationFrame(() => document.getElementById(section.anchor)?.focus({ preventScroll: true }));
+                requestAnimationFrame(() => {
+                    const target = document.getElementById(section.anchor);
+                    if (!target) return;
+                    // Focus before scrolling: moving focus during a native smooth anchor jump cancels it on mobile.
+                    target.focus({ preventScroll: true });
+                    target.scrollIntoView({ block: 'start', behavior: shouldReduceMotion ? 'instant' : 'smooth' });
+                    if (window.location.hash !== `#${section.anchor}`) {
+                        window.history.pushState(null, '', `#${section.anchor}`);
+                    }
+                });
             }}
         >
             <span>{section.label}</span>
         </a>
     ));
     return (
-        <nav className="delivery-nav bg-bg-base text-fg-base" aria-label="Gallery sections">
+        <nav className="delivery-nav bg-bg-base text-fg-base" aria-label="Galleriets sektioner">
             <div className="delivery-nav-desktop">{links}</div>
             <div className="delivery-nav-mobile">
                 <button
@@ -45,7 +56,9 @@ export function SectionMenu({
                     aria-controls={menuId}
                     onClick={() => setIsOpen((previous) => !previous)}
                 >
-                    {sections.find((section) => section.anchor === activeAnchor)?.label || 'Sections'}
+                    <span className="min-w-0 wrap-anywhere">
+                        {sections.find((section) => section.anchor === activeAnchor)?.label || 'Sektioner'}
+                    </span>
                     <ChevronDown
                         aria-hidden="true"
                         size={20}

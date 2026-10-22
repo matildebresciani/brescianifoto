@@ -56,7 +56,7 @@ describe('client gallery theme and photo revisions', () => {
     it('resolves menu labels without requiring a separate title', () => {
         expect(sectionMenuLabel({ menuLabel: ' Dinner ', title: 'Old title' })).toBe('Dinner');
         expect(sectionMenuLabel({ title: 'Legacy section' })).toBe('Legacy section');
-        expect(sectionMenuLabel({})).toBe('Photos');
+        expect(sectionMenuLabel({})).toBe('Billeder');
     });
     it('checks actual contrast on both backgrounds, including muted text', () => {
         expect(contrastRatio('#000000', '#ffffff')).toBeCloseTo(21);

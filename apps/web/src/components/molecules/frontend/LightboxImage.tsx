@@ -18,6 +18,7 @@ type Props = {
     onReady?: (size: string) => void;
     onLoadError?: () => void;
     onNavigate: (direction: -1 | 1) => void;
+    labels?: typeof defaultLabels;
 };
 
 type Point = { x: number; y: number };
@@ -33,6 +34,14 @@ const origin: Point = { x: 0, y: 0 };
 const zoomScale = 2;
 const dragThreshold = 6;
 const swipeThreshold = 50;
+const defaultLabels = {
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    viewer: 'Photo viewer',
+    loading: 'Loading photo',
+    error: 'Photo could not load.',
+    retry: 'Retry',
+};
 
 function subscribeToDesktop(onChange: () => void) {
     const query = window.matchMedia(desktopQuery);
@@ -56,7 +65,15 @@ function clampPan(point: Point, limits: Point): Point {
 }
 
 /** Owns the photo's pointer gestures; remount for each photo to reset zoom and pan. */
-const LightboxImage = ({ image, isActive = true, onViewportChange, onReady, onLoadError, onNavigate }: Props) => {
+const LightboxImage = ({
+    image,
+    isActive = true,
+    onViewportChange,
+    onReady,
+    onLoadError,
+    onNavigate,
+    labels = defaultLabels,
+}: Props) => {
     const viewportRef = useRef<HTMLButtonElement>(null);
     const gestureRef = useRef<Gesture | null>(null);
     const pointersRef = useRef(new Set<number>());
@@ -219,7 +236,7 @@ const LightboxImage = ({ image, isActive = true, onViewportChange, onReady, onLo
             <button
                 ref={viewportRef}
                 type="button"
-                aria-label={canZoom ? (isZoomed ? 'Zoom out' : 'Zoom in') : 'Photo viewer'}
+                aria-label={canZoom ? (isZoomed ? labels.zoomOut : labels.zoomIn) : labels.viewer}
                 aria-pressed={canZoom ? isZoomed : undefined}
                 aria-busy={isLoading}
                 tabIndex={canZoom ? 0 : -1}
@@ -276,7 +293,7 @@ const LightboxImage = ({ image, isActive = true, onViewportChange, onReady, onLo
                     )}
                 </span>
             </button>
-            {isLoading && <output className="sr-only">Loading photo</output>}
+            {isLoading && <output className="sr-only">{labels.loading}</output>}
             {hasFailed && (
                 <div
                     className={cn(
@@ -284,7 +301,7 @@ const LightboxImage = ({ image, isActive = true, onViewportChange, onReady, onLo
                         isLoaded ? 'bottom-0' : 'inset-y-0',
                     )}
                 >
-                    <output className="body-sm">Photo could not load.</output>
+                    <output className="body-sm">{labels.error}</output>
                     <button
                         type="button"
                         className="focus-ring-tight ui-text rounded-btn border border-border-base bg-transparent px-base py-xs text-fg-base"
@@ -296,7 +313,7 @@ const LightboxImage = ({ image, isActive = true, onViewportChange, onReady, onLo
                             setRetryCount((count) => count + 1);
                         }}
                     >
-                        Retry
+                        {labels.retry}
                     </button>
                 </div>
             )}

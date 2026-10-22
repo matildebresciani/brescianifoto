@@ -22,7 +22,7 @@ export const sectionSchema = z.object({
 
 /** Older galleries used a separate visible title before menu labels became required. */
 export function sectionMenuLabel(section: { menuLabel?: string | null; title?: string | null }): string {
-    return section.menuLabel?.trim() || section.title?.trim() || 'Photos';
+    return section.menuLabel?.trim() || section.title?.trim() || 'Billeder';
 }
 
 /** Deduplication means moving or reordering a photo does not invalidate a ZIP. */

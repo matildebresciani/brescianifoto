@@ -16,7 +16,8 @@ function pendingResponse() {
     return { promise, resolve };
 }
 
-beforeEach(() => {
+beforeEach(async () => {
+    await page.viewport(1280, 800);
     vi.stubGlobal('fetch', fetchDownload);
     fetchDownload.mockReset();
 });
@@ -33,7 +34,7 @@ describe('gallery archive download', () => {
             features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }],
         });
         await Ready.run();
-        const button = page.getByRole('button', { name: /Download all/ });
+        const button = page.getByRole('button', { name: /Hent alle/ });
         const element = button.element();
         const bounds = element.getBoundingClientRect();
         const background = getComputedStyle(element).backgroundColor;
@@ -57,7 +58,7 @@ describe('gallery archive download', () => {
     it('offers the same rolling feedback for keyboard focus with a single accessible label', async () => {
         await Ready.run();
         await userEvent.tab();
-        const button = page.getByRole('button', { name: 'Download all 2.2 GB', exact: true });
+        const button = page.getByRole('button', { name: 'Hent alle 2.2 GB', exact: true });
         await expect.element(button).toHaveFocus();
         const icon = button.element().querySelector('.delivery-download-icon');
         if (!icon) throw new Error('Rolling icon is missing');
@@ -74,8 +75,8 @@ describe('gallery archive download', () => {
             transfers.push({ href: this.href, referrerPolicy: this.referrerPolicy });
         });
         await Ready.run();
-        await page.getByRole('button', { name: /Download all/ }).click();
-        const preparing = page.getByRole('button', { name: /Preparing/ });
+        await page.getByRole('button', { name: /Hent alle/ }).click();
+        const preparing = page.getByRole('button', { name: /Klargør/ });
         await expect.element(preparing).toBeDisabled();
         await expect.element(preparing).toHaveAttribute('aria-busy', 'true');
         for (const character of preparing.element().querySelectorAll('.delivery-download-character')) {
@@ -92,14 +93,14 @@ describe('gallery archive download', () => {
         );
         expect(transfer).not.toHaveBeenCalled();
         pending.resolve(Response.json({ url: 'https://storage.example.test/gallery.zip' }));
-        await expect.element(page.getByRole('button', { name: /Download again/ })).toBeEnabled();
+        await expect.element(page.getByRole('button', { name: /Hent igen/ })).toBeEnabled();
         expect(transfer).toHaveBeenCalledTimes(1);
         expect(transfers).toEqual([
             { href: 'https://storage.example.test/gallery.zip', referrerPolicy: 'no-referrer' },
         ]);
         await expect
             .element(page.getByRole('status'))
-            .toHaveTextContent('Download started. Follow progress in your browser');
+            .toHaveTextContent('Download er startet. Følg overførslen i din browser');
     });
 
     it('reports errors and allows a retry without navigating away from the gallery', async () => {
@@ -107,12 +108,12 @@ describe('gallery archive download', () => {
         fetchDownload.mockRejectedValueOnce(new TypeError('Network unavailable'));
         const transfer = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
         await Ready.run();
-        await page.getByRole('button', { name: /Download all/ }).click();
+        await page.getByRole('button', { name: /Hent alle/ }).click();
         await expect.element(page.getByRole('status')).toBeVisible();
-        await expect.element(page.getByRole('status')).toHaveTextContent('Could not start the download');
-        await expect.element(page.getByRole('button', { name: /Download all/ })).toBeEnabled();
-        await page.getByRole('button', { name: /Download all/ }).click();
-        await expect.element(page.getByRole('button', { name: /Download all/ })).toBeEnabled();
+        await expect.element(page.getByRole('status')).toHaveTextContent('Download kunne ikke startes');
+        await expect.element(page.getByRole('button', { name: /Hent alle/ })).toBeEnabled();
+        await page.getByRole('button', { name: /Hent alle/ }).click();
+        await expect.element(page.getByRole('button', { name: /Hent alle/ })).toBeEnabled();
         expect(fetchDownload).toHaveBeenCalledTimes(2);
         expect(transfer).not.toHaveBeenCalled();
     });
@@ -121,14 +122,14 @@ describe('gallery archive download', () => {
         fetchDownload.mockResolvedValueOnce(Response.json({ url: 'javascript:alert(1)' }));
         const transfer = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
         await Ready.run();
-        await page.getByRole('button', { name: /Download all/ }).click();
-        await expect.element(page.getByRole('status')).toHaveTextContent('Could not start the download');
+        await page.getByRole('button', { name: /Hent alle/ }).click();
+        await expect.element(page.getByRole('status')).toHaveTextContent('Download kunne ikke startes');
         expect(transfer).not.toHaveBeenCalled();
     });
 
     it('has a native disabled state that cannot start a request', async () => {
         await Disabled.run();
-        const button = page.getByRole('button', { name: /Download all/ });
+        const button = page.getByRole('button', { name: /Hent alle/ });
         await expect.element(button).toBeDisabled();
         const element = button.element();
         await button.hover();
@@ -139,18 +140,18 @@ describe('gallery archive download', () => {
         expect(fetchDownload).not.toHaveBeenCalled();
     });
 
-    it.each([320, 768, 1440])('fits the section menu and uses mono text at %ipx', async (width) => {
+    it.each([320, 768, 1440])('fits the section menu and uses the shared UI typography at %ipx', async (width) => {
         await page.viewport(width, 800);
         await WithDownload.run();
-        const button = page.getByRole('button', { name: /Download all/ }).element();
+        const button = page.getByRole('button', { name: /Hent alle/ }).element();
         const rect = button.getBoundingClientRect();
         expect(rect.left).toBeGreaterThanOrEqual(0);
         expect(rect.right).toBeLessThanOrEqual(width);
         expect(rect.height).toBeGreaterThanOrEqual(48);
         expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(width);
         const styles = getComputedStyle(button);
-        expect(styles.fontFamily).toMatch(/IBM Plex Mono/);
-        expect(styles.textTransform).toBe('uppercase');
+        expect(styles.fontFamily).toMatch(/Archivo/);
+        expect(styles.textTransform).toBe('none');
         expect(styles.transitionDuration).toBe('0.36s');
     });
 
@@ -161,15 +162,15 @@ describe('gallery archive download', () => {
         const pending = pendingResponse();
         fetchDownload.mockReturnValueOnce(pending.promise);
         await Ready.run();
-        await page.getByRole('button', { name: /Download all/ }).click();
-        const button = page.getByRole('button', { name: /Preparing/ }).element();
+        await page.getByRole('button', { name: /Hent alle/ }).click();
+        const button = page.getByRole('button', { name: /Klargør/ }).element();
         const spinner = button.querySelector('.animate-spin');
         expect(spinner).not.toBeNull();
         if (spinner) expect(getComputedStyle(spinner).animationName).toBe('none');
         expect(getComputedStyle(button).transitionProperty).toBe('none');
         pending.resolve(new Response(null, { status: 503 }));
-        await expect.element(page.getByRole('button', { name: /Download all/ })).toBeEnabled();
-        await page.getByRole('button', { name: /Download all/ }).hover();
+        await expect.element(page.getByRole('button', { name: /Hent alle/ })).toBeEnabled();
+        await page.getByRole('button', { name: /Hent alle/ }).hover();
         for (const part of button.querySelectorAll('.delivery-download-character, .delivery-download-icon')) {
             expect(getComputedStyle(part).transform).toBe('none');
             expect(getComputedStyle(part).transitionProperty).toBe('none');

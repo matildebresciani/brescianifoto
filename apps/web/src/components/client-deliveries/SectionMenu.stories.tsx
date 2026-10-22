@@ -66,6 +66,16 @@ export const WithDownload: Story = {
     args: { archive: { href: '/deliveries/example/download/archive', byteSize: 2_400_000_000 } },
 };
 
+export const LongLabels: Story = {
+    args: {
+        ...WithDownload.args,
+        sections: [
+            { anchor: 'portraits', label: 'Frederiksberg Have', theme: themeDefaults },
+            { anchor: 'family', label: 'Familie og venner', theme: themeDefaults },
+        ],
+    },
+};
+
 export const WithTextSection: Story = {
     args: {
         blocks: [

@@ -57,11 +57,11 @@ afterEach(async () => {
 describe('delivery lightbox transitions', () => {
     it('keeps an opaque photo behind every frame of the replacement fade', async () => {
         await MultipleSections.run();
-        await page.getByRole('button', { name: 'Open photo 1: Concert stage', exact: true }).click();
+        await page.getByRole('button', { name: 'Åbn billede 1: Concert stage', exact: true }).click();
         settlePhoto();
         const previous = currentSlide();
         await expect.poll(() => getComputedStyle(previous).opacity).toBe('1');
-        await page.getByRole('button', { name: 'Next photo', exact: true }).click();
+        await page.getByRole('button', { name: 'Næste billede', exact: true }).click();
         const incoming = currentSlide();
         const photo = incoming.querySelector('img');
         if (!photo) throw new Error('Incoming photo is missing');
@@ -84,16 +84,16 @@ describe('delivery lightbox transitions', () => {
         expect(frames.length).toBeGreaterThan(0);
         expect(frames.every((frame) => frame.backing === '1' && frame.photo === '1')).toBe(true);
         expect(getComputedStyle(photo).transitionProperty).not.toContain('opacity');
-        expect(getComputedStyle(incoming).opacity).toBe('1');
+        await expect.poll(() => getComputedStyle(incoming).opacity).toBe('1');
     });
 
     it('holds the previous photo until its replacement has finished fading in', async () => {
         await MultipleSections.run();
-        await page.getByRole('button', { name: 'Open photo 1: Concert stage', exact: true }).click();
+        await page.getByRole('button', { name: 'Åbn billede 1: Concert stage', exact: true }).click();
         settlePhoto();
         const previous = currentSlide();
         await expect.poll(() => getComputedStyle(previous).opacity).toBe('1');
-        await page.getByRole('button', { name: 'Next photo', exact: true }).click();
+        await page.getByRole('button', { name: 'Næste billede', exact: true }).click();
         expect(previous.inert).toBe(true);
         expect(previous.getAttribute('aria-hidden')).toBe('true');
         expect(getComputedStyle(previous).opacity).toBe('1');
@@ -106,17 +106,17 @@ describe('delivery lightbox transitions', () => {
 
     it('keeps a ready photo visible through rapid navigation and exposes a failed replacement for retry', async () => {
         await MultipleSections.run();
-        await page.getByRole('button', { name: 'Open photo 1: Concert stage', exact: true }).click();
+        await page.getByRole('button', { name: 'Åbn billede 1: Concert stage', exact: true }).click();
         settlePhoto();
         const previous = currentSlide();
-        await page.getByRole('button', { name: 'Next photo', exact: true }).click();
-        await page.getByRole('button', { name: 'Next photo', exact: true }).click();
+        await page.getByRole('button', { name: 'Næste billede', exact: true }).click();
+        await page.getByRole('button', { name: 'Næste billede', exact: true }).click();
         expect(previous.isConnected).toBe(true);
         expect(getComputedStyle(previous).opacity).toBe('1');
         expect(currentSlide().querySelector('img')?.alt).toBe('Crowd');
         settlePhoto('error');
-        await expect.element(page.getByRole('button', { name: 'Retry', exact: true })).toBeVisible();
-        await page.getByRole('button', { name: 'Retry', exact: true }).click();
+        await expect.element(page.getByRole('button', { name: 'Prøv igen', exact: true })).toBeVisible();
+        await page.getByRole('button', { name: 'Prøv igen', exact: true }).click();
         settlePhoto();
         await expect.poll(() => document.querySelectorAll('[data-lightbox-slide]').length).toBe(1);
         await expect.poll(() => currentSlide().querySelector('[data-lightbox-skeleton]')).toBeNull();
@@ -124,7 +124,7 @@ describe('delivery lightbox transitions', () => {
 
     it('keeps focus and scroll locked until the closing fade finishes', async () => {
         await MultipleSections.run();
-        const opener = page.getByRole('button', { name: 'Open photo 1: Concert stage', exact: true });
+        const opener = page.getByRole('button', { name: 'Åbn billede 1: Concert stage', exact: true });
         await opener.click();
         await expect.poll(() => getComputedStyle(page.getByRole('dialog').element()).opacity).toBe('1');
         await userEvent.keyboard('{Escape}');
@@ -139,10 +139,10 @@ describe('delivery lightbox transitions', () => {
             features: [{ name: 'prefers-reduced-motion', value: 'reduce' }],
         });
         await MultipleSections.run();
-        const opener = page.getByRole('button', { name: 'Open photo 1: Concert stage', exact: true });
+        const opener = page.getByRole('button', { name: 'Åbn billede 1: Concert stage', exact: true });
         await opener.click();
         settlePhoto();
-        await page.getByRole('button', { name: 'Next photo', exact: true }).click();
+        await page.getByRole('button', { name: 'Næste billede', exact: true }).click();
         settlePhoto();
         await expect.poll(() => document.querySelectorAll('[data-lightbox-slide]').length).toBe(1);
         expect(getComputedStyle(currentSlide()).opacity).toBe('1');
