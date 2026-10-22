@@ -81,7 +81,7 @@ export function GallerySections({
                 {children}
             </main>
             {footer}
-            <BackToTop />
+            <BackToTop theme={theme} />
         </div>
     );
 }

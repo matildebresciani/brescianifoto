@@ -69,18 +69,19 @@ describe('floating gallery return control', () => {
         expect(rect.right).toBe(width - 24);
         expect(rect.bottom).toBe(innerHeight - 24);
         expect(getComputedStyle(control).borderRadius).toBe('2px');
-        expect(getComputedStyle(control).backgroundColor).toBe('rgb(250, 255, 239)');
-        expect(getComputedStyle(control).color).toBe('rgb(21, 22, 17)');
+        expect(getComputedStyle(control).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+        expect(getComputedStyle(control).color).toBe('rgb(250, 255, 239)');
+        expect(getComputedStyle(control).borderColor).toBe('rgb(250, 255, 239)');
 
         const laterSection = document.getElementById('second');
         if (!laterSection) throw new Error('Later section is missing');
         laterSection.scrollIntoView({ behavior: 'instant' });
         await expect.poll(() => getComputedStyle(surface).backgroundColor).toBe('rgb(37, 38, 31)');
-        expect(getComputedStyle(control).backgroundColor).toBe('rgb(250, 255, 239)');
-        expect(getComputedStyle(control).color).toBe('rgb(21, 22, 17)');
-        await page.getByRole('button', { name: 'Til toppen', exact: true }).hover();
-        await expect.poll(() => getComputedStyle(control).backgroundColor).toBe('rgb(21, 22, 17)');
+        expect(getComputedStyle(control).backgroundColor).toBe('rgba(0, 0, 0, 0)');
         expect(getComputedStyle(control).color).toBe('rgb(250, 255, 239)');
+        await page.getByRole('button', { name: 'Til toppen', exact: true }).hover();
+        await expect.poll(() => getComputedStyle(control).backgroundColor).toBe('rgb(250, 255, 239)');
+        expect(getComputedStyle(control).color).toBe('rgb(21, 22, 17)');
         const opener = page.getByRole('button', { name: 'Åbn billede 1: Crowd', exact: true });
         await opener.click();
         await expect.element(control).not.toBeVisible();
