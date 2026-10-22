@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { DeliveryHero } from '@/components/client-deliveries/DeliveryHero';
+import { GalleryLightbox } from '@/components/client-deliveries/GalleryLightbox';
 import { PhotoSection } from '@/components/client-deliveries/PhotoSection';
 import { SectionMenu } from '@/components/client-deliveries/SectionMenu';
 import { LivePreviewListener } from '@/components/molecules/admin/LivePreviewListener';
@@ -39,6 +40,7 @@ export default async function ClientGalleryPage({
     const sections = gallery.blocks.flatMap((block) =>
         block.type === 'photos' ? [{ anchor: block.anchor, label: block.menuLabel }] : [],
     );
+    const photos = gallery.blocks.flatMap((block) => (block.type === 'photos' ? block.photos : []));
     return (
         <div className="delivery-page min-h-svh bg-bg-base text-fg-base" style={style}>
             {isPreview && <LivePreviewListener />}
@@ -59,23 +61,25 @@ export default async function ClientGalleryPage({
             </div>
             <SectionMenu sections={sections} archive={gallery.archive} />
             <main id="main-content" tabIndex={-1} className="delivery-content outline-none">
-                {gallery.blocks.map((block) =>
-                    block.type === 'text' ? (
-                        <div
-                            key={block.id}
-                            className="delivery-text-section bg-bg-base text-fg-base"
-                            style={themeStyle(block.theme)}
-                        >
-                            <div className="delivery-section-inner">
-                                <div className="delivery-text">
-                                    <RichText data={block.content} enableGutter={false} isDelivery />
+                <GalleryLightbox photos={photos}>
+                    {gallery.blocks.map((block) =>
+                        block.type === 'text' ? (
+                            <div
+                                key={block.id}
+                                className="delivery-text-section bg-bg-base text-fg-base"
+                                style={themeStyle(block.theme)}
+                            >
+                                <div className="delivery-section-inner">
+                                    <div className="delivery-text">
+                                        <RichText data={block.content} enableGutter={false} isDelivery />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ) : (
-                        <PhotoSection key={block.id} block={block} />
-                    ),
-                )}
+                        ) : (
+                            <PhotoSection key={block.id} block={block} />
+                        ),
+                    )}
+                </GalleryLightbox>
                 {!gallery.blocks.length && isPreview && (
                     <p className="delivery-section-inner body-lg py-section">
                         Add text and photo sections in the gallery editor.
