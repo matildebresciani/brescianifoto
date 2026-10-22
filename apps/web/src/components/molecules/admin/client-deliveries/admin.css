@@ -44,12 +44,38 @@
 }
 .delivery-upload-panel {
     margin-block: 16px;
-    padding: 16px;
-    border: 1px solid var(--theme-elevation-200);
-    background: var(--theme-elevation-50);
 }
-.delivery-upload-panel input[type="file"] {
-    display: block;
-    margin-top: 8px;
-    max-width: 100%;
+.delivery-upload-panel .dropzone {
+    padding: 16px;
+}
+.delivery-upload-panel input[type="file"][hidden] {
+    display: none;
+}
+
+.delivery-color-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.delivery-color-swatch {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    border: 1px solid var(--theme-elevation-400);
+    border-radius: 2px;
+}
+.delivery-palette-select .rs__control {
+    flex-wrap: nowrap;
+}
+.delivery-palette-select .value-container {
+    min-width: 0;
+    flex: 1;
+}
+.delivery-section-label {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }

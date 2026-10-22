@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import RichText from '@/components/molecules/admin/RichText';
 import type { DeliveryView } from '@/lib/client-deliveries/view';
 
 export function DeliveryHero({ gallery }: { gallery: DeliveryView }) {
@@ -23,7 +24,7 @@ export function DeliveryHero({ gallery }: { gallery: DeliveryView }) {
                     {gallery.location}
                 </p>
             )}
-            {gallery.details && <p className="body-sm mt-base whitespace-pre-line">{gallery.details}</p>}
+            {gallery.details && <RichText data={gallery.details} enableGutter={false} className="mt-base" />}
         </div>
     );
     return (
@@ -33,7 +34,7 @@ export function DeliveryHero({ gallery }: { gallery: DeliveryView }) {
                 <div className="delivery-cover-frame">
                     <Image
                         src={gallery.cover.src}
-                        alt={`${gallery.title} — cover photograph`}
+                        alt={`${gallery.title} — featured photograph`}
                         width={gallery.cover.width}
                         height={gallery.cover.height}
                         sizes="100vw"

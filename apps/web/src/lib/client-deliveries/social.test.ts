@@ -1,0 +1,105 @@
+import { createHash } from 'node:crypto';
+import sharp from 'sharp';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { ClientGallery, ClientPhoto } from '@/payload-types';
+import { deliveryMetadata, featuredPhoto, renderSocialImage, socialCrop } from './social';
+
+const mocks = vi.hoisted(() => ({ read: vi.fn(), url: vi.fn() }));
+vi.mock('./read', () => ({ readDelivery: mocks.read }));
+vi.mock('./storage', () => ({ assetURL: mocks.url }));
+vi.mock('@/lib/utilities/get-url', () => ({ getServerSideURL: () => 'https://example.test' }));
+
+const photo: ClientPhoto = {
+    id: 'photo-1',
+    gallery: 'gallery-1',
+    originalFilename: 'photo.jpg',
+    storageKey: 'private/photo.jpg',
+    byteSize: 2000,
+    mimeType: 'image/jpeg',
+    width: 1800,
+    height: 900,
+    checksum: 'immutable-checksum',
+    thumbnailKey: 'thumb.webp',
+    createdAt: '2026-10-01',
+    updatedAt: '2026-10-01',
+};
+const gallery: ClientGallery = {
+    id: 'gallery-1',
+    name: 'INTERNAL PRIVATE NAME',
+    title: 'Alex & Jamie',
+    subtitle: 'A day together',
+    shareId: 'a'.repeat(32),
+    cover: photo.id,
+    blocks: [],
+    _status: 'published',
+    focalX: 0,
+    focalY: 100,
+    createdAt: '2026-10-01',
+    updatedAt: '2026-10-01',
+};
+const data = { gallery, photos: [photo], archive: undefined, isArchiveCurrent: false };
+
+afterEach(() => vi.unstubAllGlobals());
+
+describe('delivery social previews', () => {
+    it('uses one featured image with a stable absolute revision-qualified URL', async () => {
+        mocks.read.mockResolvedValue(data);
+        const metadata = await deliveryMetadata('a'.repeat(32), false);
+        expect(metadata).toMatchObject({
+            title: 'Alex & Jamie · brescianifoto',
+            description: 'A day together',
+            openGraph: {
+                images: [
+                    {
+                        width: 1200,
+                        height: 630,
+                        type: 'image/jpeg',
+                        url: expect.stringMatching(
+                            /^https:\/\/example.test\/deliveries\/a{32}\/social-image\?v=[a-f0-9]{16}$/,
+                        ),
+                    },
+                ],
+            },
+            twitter: { card: 'summary_large_image' },
+        });
+        expect(JSON.stringify(metadata)).not.toContain(gallery.name);
+        expect(mocks.url).not.toHaveBeenCalled();
+        expect(await deliveryMetadata('a'.repeat(32), false)).toEqual(metadata);
+        mocks.read.mockResolvedValue({ ...data, gallery: { ...gallery, focalX: 100 } });
+        expect((await deliveryMetadata('a'.repeat(32), false)).openGraph).not.toEqual(metadata.openGraph);
+    });
+    it('never queries or exposes draft content in preview metadata', async () => {
+        expect(await deliveryMetadata('a'.repeat(32), true)).toMatchObject({ openGraph: null, twitter: null });
+        expect(mocks.read).not.toHaveBeenCalled();
+    });
+    it('omits social images for unavailable and cross-gallery photos', async () => {
+        mocks.read.mockResolvedValue(undefined);
+        expect(await deliveryMetadata('a'.repeat(32), false)).toMatchObject({ openGraph: null });
+        const foreign = { ...data, photos: [{ ...photo, gallery: 'different-gallery' }] };
+        expect(featuredPhoto(foreign)).toBeUndefined();
+        mocks.read.mockResolvedValue(foreign);
+        expect(await deliveryMetadata('a'.repeat(32), false)).toMatchObject({ openGraph: { images: [] } });
+    });
+    it('matches cover object-position at the center and all edges', () => {
+        expect(socialCrop(1800, 900, 0, 0)).toMatchObject({ left: 0, top: 0 });
+        expect(socialCrop(1800, 900, 100, 100)).toMatchObject({ left: 60, top: 0 });
+        expect(socialCrop(900, 1800)).toMatchObject({ left: 0, top: 885 });
+        expect(socialCrop(900, 1800, 100, 100)).toMatchObject({ left: 0, top: 1770 });
+    });
+    it('produces a colored 1200×630 JPEG without changing source bytes', async () => {
+        const source = await sharp({ create: { width: 1800, height: 900, channels: 3, background: '#da2345' } })
+            .jpeg()
+            .toBuffer();
+        const checksum = createHash('sha256').update(source).digest('hex');
+        mocks.url.mockResolvedValue('https://storage.test/signed');
+        vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(new Uint8Array(source))));
+        const result = await renderSocialImage(photo, 0, 100);
+        expect(result).toBeDefined();
+        if (!result) return;
+        expect(await sharp(result).metadata()).toMatchObject({ width: 1200, height: 630, format: 'jpeg' });
+        const { channels } = await sharp(result).stats();
+        expect(channels[0]?.mean).toBeGreaterThan(200);
+        expect(channels[1]?.mean).toBeLessThan(50);
+        expect(createHash('sha256').update(source).digest('hex')).toBe(checksum);
+    });
+});

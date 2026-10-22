@@ -14,7 +14,8 @@ export function PhotoUpload({ path, field, readOnly }: UploadFieldClientProps) {
         <UploadPanel
             galleryId={id ? String(id) : undefined}
             kind="photo"
-            label={field.hasMany ? 'Upload photos to this section' : 'Upload a cover photo'}
+            hasMany={Boolean(field.hasMany)}
+            label={field.hasMany ? 'Upload photos to this section' : 'Upload featured image'}
             isDisabled={readOnly || disabled}
             onUploaded={(ids) =>
                 setValue(field.hasMany ? mergeUploadedPhotos(getDataByPath(currentPath), ids) : ids[0])

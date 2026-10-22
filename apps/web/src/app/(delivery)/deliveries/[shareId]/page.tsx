@@ -7,8 +7,19 @@ import { LivePreviewListener } from '@/components/molecules/admin/LivePreviewLis
 import RichText from '@/components/molecules/admin/RichText';
 import { deliveryView, readDelivery } from '@/lib/client-deliveries/read';
 import { themeStyle } from '@/lib/client-deliveries/shared';
+import { deliveryMetadata } from '@/lib/client-deliveries/social';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+    params,
+    searchParams,
+}: {
+    params: Promise<{ shareId: string }>;
+    searchParams: Promise<{ preview?: string }>;
+}) {
+    return deliveryMetadata((await params).shareId, (await searchParams).preview === '1');
+}
 
 export default async function ClientGalleryPage({
     params,

@@ -1,0 +1,35 @@
+diff --git a/dist/components/MediaGallery/index.js b/dist/components/MediaGallery/index.js
+index 287bf33a0043f7ea80c1bef24d29812969ea029f..04147791df80757d49d86032d875ba4ac0a7cad9 100644
+--- a/dist/components/MediaGallery/index.js
++++ b/dist/components/MediaGallery/index.js
+@@ -133,6 +133,7 @@ export const MediaGallery = (props) => {
+         }
+     }, [editingID, openTrigger, isDrawerOpen, openDrawer]);
+     const handleQuickEdit = useCallback((id) => {
++        setLightboxOpen(false);
+         setEditingID(id);
+         setOpenTrigger((t) => t + 1);
+         openingPendingRef.current = true;
+@@ -201,6 +202,6 @@ export const MediaGallery = (props) => {
+                                 : undefined, handleSelection: resolvedSelectionHandler, footer: (_b = availableViews.find((v) => v.slug === viewType)) === null || _b === void 0 ? void 0 : _b.footer, collectionLabel: collectionLabel, collectionSlug: slug }))] }), Table: TableSlot }), props.lightbox !== false &&
+                 lightboxOpen &&
+                 galleryItems.length > 0 &&
+-                createPortal(_jsx(Lightbox, { items: galleryItems, initialIndex: lightboxIndex !== null && lightboxIndex !== void 0 ? lightboxIndex : 0, onClose: () => setLightboxOpen(false), onEdit: (item) => handleQuickEdit(item.id) }), document.body)] }));
++                createPortal(_jsx(Lightbox, { items: galleryItems, initialIndex: lightboxIndex !== null && lightboxIndex !== void 0 ? lightboxIndex : 0, onClose: () => setLightboxOpen(false), onEdit: props.edit !== false ? (item) => handleQuickEdit(item.id) : undefined }), document.body)] }));
+ };
+ //# sourceMappingURL=index.js.map
+\ No newline at end of file
+diff --git a/dist/components/ui/Lightbox/index.scss b/dist/components/ui/Lightbox/index.scss
+index 6d0b875dc8ce2c7ed86bcec345e658332267456f..90d92ac1e51d7f3172c245b373d53c8ffe7780d3 100644
+--- a/dist/components/ui/Lightbox/index.scss
++++ b/dist/components/ui/Lightbox/index.scss
+@@ -14,7 +14,8 @@ body {
+ .media-gallery-lightbox {
+   position: fixed;
+   inset: 0;
+-  z-index: 25;
++  // Lightboxes are portalled to body and must sit above Payload list drawers.
++  z-index: calc(var(--z-modal) + 1);
+   display: flex;
+   flex-direction: column;
+   background: color-mix(in srgb, var(--theme-bg), transparent 5%);

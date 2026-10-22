@@ -11,7 +11,9 @@ export function GalleryField(props: UploadFieldClientProps) {
     return (
         <div className="photo-gallery-field" data-photo-view={view}>
             <div className="photo-view-toolbar">
-                <p>Drag the handles to reorder photos. Click a filename to open the original.</p>
+                {props.field.relationTo !== 'client-photos' && (
+                    <p>Drag the handles to reorder photos. Click a filename to open the original.</p>
+                )}
                 <PhotoViewToggle view={view} onChange={changeView} label="Gallery photo layout" />
             </div>
             <UploadField {...props} />

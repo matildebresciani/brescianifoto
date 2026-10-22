@@ -34,7 +34,8 @@
             "core-js-pure"
         ],
         "patchedDependencies": {
-            "@innovixx/payload-color-picker-field@2.0.4": "patches/@innovixx__payload-color-picker-field@2.0.4.patch"
+            "@innovixx/payload-color-picker-field@2.0.4": "patches/@innovixx__payload-color-picker-field@2.0.4.patch",
+            "@sitebytom/payload-media-gallery@1.2.0": "patches/@sitebytom__payload-media-gallery@1.2.0.patch"
         }
     },
     "packageManager": "pnpm@10.30.0",

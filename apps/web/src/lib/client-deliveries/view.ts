@@ -28,7 +28,7 @@ export type DeliveryView = {
     subtitle?: string | null;
     date?: string | null;
     location?: string | null;
-    details?: string | null;
+    details?: SerializedEditorState | null;
     cover?: DeliveryPhoto;
     coverLayout: 'editorial' | 'overlay';
     alignment: 'left' | 'center' | 'right';

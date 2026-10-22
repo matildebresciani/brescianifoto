@@ -1,5 +1,6 @@
 'use client';
 
+import { Button, Dropzone } from '@payloadcms/ui';
 import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { formatBytes } from '@/lib/client-deliveries/shared';
@@ -14,14 +15,19 @@ export function UploadPanel({
     kind,
     label,
     isDisabled = false,
+    hasMany = false,
+    onBusyChange,
     onUploaded,
 }: {
     galleryId?: string;
     kind: UploadJob['kind'];
     label: string;
     isDisabled?: boolean;
+    hasMany?: boolean;
+    onBusyChange?: (isBusy: boolean) => void;
     onUploaded?: (ids: string[]) => void;
 }) {
+    const fileInput = useRef<HTMLInputElement>(null);
     const jobs = useRef<QueueJob[]>([]);
     const [, render] = useState(0);
     const isMounted = useRef(true);
@@ -41,6 +47,10 @@ export function UploadPanel({
         if (isMounted.current) render((value) => value + 1);
     };
     const isBusy = jobs.current.some((job) => job.status === 'uploading' || job.status === 'queued');
+    useEffect(() => {
+        onBusyChange?.(isBusy);
+        return () => onBusyChange?.(false);
+    }, [isBusy, onBusyChange]);
     const notifyCompleted = (batch: QueueJob[]) => {
         if (!isMounted.current) return;
         const ids = batch.flatMap((job) => (job.status === 'done' && job.assetID ? [job.assetID] : []));
@@ -65,7 +75,7 @@ export function UploadPanel({
     };
     const enqueue = async (files: FileList | null) => {
         if (!files || !galleryId || isBusy || isDisabled) return;
-        const batch: QueueJob[] = [...files].map((file) => ({
+        const batch: QueueJob[] = (hasMany ? [...files] : [...files].slice(0, 1)).map((file) => ({
             id: crypto.randomUUID(),
             file,
             kind,
@@ -103,20 +113,35 @@ export function UploadPanel({
     };
     return (
         <div className="delivery-upload-panel">
-            <label>
-                <strong>{label}</strong>
+            <Dropzone
+                disabled={!galleryId || isBusy || isDisabled}
+                multipleFiles={hasMany}
+                onChange={(files) => void enqueue(files)}
+            >
+                <Button
+                    type="button"
+                    buttonStyle="pill"
+                    disabled={!galleryId || isBusy || isDisabled}
+                    onClick={() => fileInput.current?.click()}
+                >
+                    {label}
+                </Button>
+                <span> or drag and drop {hasMany ? 'files' : 'a file'} here</span>
                 <input
+                    ref={fileInput}
                     type="file"
+                    hidden
+                    aria-label={label}
                     accept={kind === 'photo' ? 'image/jpeg,.jpg,.jpeg' : '.zip,application/zip'}
-                    multiple={kind === 'photo'}
+                    multiple={hasMany}
                     disabled={!galleryId || isBusy || isDisabled}
                     onChange={(event) => {
                         void enqueue(event.target.files);
                         event.target.value = '';
                     }}
                 />
-            </label>
-            {!galleryId && <p>Save this gallery as a draft first to enable uploads.</p>}
+            </Dropzone>
+            {!galleryId && <p>Save a draft to enable uploads.</p>}
             <ul className="delivery-upload-list">
                 {jobs.current.map((job) => (
                     <li key={job.id}>
@@ -126,7 +151,9 @@ export function UploadPanel({
                         <progress value={job.progress} max={100} aria-label={`${job.file.name} upload`} />
                         {job.message && <span role={job.status === 'error' ? 'alert' : 'status'}>{job.message}</span>}
                         {job.status === 'error' && (
-                            <button
+                            <Button
+                                buttonStyle="secondary"
+                                size="small"
                                 type="button"
                                 disabled={isBusy || isDisabled}
                                 onClick={() => {
@@ -135,10 +162,12 @@ export function UploadPanel({
                                 }}
                             >
                                 Retry unfinished parts
-                            </button>
+                            </Button>
                         )}
                         {(job.status === 'error' || job.status === 'cancelled') && (
-                            <button
+                            <Button
+                                buttonStyle="secondary"
+                                size="small"
                                 type="button"
                                 disabled={isBusy || isDisabled}
                                 onClick={async () => {
@@ -149,27 +178,24 @@ export function UploadPanel({
                                 }}
                             >
                                 Start again
-                            </button>
+                            </Button>
                         )}
                         {(job.status === 'uploading' || job.status === 'queued') && (
-                            <button
+                            <Button
+                                buttonStyle="secondary"
+                                size="small"
                                 type="button"
                                 onClick={() => {
                                     void cancel(job);
                                 }}
                             >
                                 Cancel
-                            </button>
+                            </Button>
                         )}
                     </li>
                 ))}
             </ul>
-            {jobs.current.length > 0 && (
-                <p>
-                    Keep this gallery open while uploading. Retry failed files here; completed files will not upload
-                    again.
-                </p>
-            )}
+            {isBusy && <p>Keep this gallery open until uploads finish.</p>}
         </div>
     );
 }

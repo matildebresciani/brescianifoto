@@ -19,40 +19,28 @@ export function DeliveryTools() {
             <div className="delivery-admin-actions">
                 <strong>Client delivery</strong>
                 {url && (
-                    <>
-                        <button
-                            type="button"
-                            onClick={async () => {
-                                const result = await ResultAsync.fromPromise(
-                                    navigator.clipboard.writeText(new URL(url, window.location.origin).toString()),
-                                    () => 'Copy failed.',
-                                );
-                                setNotice(
-                                    result.isOk()
-                                        ? 'Gallery link copied. Publish the gallery before sharing.'
-                                        : 'Could not copy automatically. Open the gallery and copy its address.',
-                                );
-                            }}
-                        >
-                            Copy client link
-                        </button>
-                        <a href={`${url}?preview=1`} target="_blank" rel="noreferrer">
-                            Preview saved draft ↗
-                        </a>
-                        <a href={url} target="_blank" rel="noreferrer">
-                            Open client link ↗
-                        </a>
-                    </>
+                    <button
+                        type="button"
+                        onClick={async () => {
+                            const result = await ResultAsync.fromPromise(
+                                navigator.clipboard.writeText(new URL(url, window.location.origin).toString()),
+                                () => 'Copy failed.',
+                            );
+                            setNotice(
+                                result.isOk()
+                                    ? 'Gallery link copied.'
+                                    : `Could not copy automatically. Gallery link: ${new URL(url, window.location.origin).toString()}`,
+                            );
+                        }}
+                    >
+                        Copy client link
+                    </button>
                 )}
             </div>
-            <p>
-                Upload photos directly inside each Photo section under Page sections. Save your section changes before
-                uploading a matching ZIP.
-            </p>
             <UploadPanel
                 galleryId={id ? String(id) : undefined}
                 kind="archive"
-                label="Full gallery ZIP (up to 25 GB)"
+                label="Upload gallery ZIP (max. 25 GB)"
                 onUploaded={(ids) => {
                     if (ids[0]) {
                         setArchive(ids[0]);
@@ -61,11 +49,9 @@ export function DeliveryTools() {
                 }}
             />
             {archiveRevision && archiveRevision !== revision ? (
-                <p aria-live="polite">
-                    The ZIP is out of date. Download all stays hidden until you replace or explicitly confirm it.
-                </p>
+                <p aria-live="polite">ZIP out of date. Replace or confirm it to enable Download all.</p>
             ) : null}
-            <p aria-live="polite">{notice}</p>
+            <div aria-live="polite">{notice && <p>{notice}</p>}</div>
         </section>
     );
 }

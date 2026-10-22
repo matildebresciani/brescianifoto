@@ -121,6 +121,7 @@ const nativePhoto = await payload.findByID({ collection: 'client-photos', id: im
 assert.equal(nativePhoto.filename, images[0].originalFilename);
 assert.equal(nativePhoto.url, `http://localhost:3001/${images[0].storageKey}`);
 assert.equal(nativePhoto.thumbnailURL, `http://localhost:3001/${images[0].thumbnailKey}`);
+assert.equal(nativePhoto.sizes.thumbnail.url, nativePhoto.thumbnailURL);
 const paletteBlocks = structuredClone(saved.blocks);
 paletteBlocks[1].colors = { backgroundSource: 'text', textSource: 'background' };
 saved = await payload.update({
@@ -134,6 +135,43 @@ assert.equal(saved.blocks[1].colors.textSource, 'background');
 const firstAnchor = saved.blocks[1].anchor;
 const revision = saved.photoRevision;
 assert.ok(firstAnchor.startsWith('section-'));
+// Library-only uploads must neither enter a section nor alter the delivered photo set.
+await writeFile(
+    `public/${images[0].storageKey.replace('.jpg', '-library.jpg')}`,
+    await readFile(`public/${images[0].storageKey}`),
+);
+const libraryPhoto = await payload.create({
+    collection: 'client-photos',
+    overrideAccess: true,
+    data: {
+        gallery: gallery.id,
+        originalFilename: 'Library-only.jpg',
+        storageKey: images[0].storageKey.replace('.jpg', '-library.jpg'),
+        thumbnailKey: images[0].thumbnailKey,
+        byteSize: images[0].byteSize,
+        mimeType: 'image/jpeg',
+        width: images[0].width,
+        height: images[0].height,
+        checksum: 'qa-library-only',
+    },
+});
+saved = await payload.update({
+    collection: 'client-galleries',
+    id: gallery.id,
+    overrideAccess: true,
+    data: { blocks: saved.blocks },
+});
+assert.equal(saved.photoRevision, revision);
+assert.ok(!saved.blocks.some((block) => block.blockType === 'photos' && block.photos.includes(libraryPhoto.id)));
+const library = await payload.find({
+    collection: 'client-photos',
+    where: { gallery: { equals: gallery.id } },
+    limit: 5,
+    depth: 0,
+    overrideAccess: true,
+});
+assert.equal(library.totalDocs, images.length + 1);
+assert.ok(library.hasNextPage);
 const archive = await payload.create({
     collection: 'client-downloads',
     overrideAccess: true,

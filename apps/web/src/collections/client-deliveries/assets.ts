@@ -32,14 +32,20 @@ export const ClientPhotos: CollectionConfig = {
     },
     hooks: {
         afterRead: [
-            async ({ doc }) => ({
-                ...doc,
-                // Adapt legacy records too: IDs and stored object keys do not change.
-                filename: doc.originalFilename,
-                filesize: doc.byteSize,
-                url: typeof doc.storageKey === 'string' ? await assetURL(doc.storageKey) : undefined,
-                thumbnailURL: typeof doc.thumbnailKey === 'string' ? await assetURL(doc.thumbnailKey) : undefined,
-            }),
+            async ({ doc }) => {
+                const thumbnailURL =
+                    typeof doc.thumbnailKey === 'string' ? await assetURL(doc.thumbnailKey) : undefined;
+                return {
+                    ...doc,
+                    // Adapt legacy records too: IDs and stored object keys do not change.
+                    filename: doc.originalFilename,
+                    filesize: doc.byteSize,
+                    url: typeof doc.storageKey === 'string' ? await assetURL(doc.storageKey) : undefined,
+                    thumbnailURL,
+                    // The Media gallery plugin reads sizes.thumbnail instead of adminThumbnail.
+                    sizes: { thumbnail: { url: thumbnailURL, mimeType: 'image/webp' } },
+                };
+            },
         ],
     },
     admin: {

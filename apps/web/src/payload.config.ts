@@ -95,6 +95,10 @@ export default buildConfig({
     ],
     bin: [
         {
+            scriptPath: path.resolve(dirname, 'scripts/client-gallery-details.ts'),
+            key: 'client-gallery-details',
+        },
+        {
             scriptPath: path.resolve(dirname, 'scripts/portfolio-setup.ts'),
             key: 'portfolio-setup',
         },

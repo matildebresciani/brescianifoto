@@ -138,17 +138,17 @@
     text-decoration: none;
 }
 .delivery-primary {
-    background: var(--fg-base);
-    color: var(--bg-base);
-    border-color: var(--fg-base);
+    background: var(--bg-invert);
+    color: var(--fg-on-color);
+    border-color: var(--bg-invert);
 }
 .delivery-primary:hover {
     background: var(--bg-base);
     color: var(--fg-base);
 }
 .delivery-outline:hover {
-    background: var(--fg-base);
-    color: var(--bg-base);
+    background: var(--bg-invert);
+    color: var(--fg-on-color);
 }
 .delivery-icon {
     display: flex;

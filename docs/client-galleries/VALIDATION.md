@@ -1,5 +1,33 @@
 # Client gallery validation — 2026-10-22
 
+## Editor cleanup — 2026-10-22
+
+- Palette rows and selectors show swatches and uppercase hex values; internal color variables are hidden. Only semantic names such as `bg-base` and `fg-base` remain visible. Names are hidden and optional; legacy names and references remain compatible. Semantic assignments are grouped as Background, Text and Border. Section labels use live titles/counts or text excerpts.
+- Removed routine descriptions and successful contrast messages. Kept upload constraints, actionable errors and archive confirmation guidance.
+- 71 focused tests pass across 12 files. The local color integration fixture passes, including nameless creation, hex edits/reordering/reload, legacy appearance, reference protection and publication contrast. The unit runner still reports the existing missing Storybook preset warnings.
+- Browser checks at 1440px and 375px verify nameless creation, keyboard color selection, two assignments updating from one hex edit, draft save/reload, live section title/count/excerpt labels and warnings for invalid contrast. No browser runtime errors occurred. Gallery fields fit the narrow viewport; Payload's existing top account/date controls extend beyond it.
+
+## Upload-once photo library — 2026-10-22
+
+- Added the gallery-specific Photo library tab with bulk upload, an authenticated count and the existing Media gallery grid/list browser. Photo sections reuse the existing sortable GalleryField. Existing uploads appear without a data migration; unsaved galleries have empty photo-picker filters.
+- 68 focused unit tests pass, including the read adapter test that keeps full-resolution originals separate from plugin thumbnails. The unit runner emits pre-existing missing Storybook builder preset warnings, but the unit suite completes successfully.
+- The isolated MongoDB integration script passes with additional checks for library-only photos, paginated membership and unchanged delivery revisions. Existing ownership/access and ZIP revision checks also pass.
+- Browser checks pass for gallery-filtered bulk selection, preserving existing selection order, keyboard grid reordering, grid/list switching, draft save/reload, independent section order, retaining originals after removing a section selection, library count, search, pagination and full-resolution lightbox previews.
+- Mocked browser transfers verify a three-file batch with one failure, retrying just that file, refreshing the count after each completed batch/retry, and leaving section selections and revisions unchanged. New galleries require a draft save before library upload. These are simulated transfers; a live R2 round trip was not performed.
+- The versioned Media gallery plugin patch fixes lightbox stacking above Payload drawers and honors disabled editing in the lightbox. For editable collections, opening Quick edit closes the lightbox before opening the document drawer. The patch is recorded in package.json and pnpm-lock.yaml; frozen lockfile validation passes.
+- Payload import map/types regenerated; TypeScript and targeted Biome checks pass.
+
+
+## Project journal reconciliation — 2026-10-22
+
+The journal was reconciled with this file, the working tree and recent implementation chats. CG-14 records the completed local Overview/Details/social-preview checks below. CG-15 tracks the active Photo library work, including drawer lightbox stacking and disabled-editing compatibility issues found during browser QA. CG-16 records the later request for a single unified native Featured image field; that correction has no completed acceptance evidence yet. Earlier completed editor tasks retain their original scope.
+
+CG-03, CG-09, CG-11 and CG-12 remain Blocked. The deployment investigation identified Production-only Vercel environment scope as the cause of the failed Preview build; enabling Preview scope and redeploying were advised, but no successful redeployment was recorded. Dedicated bucket creation does not verify credentials, CORS/lifecycle or actual transfers. Test totals below describe separate runs and snapshots; this journal update did not rerun application tests or verify remote configuration. The task JSON and generated dashboard were validated by the journal generator.
+
+## Visible publication requirements — 2026-10-22
+
+Featured image and Page sections now use Payload’s standard red required asterisk, with plain labels. Publication-aware validation keeps drafts saveable without images. Missing image publication failures use Payload field validation errors with readable labels, rather than a generic API error. The isolated integration script verifies both error paths and successful empty draft saves. Earlier browser verification confirms inline errors in Overview/Page sections, and saving a draft edit after rejected publication. Typecheck and app-wide lint/format checks pass. This changes requirement visibility, not the publication rules.
+
 ## Cloudflare-only commit validation — 2026-10-22
 
 Validated an isolated HEAD snapshot containing only the Cloudflare changes, excluding concurrent gallery editor/design work. All 40 client-delivery tests pass, Payload and Next types/import map regenerate, typecheck passes, and Biome checks pass for the changed application files. This verifies the commit independently of uncommitted features; production R2 transfers remain unverified.
@@ -8,11 +36,30 @@ Validated an isolated HEAD snapshot containing only the Cloudflare changes, excl
 
 New uploads are grouped by gallery ID into photos, thumbnails and downloads. All 11 upload endpoint tests pass, covering unique keys for duplicate filenames, gallery grouping, ZIP placement, preserved original bytes and compatible new/legacy thumbnail completion. Typecheck and Biome checks on the two changed TypeScript files pass. Vitest emits the previously recorded Storybook preset warnings but completes successfully. No live R2 upload or migration was performed; deployment remains pending.
 
+## Reusable palette colors — 2026-10-22
+
+- Replaced required highlight pairs with independently named colors. Each hex is defined once and reused by semantic tokens and section background/text selections. Existing palettes are deduplicated on read before Payload field defaults run; legacy pair references and automatic foregrounds keep their appearance.
+- All 67 focused tests pass across 11 files, including 13 theme tests for reusable colors, live resolution, stable rename/reorder keys, legacy deduplication, missing/referenced colors, incomplete rows and contrast. Vitest emitted the existing Storybook preset warnings without affecting the unit run.
+- `scripts/check-client-gallery-colors.mts` passes against the isolated local QA database: create/save/reload, old document and draft-version conversion, unchanged legacy appearance, new-section inheritance, independent selections, rename/reorder stability, deletion protection for semantic tokens and sections in drafts and published documents, and publication contrast rejection.
+- Browser checks pass for adding a color with only a name and hex, reuse across multiple semantic tokens, live updates, independent section text, keyboard dropdown selection, name/swatch/uppercase-hex rendering, hidden stable keys and save/reload. Live gallery and section contrast feedback also passes after handling Payload’s hidden legacy array state. Mobile/desktop checks at 375px/1440px verify alternating sections, matching lightbox colors, Escape closing and no horizontal overflow, using local placeholder photos.
+- Payload types/import map regenerated; typecheck, app-wide lint/format checks and production Webpack build pass. Build uses isolated QA data and placeholder storage settings. Existing production-storage and physical-phone release blockers remain unchanged.
+- OPERATIONS.md and CG-13 now describe defining the four example colors once and reusing them. The earlier pair implementation below is historical and superseded by this simpler editor.
+
+## Gallery tokens and highlight pairs — 2026-10-22
+
+- 48 focused tests pass (45 client-delivery tests plus 3 upload-selection tests). Added semantic tokens and repeatable highlight pairs while retaining original theme fields and legacy section behavior. Tests cover key generation/rename/reorder, automatic foregrounds, explicit overrides, invalid/deleted references, incomplete new editor rows and contrast of actual rendered combinations.
+- `scripts/check-client-gallery-colors.mts` passes with the isolated `brescianifoto_client_colors_qa` database. It verifies saved pairs, new-section defaults, legacy records and draft versions, stable keys, referenced-highlight deletion rejection in drafts and published documents, and unreadable section publication rejection.
+- Browser checks pass for live palette edits, creating a named pair, stable read-only keys, keyboard dropdown selection, token/swatch/hex rendering, automatic foreground updates and save/reload. Preview checks at 375px and 1440px verify separate orange/green sections, no horizontal overflow, matching portal backgrounds/text and Escape closing. Only local placeholder photographs were used.
+- Payload types/import map regenerated. Whole-app type checking, lint and formatting pass. Production Webpack build passes using the local QA database and non-secret placeholder storage settings; this does not verify production storage.
+- The optional orange/pistachio/green gallery configuration is documented in OPERATIONS.md. Neutral defaults and the public portfolio palette remain unchanged. Existing storage, physical-phone and first-delivery release blockers remain open.
+
+
 ## Dedicated client bucket configuration
 
 - Client storage now uses only `CLIENT_R2_*` variables, including its own bucket, endpoint and credentials. Images and admin thumbnails now use signed S3 URLs without a public hostname or DNS changes. Portfolio settings remain unchanged. Next image optimization accepts the client S3 endpoint scoped to the bucket/client prefix. Local QA placeholders resolve locally only in development with no client bucket configured.
 - All 44 client-delivery unit tests pass, including six storage tests that check image/download routing and reject missing client configuration instead of using portfolio settings. Typecheck passes. Vitest also emitted missing Storybook builder preset warnings; these did not prevent the unit tests from running or passing.
 - Production bucket creation was reported by the user. Token/CORS/lifecycle/private-bucket configuration, deployment and a live R2 round trip are not yet verified. No DNS, nameserver or remote bucket changes were made.
+
 
 ## DIF / native Payload refactor
 
@@ -58,8 +105,19 @@ Final whole-app **type checking, lint and formatting pass**, and the production 
 
 ## Still required before production
 
-1. Configure actual R2 credentials, CORS, scoped abandoned-multipart cleanup and asset-domain noindex headers. No R2 configuration is present in the local environment.
+1. Verify dedicated client R2 credentials, CORS, private bucket access and scoped abandoned-multipart cleanup in the intended deployment. The bucket is recorded as created, but remote configuration and live transfers are unverified. Verify application noindex headers on delivery and optimized-image responses; signed S3 access needs no custom asset domain. Ensure portfolio and client variables are available to the intended Vercel environment, then redeploy successfully.
 2. Test real JPEG upload/download hashes and metadata, large ZIP transfer/retry/cancel, interrupted native downloads and maximum-size photo processing on the actual Vercel plan.
 3. Complete physical-phone and reduced-motion checks, and review the real wedding's layouts/images.
 4. Resolve the existing public-gallery metadata-test mismatch through its owning work; re-run release checks after configuring production storage.
 5. Deploy to the intended production project, create the actual wedding gallery from supplied content, and test signed-out delivery on the live domain. No real wedding assets or ZIP have been supplied and no production deployment or client message was sent.
+
+## Featured image / Overview follow-up — 2026-10-22
+
+- Renamed Cover to Overview and its image field to Featured image. Appearance is collapsed; Details uses the shared delivery Lexical editor and frontend rich-text renderer.
+- Native Payload Dropzone/buttons now wrap direct photo transfers. Featured image is single-file; sections retain batch upload and native selection/reordering. Payload EditUpload provides visual, non-destructive focal adjustment.
+- 59 focused delivery/upload tests passed, including new Details conversion, social metadata, image rendering/color/source-byte preservation, crop geometry, and route access/error tests. Typecheck passed. Biome passed for the 16 isolated implementation files; the full app lint run initially passed, then reported concurrent color-library edits in `theme.ts` and `galleries.ts` outside this change's hunks.
+- Browser QA in the isolated local fixture confirmed Overview, rich-text Details save/reload, focal 0/100 save/reload, Cancel discarding an edit, gallery-filtered native selection, replacement resetting focal position to 50/50, and section upload controls. The featured-image file input is single-file. No live R2 upload is claimed.
+- Actual MongoDB QA passed: dry run leaves strings untouched, an owner-only backup precedes conversion of current and version records, timestamps are retained, repeated runs find no strings, and restored versions retain rich text. Only `brescianifoto_client_delivery_qa` was migrated.
+- Actual local HTTP checks passed: published Open Graph metadata contains the revision-qualified social-image URL; the route serves a 1200×630 JPEG with no-store headers; preview and invalid-link requests return 404.
+- Production Webpack build passed using placeholder portfolio-storage settings, the isolated QA database, and `.next-overview-build`. This confirms compilation, not a production storage deployment. Generated Payload types/import map were refreshed.
+- Production conversion/deployment and live R2 transfer verification remain rollout steps; commands and backup/recovery notes are in OPERATIONS.md.

@@ -61,6 +61,12 @@ Implemented after approval:
 
 Acceptance evidence is recorded in VALIDATION.md. Production R2 round-trip and phone/release blockers remain open.
 
+## Gallery tokens and reusable colors — 2026-10-22
+
+Implemented gallery-focused DIF naming: `bg-base`, `bg-subtle`, `bg-invert`, `fg-base`, `fg-faded`, `fg-on-color`, and `border-base`. Following the photographer’s correction, the pair editor is replaced by **Palette colors**: each entry has a name and a single hex value. Semantic tokens and section background/text fields independently reference these colors. The dropdowns show names, swatches and uppercase hex values, reflecting unsaved edits everywhere a color is reused. New sections inherit the gallery colors.
+
+The five original storage fields remain compatible. Existing palettes convert into a deduplicated library before Payload applies new-field defaults; existing pair references and automatic text remain supported. Rename/reorder preserve stable references. Referenced colors cannot be removed in drafts or published galleries. Publishing checks resolved section and control contrast. Neutral defaults and portfolio colors remain unchanged. The orange/pistachio/green recipe defines four colors once in an individual gallery; no preset or global change is applied.
+
 ## Validation and handover
 
 See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPERATIONS.md) for setup and photographer instructions. The feature code is implemented; tasks awaiting real storage/launch verification remain Blocked instead of being marked complete.
@@ -121,9 +127,10 @@ See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPE
       "Original bytes and metadata preserved; separate thumbnail; checksum recorded."
     ],
     "notes": [
-      "Implementation complete. Live R2 transfer and maximum-size photo verification await R2 environment configuration.",
+      "Implementation complete. Live JPEG integrity and maximum-size processing checks remain blocked until the intended deployment has working dedicated client storage.",
       "JPEG upload controls now live inside each Photo section and automatically append successful files. Gallery-library and ZIP uploads share the same progress/retry panel. Live R2 verification is still required.",
-      "2026-10-22: New objects are grouped under client-deliveries/<gallery-id>/photos, thumbnails and downloads. Gallery IDs keep paths stable across renames; unique object filenames prevent collisions. Existing objects and older multipart sessions retain compatible paths; no remote migration performed."
+      "2026-10-22: New objects are grouped under client-deliveries/<gallery-id>/photos, thumbnails and downloads. Gallery IDs keep paths stable across renames; unique object filenames prevent collisions. Existing objects and older multipart sessions retain compatible paths; no remote migration performed.",
+      "2026-10-22 journal review: dedicated bucket creation is recorded, but successful live transfers are not verified. Next verify environment scope and deployment, then JPEG upload/download hashes, metadata, retry/cancel and maximum-size processing."
     ],
     "evidence": [
       "Unit tests cover preserved source bytes and EXIF/XMP/ICC, SHA-256, separate thumbnails, multipart completion/idempotency/cancel and size limits.",
@@ -145,19 +152,23 @@ See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPE
     ],
     "notes": [
       "Gallery editor includes cover, rich text, photo blocks, thumbnail picker, ordering, colors and archive confirmation.",
+      "2026-10-22: Use native red required asterisks on Featured image and Page sections, with native field-level validation errors. Empty drafts remain saveable.",
       "Added native visual color pickers beside each hex field; no extra plugin dependency.",
       "Added optional photo-section Lexical introductions and per-block background/text overrides with inherit/reset controls. Expanded both editors to the standard Lexical text-formatting features.",
       "Simplified the workflow to Client galleries: underlying photo/ZIP collections are hidden from the sidebar. Added direct section uploads and an optional cover/library uploader.",
-      "DIF follow-up implemented: plugin color picker, palette-role section colors, native Payload cover/photo selection and sorting; removed custom PhotoPicker. Existing records/hex overrides stay compatible. Resumable transfer panel retained."
+      "DIF follow-up implemented: plugin color picker, palette-role section colors, native Payload cover/photo selection and sorting; removed custom PhotoPicker. Existing records/hex overrides stay compatible. Resumable transfer panel retained.",
+      "2026-10-22 journal review: original editor scope is complete. Track the Overview/social-preview follow-up in CG-14, the active upload-once photo-library workflow in CG-15, and the requested unified featured-image field in CG-16."
     ],
     "evidence": [
       "Browser: palette edits saved; photo order persisted; text alignment controls present; centered rich text rendered correctly.",
+      "2026-10-22: Local integration and browser checks confirm image requirements, field-level errors for missing featured/section photos, and empty draft saving. Typecheck and lint/format pass.",
       "Browser verified both directions of hex/swatch synchronization, immediate contrast feedback, and saved values after reload. Typecheck and lint passed.",
       "Real Payload save/read preserved nested rich text and colors; publication rejected low-contrast section colors. Browser verified bold editing, saving, preview, palette reset and color feedback.",
       "Browser confirmed inline section upload controls and gallery-only client navigation. Three merge tests verify current-order preservation, retry deduplication, and empty/populated sections. Actual file transfer remains pending R2 setup.",
-      "34 focused tests pass; native metadata/palette compatibility exercised with real local Payload. Browser confirmed thumbnail bulk picker, palette roles and plugin swatch changes; typecheck, lint and production Webpack build passed."
+      "34 focused tests pass; native metadata/palette compatibility exercised with real local Payload. Browser confirmed thumbnail bulk picker, palette roles and plugin swatch changes; typecheck, lint and production Webpack build passed.",
+      "Latest local Overview verification is recorded in VALIDATION.md; photo-library compatibility fixes are still active and are not counted as completed acceptance."
     ],
-    "updatedAt": "2026-10-21"
+    "updatedAt": "2026-10-22"
   },
   {
     "id": "CG-05",
@@ -193,12 +204,14 @@ See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPE
       "Responsive dimensions and reduced motion."
     ],
     "notes": [
-      "Editorial and overlay covers implemented, with focal points and responsive long-title wrapping."
+      "Editorial and overlay covers implemented, with focal points and responsive long-title wrapping.",
+      "2026-10-22: Overview now contains Featured image, rich-text Details and collapsed Appearance settings. Visual focal editing and social previews are recorded separately in CG-14."
     ],
     "evidence": [
-      "Both layouts checked in browser; long-title overlay fits at 375px; neutral overlay text contrast repaired during QA."
+      "Both layouts checked in browser; long-title overlay fits at 375px; neutral overlay text contrast repaired during QA.",
+      "VALIDATION.md records Details and focal-point save/reload, cancellation, replacement reset and both local social metadata/image checks."
     ],
-    "updatedAt": "2026-10-21"
+    "updatedAt": "2026-10-22"
   },
   {
     "id": "CG-07",
@@ -258,12 +271,13 @@ See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPE
       "Direct original and ZIP downloads with attachment names, size and stale-archive handling."
     ],
     "notes": [
-      "Implementation complete. Live multipart ZIP transfer, interrupted native downloads and multi-gigabyte integrity checks await R2 configuration."
+      "Implementation complete. Live multipart ZIP transfer, interrupted native downloads and multi-gigabyte integrity checks await R2 configuration.",
+      "2026-10-22 journal review: no successful multi-gigabyte R2 round trip is recorded. Retain Blocked until real transfer, interruption/retry/cancel and downloaded archive integrity are verified."
     ],
     "evidence": [
       "Tests cover multipart archive initiation, signature verification, recorded revision, stale ZIP rejection, download toggles and direct redirects. Real Payload checks verified reorder stability, photo-change invalidation and one-shot confirmation."
     ],
-    "updatedAt": "2026-10-21"
+    "updatedAt": "2026-10-22"
   },
   {
     "id": "CG-10",
@@ -281,12 +295,14 @@ See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPE
       "No indexing, public listings, sitemap or random-mix exposure."
     ],
     "notes": [
-      "Authenticated saved-draft preview, refresh-on-save, share controls, publish validation and noindex/no-store behavior implemented."
+      "Authenticated saved-draft preview, refresh-on-save, share controls, publish validation and noindex/no-store behavior implemented.",
+      "2026-10-22: Removed redundant custom draft-preview/open links in favor of Payload native preview controls. Kept Copy client link; relabeled the stable generated shareId as Slug without changing URLs or storage.",
+      "2026-10-22: Published galleries now have a revision-qualified Open Graph/Twitter image derived from Featured image. Local HTTP and publication-access checks are recorded in CG-14; deployment verification remains outstanding."
     ],
     "evidence": [
       "HTTP checks passed: existing published snapshot survives a draft edit, anonymous preview denied, admin preview allowed, unpublish returns 404, republish restores gallery, invalid download denied."
     ],
-    "updatedAt": "2026-10-21"
+    "updatedAt": "2026-10-22"
   },
   {
     "id": "CG-11",
@@ -301,15 +317,17 @@ See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPE
       "Check 500 photos, original integrity, metadata, large ZIP, failures and responsive accessibility."
     ],
     "notes": [
-      "30 client-delivery tests pass. Final typecheck, lint, formatting and production Webpack build pass. Live R2 and actual-phone checks remain; the full suite has one existing metadata-test mismatch. See VALIDATION.md."
+      "Local automated and browser checks are recorded in VALIDATION.md. Release acceptance still needs real R2 integrity/large ZIP tests, physical-phone checks and final checks of the combined editor changes; the last recorded full suite has one pre-existing metadata-test mismatch.",
+      "2026-10-22 journal review: recorded test totals belong to separate snapshots and must not be added together or presented as a fresh whole-suite result. Re-run final release checks after active editor changes finish."
     ],
     "evidence": [
       "Full suite: 177 passing / 1 existing metadata-formatting failure. All 27 delivery tests pass. Final typecheck, lint, formatting and Webpack build passed. Browser checks cover 320/375/768/1440px, both covers, theme, lightbox and a 500-photo fixture. Real local Payload/HTTP integration passed.",
       "Section follow-up: all 30 client-delivery tests and 3 shared RichText renderer tests pass; real local integration, typecheck, lint and formatting pass.",
       "Inline-upload follow-up: three additional client upload-selection tests, typecheck and lint passed. Browser inspected controls and simplified sidebar; no live storage transfer was verified.",
-      "DIF refactor: 34 focused tests pass, typecheck/lint/build passed, local Payload metadata/palette checks and browser editor checks completed. No live R2 transfer claimed."
+      "DIF refactor: 34 focused tests pass, typecheck/lint/build passed, local Payload metadata/palette checks and browser editor checks completed. No live R2 transfer claimed.",
+      "VALIDATION.md records 67 focused palette tests and a separate 59-test Overview run, with local integration/browser checks and Webpack builds. The active library chat reports focused tests/typecheck and browser checks, but found drawer lightbox/Quick edit compatibility issues still being fixed."
     ],
-    "updatedAt": "2026-10-21"
+    "updatedAt": "2026-10-22"
   },
   {
     "id": "CG-12",
@@ -324,15 +342,118 @@ See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPE
       "First supplied wedding gallery tested on the live domain and a real phone; handover documented."
     ],
     "notes": [
-      "Needs production Vercel/R2 access/configuration and the actual wedding photos, cover, text and ZIP. No production deployment or client sharing performed.",
+      "Dedicated client bucket creation is recorded. Successful deployment, scoped credentials/CORS/lifecycle, live transfer acceptance, real wedding content and phone verification remain unconfirmed.",
       "2026-10-22: User created the dedicated client bucket. Client storage now requires CLIENT_R2_* settings and never falls back to portfolio R2_* settings. Token, CORS, lifecycle, deployment and live transfers remain pending.",
-      "User explicitly keeps registration, DNS and nameservers at Simply. Use signed S3 URLs for client images/admin thumbnails and downloads, keep bucket public access disabled, and configure only the four CLIENT_R2 bucket/endpoint/credential variables. No custom domain or CLIENT_R2_PUBLIC_URL."
+      "User explicitly keeps registration, DNS and nameservers at Simply. Use signed S3 URLs for client images/admin thumbnails and downloads, keep bucket public access disabled, and configure only the four CLIENT_R2 bucket/endpoint/credential variables. No custom domain or CLIENT_R2_PUBLIC_URL.",
+      "2026-10-22 deployment investigation: the failed feat/client-galleries build could not read portfolio R2_* variables. The Vercel screenshot showed Production-only scope; Preview scope and redeployment were advised. No successful redeployment is recorded. Verify the client CLIENT_R2_* scope too."
     ],
     "evidence": [
       "Operations guide documents CORS, lifecycle cleanup, noindex headers, deployment, verification and rollback.",
       "Dedicated storage follow-up: 36 client-delivery unit tests and typecheck pass; five new tests verify client image/download routing and missing-setting rejection. Setup is documented for brescianifoto.dk/admin.",
-      "Cloudflare-only commit independently validated against HEAD: 40 client-delivery tests, generated types/import map, typecheck and changed-file Biome checks pass without concurrent gallery editor/design changes."
+      "Cloudflare-only commit independently validated against HEAD: 40 client-delivery tests, generated types/import map, typecheck and changed-file Biome checks pass without concurrent gallery editor/design changes.",
+      "Journal review cross-checked the completed deployment-investigation chat. This is a recorded diagnosis, not direct verification of current Vercel configuration."
     ],
+    "updatedAt": "2026-10-22"
+  },
+  {
+    "id": "CG-13",
+    "title": "Gallery color tokens and reusable palette colors",
+    "description": "DIF-style semantic tokens and section selectors reuse independently named palette colors with live swatches and legacy compatibility.",
+    "dependencies": [
+      "CG-04",
+      "CG-05",
+      "CG-07",
+      "CG-08"
+    ],
+    "status": "Done",
+    "acceptance": [
+      "Expose gallery-focused semantic tokens with unchanged neutral defaults.",
+      "Define named colors once and reuse them independently for semantic tokens and section backgrounds/text; preserve stable references when renamed or reordered.",
+      "Show live token names, swatches and hex values in accessible section dropdowns.",
+      "Preserve legacy custom/inherited and automatic pair colors; block deletion of referenced palette colors.",
+      "Verify palette persistence, scoped section/lightbox rendering, contrast, mobile layouts and build checks."
+    ],
+    "notes": [
+      "Replaced the pair editor with reusable named colors at the photographer’s request. Existing palette hex values are deduplicated without changing appearance. The individual-gallery recipe defines four colors once; neutral defaults remain unchanged."
+    ],
+    "evidence": [
+      "Focused unit tests cover semantic tokens, incomplete editor rows, key stability, automatic pairing, explicit overrides, legacy references, missing tokens and contrast.",
+      "scripts/check-client-gallery-colors.mts passes against an isolated local MongoDB database, including legacy documents/versions, draft and published reference protection, save/reload, rename/reorder and publication contrast.",
+      "Browser verified adding one independent color, reusing a color across tokens, live updates, renaming, keyboard selection, independent text, save/reload, and separate section/lightbox colors at 375px and 1440px without overflow.",
+      "Payload types/import map regenerated; typecheck, app-wide lint/format checks and production Webpack build pass. Build used local QA data and placeholder storage settings, not production storage."
+    ],
+    "updatedAt": "2026-10-22"
+  },
+  {
+    "id": "CG-14",
+    "title": "Overview, rich-text Details and social previews",
+    "description": "Simplify the gallery Overview, reuse Featured image for social previews, provide visual focal editing, and support legacy Details conversion.",
+    "dependencies": [
+      "CG-04",
+      "CG-06",
+      "CG-10"
+    ],
+    "status": "Done",
+    "acceptance": [
+      "Overview exposes Featured image and rich-text Details, with layout/alignment under collapsed Appearance.",
+      "Visual focal editing persists and cancels correctly without changing original photos.",
+      "Legacy Details documents and versions convert idempotently with a backup and retain restored rich text.",
+      "Published social metadata uses a revision-qualified 1200×630 JPEG; invalid, preview and unavailable-gallery requests are denied.",
+      "Record focused tests, browser/integration checks and a production compilation check."
+    ],
+    "notes": [
+      "Local implementation and acceptance are recorded in VALIDATION.md. Production conversion/deployment remains part of CG-12. The later request for a single native featured-image upload field is tracked in CG-16."
+    ],
+    "evidence": [
+      "59 focused delivery/upload tests and typecheck passed; isolated changed-file Biome checks passed.",
+      "Local browser checked Details/focal save/reload, cancellation, image replacement and gallery-filtered selection.",
+      "Isolated MongoDB verification covered dry run, protected backup, current/version conversion, idempotence and restored versions.",
+      "Local HTTP checks verified published metadata and 1200×630 JPEG responses; production Webpack compilation passed using QA data and placeholder storage settings."
+    ],
+    "updatedAt": "2026-10-22"
+  },
+  {
+    "id": "CG-15",
+    "title": "Upload once, organise photos into sections",
+    "description": "Add a gallery Photo library with bulk upload, live count and the existing Media grid browser; select and reorder section photos independently.",
+    "dependencies": [
+      "CG-04"
+    ],
+    "status": "In progress",
+    "acceptance": [
+      "Photo library appears between Overview and Page sections, with upload progress/retry/cancel, count and a gallery-filtered paginated grid browser.",
+      "Existing uploads appear without migration; library-only uploads do not change selected photos or ZIP revisions.",
+      "Sections support bulk selection, duplicate exclusion and independent grid/list ordering that persists after save/reload.",
+      "Removing section selections preserves originals; shared photos retain independent order in each section.",
+      "Thumbnail browsing and lightbox previews work inside the Payload drawer with immutable-asset editing disabled.",
+      "Complete focused tests, typecheck, applicable Biome and local browser workflow checks; retain real-storage release tests in CG-03/09/11."
+    ],
+    "notes": [
+      "Implementation and QA are active in the chat “Improve client gallery photo picking”. The latest browser check found lightbox stacking behind the Payload drawer and Quick edit appearing despite editing being disabled; compatibility fixes are in progress."
+    ],
+    "evidence": [
+      "Active chat reports focused tests/typecheck passing, gallery-filtered grid browsing, bulk append selection, independent reorder save/reload and unchanged ZIP revisions for unused library photos.",
+      "Simulated partial upload success/retry refreshed the count without altering selected section photos. This does not verify live R2 transfer."
+    ],
+    "updatedAt": "2026-10-22"
+  },
+  {
+    "id": "CG-16",
+    "title": "Unify the native Featured image upload field",
+    "description": "Connect private photo transfers to one native Payload field with Create New, Choose from existing and drag-and-drop actions, as requested after the Overview review.",
+    "dependencies": [
+      "CG-14"
+    ],
+    "status": "To do",
+    "acceptance": [
+      "Use one unified featured-image field for upload, existing-photo selection and drag-and-drop.",
+      "Preserve progress, retry/cancel, gallery ownership and original photo bytes.",
+      "Verify replacement, focal-point behaviour and saved/unsaved form state through the unified field."
+    ],
+    "notes": [
+      "The completed chat “Simplify client gallery cover tab” acknowledged that composing native UI pieces alongside a separate uploader did not fulfill the requested single field. No completed implementation or acceptance evidence is recorded for this correction."
+    ],
+    "evidence": [],
     "updatedAt": "2026-10-22"
   }
 ]
