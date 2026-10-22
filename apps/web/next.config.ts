@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
     distDir: process.env.NEXT_BUILD_DIR || '.next',
     images: {
         formats: ['image/webp'],
+        qualities: [75, 90],
         remotePatterns: [
             ...clientImagePatterns,
             ...[NEXT_PUBLIC_SERVER_URL, process.env.R2_PUBLIC_URL]
