@@ -65,7 +65,7 @@ export function DownloadArchiveButton({
         <div className="relative shrink-0">
             <button
                 type="button"
-                className="delivery-download metadata focus-ring inline-flex min-h-12 items-center justify-center gap-xs rounded-[var(--btn-radius)] border border-bg-invert bg-bg-invert px-xs py-xs text-fg-on-color transition-[background-color,color,border-color] duration-[360ms] ease-[var(--delivery-ease)] enabled:cursor-pointer enabled:active:bg-bg-pressed disabled:cursor-not-allowed disabled:border-border-base disabled:bg-bg-subtle disabled:text-fg-subtle aria-busy:cursor-wait motion-reduce:transition-none md:px-base"
+                className="delivery-download metadata focus-ring inline-flex min-h-12 items-center justify-center gap-xs rounded-[var(--btn-radius)] border border-bg-invert bg-bg-invert px-xs py-xs text-fg-on-color transition-[background-color,color,border-color] duration-[360ms] ease-[var(--delivery-ease)] enabled:cursor-pointer disabled:cursor-not-allowed disabled:border-border-base disabled:bg-bg-subtle disabled:text-fg-subtle aria-busy:cursor-wait motion-reduce:transition-none md:px-base"
                 disabled={isDisabled || isPreparing}
                 aria-busy={isPreparing}
                 aria-describedby={statusId}

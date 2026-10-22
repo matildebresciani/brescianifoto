@@ -143,13 +143,16 @@
         background-color 280ms ease,
         color 280ms ease;
 }
-.delivery-hero-link:is(:hover, :focus-visible) {
+.delivery-hero-link:is(:hover, :focus-visible, :active) {
     background: var(--fg-base);
     color: var(--bg-base);
     border-color: var(--fg-base);
 }
+.delivery-hero-overlay .delivery-hero-link:is(:hover, :focus-visible, :active) {
+    color: var(--void);
+}
 .delivery-hero-link:focus-visible {
-    outline-color: currentColor;
+    outline-color: var(--fg-base);
 }
 .delivery-welcome .delivery-rich-text > :last-child {
     margin-bottom: 0;
@@ -285,6 +288,18 @@
 .delivery-download {
     --delivery-button-roll-duration: 520ms;
     --delivery-button-roll-stagger: 12ms;
+}
+.delivery-download:enabled:is(:hover, :focus-visible, :active) {
+    background-color: var(--fg-on-color);
+    color: var(--bg-invert);
+    border-color: var(--bg-invert);
+}
+.delivery-download:enabled:active {
+    background-color: color-mix(
+        in srgb,
+        var(--fg-on-color) 92%,
+        var(--bg-invert)
+    );
 }
 .delivery-download-character,
 .delivery-download-icon {

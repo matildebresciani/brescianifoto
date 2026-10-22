@@ -29,7 +29,7 @@ afterEach(async () => {
 });
 
 describe('gallery archive download', () => {
-    it('rolls the label and icon on hover without changing the fill or button size', async () => {
+    it('inverts the text and fill on hover while rolling the label without resizing', async () => {
         await cdp().send('Emulation.setEmulatedMedia', {
             features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }],
         });
@@ -38,6 +38,7 @@ describe('gallery archive download', () => {
         const element = button.element();
         const bounds = element.getBoundingClientRect();
         const background = getComputedStyle(element).backgroundColor;
+        const foreground = getComputedStyle(element).color;
         const character = element.querySelector('.delivery-download-character');
         const icon = element.querySelector('.delivery-download-icon');
         if (!character || !icon) throw new Error('Rolling label or icon is missing');
@@ -47,7 +48,8 @@ describe('gallery archive download', () => {
             .poll(() => Math.round(translateY(character)))
             .toBe(-Math.round(character.getBoundingClientRect().height));
         await expect.poll(() => translateY(icon)).toBe(16);
-        expect(getComputedStyle(element).backgroundColor).toBe(background);
+        expect(getComputedStyle(element).backgroundColor).toBe(foreground);
+        expect(getComputedStyle(element).color).toBe(background);
         expect(element.getBoundingClientRect().width).toBe(bounds.width);
         expect(element.getBoundingClientRect().height).toBe(bounds.height);
         await cdp().send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 500, y: 300 });
@@ -63,6 +65,36 @@ describe('gallery archive download', () => {
         const icon = button.element().querySelector('.delivery-download-icon');
         if (!icon) throw new Error('Rolling icon is missing');
         await expect.poll(() => new DOMMatrixReadOnly(getComputedStyle(icon).transform).m42).toBe(16);
+        await expect.poll(() => getComputedStyle(button.element()).color).toBe('rgb(21, 22, 17)');
+        expect(getComputedStyle(button.element()).backgroundColor).toBe('rgb(250, 255, 239)');
+    });
+
+    it('keeps the pressed text contrasting with its changed fill', async () => {
+        await Ready.run();
+        const element = page.getByRole('button', { name: /Download/ }).element();
+        const bounds = element.getBoundingClientRect();
+        await cdp().send('Input.dispatchMouseEvent', {
+            type: 'mousePressed',
+            button: 'left',
+            buttons: 1,
+            clickCount: 1,
+            x: bounds.x + bounds.width / 2,
+            y: bounds.y + bounds.height / 2,
+        });
+        try {
+            expect(element.matches(':active')).toBe(true);
+            await expect.poll(() => getComputedStyle(element).color).toBe('rgb(21, 22, 17)');
+            expect(getComputedStyle(element).backgroundColor).not.toBe(getComputedStyle(element).color);
+        } finally {
+            await cdp().send('Input.dispatchMouseEvent', {
+                type: 'mouseReleased',
+                button: 'left',
+                buttons: 0,
+                clickCount: 1,
+                x: 500,
+                y: 300,
+            });
+        }
     });
 
     it('disables repeat clicks while preparing and hands only the signed URL to the browser', async () => {
