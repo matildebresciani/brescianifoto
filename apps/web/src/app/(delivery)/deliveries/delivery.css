@@ -112,29 +112,30 @@
     min-width: 0;
     flex: 1;
 }
-.delivery-nav-mobile summary {
+.delivery-nav-toggle {
     display: flex;
+    width: 100%;
+    align-items: center;
     justify-content: space-between;
     gap: var(--space-base);
-    list-style: none;
+    text-align: left;
     cursor: pointer;
 }
-.delivery-nav-mobile summary::-webkit-details-marker {
-    display: none;
-}
-.delivery-nav-mobile > div {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
+.delivery-nav-panel {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
+    overflow: hidden;
+    background: var(--bg-base);
+}
+.delivery-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
     max-height: 60svh;
     overflow: auto;
     padding: var(--space-md);
-    background: var(--bg-base);
-    border-bottom: 1px solid var(--border-base);
 }
 .delivery-nav a[aria-current="location"] {
     text-decoration: underline;

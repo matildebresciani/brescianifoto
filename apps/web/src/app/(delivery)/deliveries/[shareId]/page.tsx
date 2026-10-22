@@ -38,7 +38,7 @@ export default async function ClientGalleryPage({
     style['--delivery-overlay-color'] = gallery.overlayColor;
     style['--delivery-overlay-opacity'] = `${gallery.overlayOpacity}%`;
     const sections = gallery.blocks.flatMap((block) =>
-        block.type === 'photos' ? [{ anchor: block.anchor, label: block.menuLabel }] : [],
+        block.type === 'photos' ? [{ anchor: block.anchor, label: block.menuLabel, theme: block.theme }] : [],
     );
     const photos = gallery.blocks.flatMap((block) => (block.type === 'photos' ? block.photos : []));
     return (

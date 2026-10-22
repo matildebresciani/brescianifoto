@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { type DeliveryTheme, formatBytes, themeStyle } from '@/lib/client-deliveries/shared';
 import type { DeliveryView } from '@/lib/client-deliveries/view';
 
@@ -9,13 +11,16 @@ export function SectionMenu({
     archive,
     theme,
 }: {
-    sections: { anchor: string; label: string }[];
+    sections: { anchor: string; label: string; theme: DeliveryTheme }[];
     archive: DeliveryView['archive'];
     theme: DeliveryTheme;
 }) {
     const [active, setActive] = useState(sections[0]?.anchor);
+    const [isOpen, setIsOpen] = useState(false);
+    const shouldReduceMotion = useReducedMotion();
+    const menuId = useId();
     const nav = useRef<HTMLElement>(null);
-    const menu = useRef<HTMLDetailsElement>(null);
+    const trigger = useRef<HTMLButtonElement>(null);
     useEffect(() => {
         const element = nav.current;
         if (!element) return;
@@ -25,7 +30,7 @@ export function SectionMenu({
         );
         resize.observe(element);
         const track = () => {
-            const threshold = element.getBoundingClientRect().height + 48;
+            const threshold = element.getBoundingClientRect().bottom;
             const current = [...sections]
                 .reverse()
                 .find(
@@ -33,7 +38,7 @@ export function SectionMenu({
                         (document.getElementById(section.anchor)?.getBoundingClientRect().top ??
                             Number.POSITIVE_INFINITY) <= threshold,
                 );
-            if (current) setActive(current.anchor);
+            setActive(current?.anchor ?? sections[0]?.anchor);
         };
         let frame = 0;
         const onScroll = () => {
@@ -56,7 +61,7 @@ export function SectionMenu({
             aria-current={active === section.anchor ? 'location' : undefined}
             onClick={() => {
                 setActive(section.anchor);
-                if (menu.current) menu.current.open = false;
+                setIsOpen(false);
                 requestAnimationFrame(() => document.getElementById(section.anchor)?.focus({ preventScroll: true }));
             }}
         >
@@ -66,18 +71,44 @@ export function SectionMenu({
     return (
         <nav
             ref={nav}
-            className="delivery-nav border-y border-border-base bg-bg-base text-fg-base"
-            style={themeStyle(theme)}
+            className="delivery-nav bg-bg-base text-fg-base"
+            style={themeStyle(sections.find((section) => section.anchor === active)?.theme ?? theme)}
             aria-label="Gallery sections"
         >
             <div className="delivery-nav-desktop">{links}</div>
-            <details ref={menu} className="delivery-nav-mobile">
-                <summary className="ui-text focus-ring">
-                    {sections.find((section) => section.anchor === active)?.label || 'Sections'}{' '}
-                    <span aria-hidden="true">⌄</span>
-                </summary>
-                <div>{links}</div>
-            </details>
+            <div className="delivery-nav-mobile">
+                <button
+                    ref={trigger}
+                    type="button"
+                    className="delivery-nav-toggle ui-text focus-ring"
+                    aria-expanded={isOpen}
+                    aria-controls={menuId}
+                    onClick={() => setIsOpen((previous) => !previous)}
+                >
+                    {sections.find((section) => section.anchor === active)?.label || 'Sections'}
+                    <ChevronDown
+                        aria-hidden="true"
+                        size={20}
+                        strokeWidth={1.5}
+                        className={`shrink-0 transition-transform duration-300 motion-reduce:transition-none${isOpen ? ' rotate-180' : ''}`}
+                    />
+                </button>
+                <motion.div
+                    id={menuId}
+                    className="delivery-nav-panel"
+                    initial={false}
+                    animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
+                    transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    inert={!isOpen}
+                    onKeyDown={(event) => {
+                        if (event.key !== 'Escape') return;
+                        setIsOpen(false);
+                        trigger.current?.focus();
+                    }}
+                >
+                    <div className="delivery-nav-links">{links}</div>
+                </motion.div>
+            </div>
             {archive && (
                 <a className="delivery-primary ui-text focus-ring" href={archive.href}>
                     Download all <span className="metadata">{formatBytes(archive.byteSize)}</span>
