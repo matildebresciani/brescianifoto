@@ -156,6 +156,7 @@ function DeliveryLightbox({
                     )}
                     <LightboxStage
                         image={image}
+                        shouldFade={false}
                         labels={imageLabels}
                         onNavigate={navigate}
                         onViewportChange={measureViewport}

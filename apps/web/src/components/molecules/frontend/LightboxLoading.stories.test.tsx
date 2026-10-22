@@ -45,7 +45,7 @@ const backgroundRequests = () => requests.filter(({ priority }) => priority === 
 const settleNavigation = () => new Promise((resolve) => setTimeout(resolve, 280));
 
 function mainImage() {
-    const image = document.querySelector('img[fetchpriority="high"]');
+    const image = document.querySelector('[data-lightbox-slide]:not([inert]) img[fetchpriority="high"]');
     if (!(image instanceof HTMLImageElement)) throw new Error('Main image is missing');
     return image;
 }

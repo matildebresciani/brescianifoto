@@ -5,8 +5,10 @@ import { type ComponentProps, useState } from 'react';
 import LightboxImage from '@/components/molecules/frontend/LightboxImage';
 import { getLightboxImageKey } from '@/lib/utilities/lightbox-images';
 
-/** Keep the last ready photo opaque until its replacement has loaded and finished fading in. */
-export function LightboxStage({ image, onReady, ...props }: ComponentProps<typeof LightboxImage>) {
+type Props = ComponentProps<typeof LightboxImage> & { shouldFade?: boolean };
+
+/** Keep the last ready photo visible until its replacement can be painted. */
+export function LightboxStage({ image, onReady, shouldFade = true, ...props }: Props) {
     const requestedKey = getLightboxImageKey(image);
     const shouldReduceMotion = useReducedMotion();
     const [stage, setStage] = useState<{ requestedKey: string; displayed: typeof image; readyKey: string | null }>({
@@ -22,7 +24,7 @@ export function LightboxStage({ image, onReady, ...props }: ComponentProps<typeo
     const reveal = () => {
         setStage((current) =>
             current.requestedKey === requestedKey && current.readyKey !== requestedKey
-                ? { ...current, readyKey: requestedKey }
+                ? { ...current, readyKey: requestedKey, displayed: shouldFade ? current.displayed : image }
                 : current,
         );
     };
@@ -32,6 +34,33 @@ export function LightboxStage({ image, onReady, ...props }: ComponentProps<typeo
             {slides.map((slide) => {
                 const key = getLightboxImageKey(slide);
                 const isCurrent = key === requestedKey;
+                const content = (
+                    <LightboxImage
+                        {...props}
+                        image={slide}
+                        isActive={isCurrent}
+                        onReady={(size) => {
+                            if (!isCurrent) return;
+                            reveal();
+                            onReady?.(size);
+                        }}
+                        onLoadError={isCurrent ? reveal : undefined}
+                    />
+                );
+                if (!shouldFade) {
+                    return (
+                        <div
+                            key={key}
+                            data-lightbox-slide={key}
+                            className="absolute inset-0 bg-bg-base"
+                            inert={!isCurrent}
+                            aria-hidden={!isCurrent}
+                            style={{ opacity: key === displayedKey ? 1 : 0 }}
+                        >
+                            {content}
+                        </div>
+                    );
+                }
                 return (
                     <motion.div
                         key={key}
@@ -52,17 +81,7 @@ export function LightboxStage({ image, onReady, ...props }: ComponentProps<typeo
                             );
                         }}
                     >
-                        <LightboxImage
-                            {...props}
-                            image={slide}
-                            isActive={isCurrent}
-                            onReady={(size) => {
-                                if (!isCurrent) return;
-                                reveal();
-                                onReady?.(size);
-                            }}
-                            onLoadError={isCurrent ? reveal : undefined}
-                        />
+                        {content}
                     </motion.div>
                 );
             })}

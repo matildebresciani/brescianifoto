@@ -55,7 +55,7 @@ afterEach(async () => {
 });
 
 describe('delivery lightbox transitions', () => {
-    it('keeps an opaque photo behind every frame of the replacement fade', async () => {
+    it('swaps a decoded replacement without a translucent or blank paint frame', async () => {
         await MultipleSections.run();
         await page.getByRole('button', { name: 'Åbn billede 1: Concert stage', exact: true }).click();
         settlePhoto();
@@ -66,28 +66,31 @@ describe('delivery lightbox transitions', () => {
         const photo = incoming.querySelector('img');
         if (!photo) throw new Error('Incoming photo is missing');
         settlePhoto();
-        const frames: { backing: string; photo: string }[] = [];
+        const frames: { visiblePhotos: number; incomingOpacity: string }[] = [];
         await new Promise<void>((resolve) => {
             const sample = () => {
-                if (!previous.isConnected) {
-                    resolve();
-                    return;
-                }
                 frames.push({
-                    backing: getComputedStyle(previous).opacity,
-                    photo: getComputedStyle(photo).opacity,
+                    visiblePhotos: Array.from(document.querySelectorAll('[data-lightbox-slide]')).filter((slide) => {
+                        const image = slide.querySelector('img');
+                        return (
+                            getComputedStyle(slide).opacity === '1' && image && getComputedStyle(image).opacity === '1'
+                        );
+                    }).length,
+                    incomingOpacity: getComputedStyle(incoming).opacity,
                 });
-                requestAnimationFrame(sample);
+                if (frames.length < 24) requestAnimationFrame(sample);
+                else resolve();
             };
             requestAnimationFrame(sample);
         });
-        expect(frames.length).toBeGreaterThan(0);
-        expect(frames.every((frame) => frame.backing === '1' && frame.photo === '1')).toBe(true);
+        expect(frames.every((frame) => frame.visiblePhotos === 1 && frame.incomingOpacity === '1')).toBe(true);
+        expect(previous.isConnected).toBe(false);
+        expect(currentSlide()).toBe(incoming);
+        expect(incoming.querySelector('img')).toBe(photo);
         expect(getComputedStyle(photo).transitionProperty).not.toContain('opacity');
-        await expect.poll(() => getComputedStyle(incoming).opacity).toBe('1');
     });
 
-    it('holds the previous photo until its replacement has finished fading in', async () => {
+    it('holds the previous photo until its replacement is ready', async () => {
         await MultipleSections.run();
         await page.getByRole('button', { name: 'Åbn billede 1: Concert stage', exact: true }).click();
         settlePhoto();
@@ -101,6 +104,20 @@ describe('delivery lightbox transitions', () => {
         settlePhoto();
         await expect.poll(() => previous.isConnected).toBe(false);
         await expect.poll(() => getComputedStyle(currentSlide()).opacity).toBe('1');
+        expect(document.querySelectorAll('[data-lightbox-slide]')).toHaveLength(1);
+    });
+
+    it('does not hide the displayed photo when navigating back before its replacement loads', async () => {
+        await MultipleSections.run();
+        await page.getByRole('button', { name: 'Åbn billede 1: Concert stage', exact: true }).click();
+        settlePhoto();
+        const original = currentSlide();
+        await expect.poll(() => original.querySelector('[data-lightbox-skeleton]')).toBeNull();
+        await page.getByRole('button', { name: 'Næste billede', exact: true }).click();
+        await page.getByRole('button', { name: 'Forrige billede', exact: true }).click();
+        expect(currentSlide()).toBe(original);
+        expect(getComputedStyle(original).opacity).toBe('1');
+        expect(original.querySelector('[data-lightbox-skeleton]')).toBeNull();
         expect(document.querySelectorAll('[data-lightbox-slide]')).toHaveLength(1);
     });
 
