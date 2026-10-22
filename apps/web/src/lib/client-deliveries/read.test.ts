@@ -59,6 +59,17 @@ beforeEach(() => {
 });
 
 describe('unlisted delivery reads', () => {
+    it.each([
+        { preferences: {}, color: '#151611', opacity: 72 },
+        { preferences: { overlayColor: '#25261F', overlayOpacity: 35 }, color: '#25261F', opacity: 35 },
+        { preferences: { overlayColor: '#151611', overlayOpacity: 0 }, color: '#151611', opacity: 0 },
+    ])('resolves cover overlay preferences: $preferences', async ({ preferences, color, opacity }) => {
+        const view = await deliveryView(
+            { gallery: { ...gallery, ...preferences }, photos: [photo], archive: undefined, isArchiveCurrent: false },
+            false,
+        );
+        expect(view).toMatchObject({ overlayColor: color, overlayOpacity: opacity });
+    });
     it('projects photo introductions and themes without affecting neighboring sections', async () => {
         const content = {
             root: { type: 'root', children: [], direction: null, format: '', indent: 0, version: 1 },

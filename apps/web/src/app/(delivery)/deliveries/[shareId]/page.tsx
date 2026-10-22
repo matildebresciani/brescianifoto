@@ -33,11 +33,14 @@ export default async function ClientGalleryPage({
     const result = await readDelivery(shareId, isPreview, isPreview ? new Headers(await headers()) : undefined);
     if (!result) notFound();
     const gallery = await deliveryView(result, isPreview);
+    const style = themeStyle(gallery.theme);
+    style['--delivery-overlay-color'] = gallery.overlayColor;
+    style['--delivery-overlay-opacity'] = `${gallery.overlayOpacity}%`;
     const sections = gallery.blocks.flatMap((block) =>
         block.type === 'photos' ? [{ anchor: block.anchor, label: block.menuLabel }] : [],
     );
     return (
-        <div className="delivery-page min-h-svh bg-bg-base text-fg-base" style={themeStyle(gallery.theme)}>
+        <div className="delivery-page min-h-svh bg-bg-base text-fg-base" style={style}>
             {isPreview && <LivePreviewListener />}
             <a href="#main-content" className="skip-link ui-text">
                 Skip to photographs
@@ -47,11 +50,13 @@ export default async function ClientGalleryPage({
                     Saved draft preview · Only signed-in administrators can see this version.
                 </aside>
             )}
-            <div className="flex items-center justify-between gap-base px-md py-md md:px-xl">
-                <span className="delivery-wordmark">brescianifoto</span>
-                <span className="metadata">{gallery.photoCount} photographs</span>
+            <div className={`relative${gallery.coverLayout === 'overlay' ? ' delivery-cover-area-overlay' : ''}`}>
+                <div className="delivery-masthead flex items-center justify-between gap-base px-md py-md md:px-xl">
+                    <span className="delivery-wordmark">brescianifoto</span>
+                    <span className="metadata">{gallery.photoCount} photographs</span>
+                </div>
+                <DeliveryHero gallery={gallery} />
             </div>
-            <DeliveryHero gallery={gallery} />
             <SectionMenu sections={sections} archive={gallery.archive} />
             <main id="main-content" tabIndex={-1} className="delivery-content outline-none">
                 {gallery.blocks.map((block) =>

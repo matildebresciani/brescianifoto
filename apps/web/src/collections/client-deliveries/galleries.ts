@@ -366,7 +366,6 @@ export const ClientGalleries: CollectionConfig = {
                                 },
                             },
                         },
-                        { name: 'subtitle', type: 'text' },
                         { name: 'date', type: 'date', admin: { date: { pickerAppearance: 'dayOnly' } } },
                         { name: 'location', type: 'text' },
                         {
@@ -392,6 +391,37 @@ export const ClientGalleries: CollectionConfig = {
                                         { label: 'Text above image', value: 'editorial' },
                                         { label: 'Text over image', value: 'overlay' },
                                     ],
+                                    admin: {
+                                        description:
+                                            'Text over image fills the viewport and places the transparent header over the photograph.',
+                                    },
+                                },
+                                colorPickerField({
+                                    name: 'overlayColor',
+                                    label: 'Overlay color',
+                                    defaultValue: themeDefaults.text,
+                                    colors: Object.values(themeDefaults),
+                                    admin: {
+                                        condition: (data) => data.coverLayout === 'overlay',
+                                        description: 'A tint above the photograph, behind the text and header.',
+                                    },
+                                    validate: (value: unknown) =>
+                                        !value || (typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value))
+                                            ? true
+                                            : 'Enter a six-digit hex color.',
+                                }),
+                                {
+                                    name: 'overlayOpacity',
+                                    label: 'Overlay opacity (%)',
+                                    type: 'number',
+                                    defaultValue: 72,
+                                    min: 0,
+                                    max: 100,
+                                    admin: {
+                                        condition: (data) => data.coverLayout === 'overlay',
+                                        description: '0 shows the original photograph; 100 is a solid color.',
+                                        step: 1,
+                                    },
                                 },
                                 {
                                     name: 'alignment',

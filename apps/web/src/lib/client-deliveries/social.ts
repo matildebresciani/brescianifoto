@@ -22,7 +22,6 @@ export async function deliveryMetadata(shareId: string, isPreview: boolean): Pro
     const { gallery } = data;
     const photo = featuredPhoto(data);
     const title = gallery.title;
-    const description = gallery.subtitle?.trim() || undefined;
     const url = new URL(`/deliveries/${shareId}`, getServerSideURL()).toString();
     const revision = createHash('sha256')
         .update(JSON.stringify([gallery.updatedAt, photo?.checksum, gallery.focalX ?? 50, gallery.focalY ?? 50]))
@@ -40,9 +39,8 @@ export async function deliveryMetadata(shareId: string, isPreview: boolean): Pro
         : [];
     return {
         title: `${title} · brescianifoto`,
-        description,
-        openGraph: { type: 'website', title, description, url, images },
-        twitter: { card: photo ? 'summary_large_image' : 'summary', title, description, images },
+        openGraph: { type: 'website', title, url, images },
+        twitter: { card: photo ? 'summary_large_image' : 'summary', title, images },
     };
 }
 

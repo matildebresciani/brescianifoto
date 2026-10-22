@@ -1,7 +1,23 @@
 .delivery-page {
     --delivery-nav-height: 80px;
-    --delivery-overlay: rgba(21, 22, 17, 0.72);
+    --delivery-overlay-color: var(--void);
+    --delivery-overlay-opacity: 72%;
+    --delivery-overlay: color-mix(
+        in srgb,
+        var(--delivery-overlay-color) var(--delivery-overlay-opacity),
+        transparent
+    );
     --delivery-cover-text: #faffef;
+}
+.delivery-cover-area-overlay .delivery-masthead {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 10;
+    color: var(--delivery-cover-text);
+    --fg-base: var(--delivery-cover-text);
+    --fg-subtle: var(--delivery-cover-text);
+    --fg-faded: var(--delivery-cover-text);
+    --color-fg-base: var(--delivery-cover-text);
 }
 .delivery-wordmark {
     font-family: var(--font-body);
@@ -63,9 +79,9 @@
     justify-content: center;
     max-width: none;
     width: 100%;
-    min-height: max(600px, 85svh);
+    min-height: 100svh;
     margin: 0;
-    padding: var(--space-xl) var(--space-md);
+    padding: var(--space-section-wide) var(--space-md);
     color: var(--delivery-cover-text);
     background: var(--delivery-overlay);
     --fg-base: var(--delivery-cover-text);

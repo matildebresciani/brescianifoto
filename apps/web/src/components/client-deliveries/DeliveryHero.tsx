@@ -7,7 +7,6 @@ export function DeliveryHero({ gallery }: { gallery: DeliveryView }) {
     const content = (
         <div className="delivery-hero-copy" style={{ textAlign: gallery.alignment }}>
             <h1 className="statement">{gallery.title}</h1>
-            {gallery.subtitle && <p className="body-lg mt-md">{gallery.subtitle}</p>}
             {(gallery.date || gallery.location) && (
                 <p className="metadata mt-lg">
                     {gallery.date && (

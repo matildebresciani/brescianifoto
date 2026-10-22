@@ -26,12 +26,13 @@ export type DeliveryBlock = { theme: DeliveryTheme; hasCustomColors: boolean } &
 );
 export type DeliveryView = {
     title: string;
-    subtitle?: string | null;
     date?: string | null;
     location?: string | null;
     details?: SerializedEditorState | null;
     cover?: DeliveryPhoto;
     coverLayout: 'editorial' | 'overlay';
+    overlayColor: string;
+    overlayOpacity: number;
     alignment: 'left' | 'center' | 'right';
     focalX: number;
     focalY: number;

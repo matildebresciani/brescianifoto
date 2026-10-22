@@ -27,7 +27,6 @@ const gallery: ClientGallery = {
     id: 'gallery-1',
     name: 'INTERNAL PRIVATE NAME',
     title: 'Alex & Jamie',
-    subtitle: 'A day together',
     shareId: 'a'.repeat(32),
     cover: photo.id,
     blocks: [],
@@ -47,7 +46,6 @@ describe('delivery social previews', () => {
         const metadata = await deliveryMetadata('a'.repeat(32), false);
         expect(metadata).toMatchObject({
             title: 'Alex & Jamie · brescianifoto',
-            description: 'A day together',
             openGraph: {
                 images: [
                     {
