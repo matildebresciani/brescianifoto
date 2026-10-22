@@ -27,6 +27,7 @@ const LightboxThumbnails = ({ items, index, onNavigate }: Props) => {
     const activeRef = useRef<HTMLButtonElement>(null);
     const gestureRef = useRef<DragGesture | null>(null);
     const shouldSuppressClickRef = useRef(false);
+    const hasPositionedRef = useRef(false);
     const [isDragging, setIsDragging] = useState(false);
 
     useLayoutEffect(() => {
@@ -34,17 +35,25 @@ const LightboxThumbnails = ({ items, index, onNavigate }: Props) => {
         const active = activeRef.current;
         if (!strip || !active || !items[index]) return;
 
-        const followActivePhoto = () => {
+        const followActivePhoto = (behavior: ScrollBehavior = 'instant') => {
             const stripRect = strip.getBoundingClientRect();
             const activeRect = active.getBoundingClientRect();
             // Scroll only the strip so following a photo never moves the viewer or the page behind it.
             strip.scrollTo({
                 left: strip.scrollLeft + activeRect.left - stripRect.left - (strip.clientWidth - activeRect.width) / 2,
-                behavior: 'instant',
+                behavior,
             });
         };
-        followActivePhoto();
-        const observer = new ResizeObserver(followActivePhoto);
+        const shouldAnimate =
+            hasPositionedRef.current && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        followActivePhoto(shouldAnimate ? 'smooth' : 'instant');
+        hasPositionedRef.current = true;
+        let previousWidth = strip.clientWidth;
+        const observer = new ResizeObserver(() => {
+            if (strip.clientWidth === previousWidth) return;
+            previousWidth = strip.clientWidth;
+            followActivePhoto();
+        });
         observer.observe(strip);
         return () => observer.disconnect();
     }, [index, items]);
@@ -130,7 +139,7 @@ const LightboxThumbnails = ({ items, index, onNavigate }: Props) => {
                     aria-label={`Go to photo ${i + 1}`}
                     aria-current={i === index}
                     className={cn(
-                        'relative size-12 shrink-0 cursor-[inherit] overflow-hidden rounded-none border transition-colors duration-200 motion-reduce:transition-none md:size-14',
+                        'lightbox-thumbnail group relative size-12 shrink-0 cursor-[inherit] overflow-hidden rounded-none border transition-colors duration-200 motion-reduce:transition-none md:size-14',
                         i === index ? 'border-border-highlight' : 'border-border-subtle hover:border-border-strong',
                     )}
                     onClick={() => onNavigate(i)}
@@ -138,7 +147,7 @@ const LightboxThumbnails = ({ items, index, onNavigate }: Props) => {
                     <ImageMedia
                         resource={item}
                         fill
-                        className="object-cover transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
+                        className="object-cover transition-transform duration-300 motion-safe:group-hover:scale-[1.03] motion-safe:group-focus-visible:scale-[1.03] motion-reduce:transition-none"
                         size="56px"
                     />
                 </button>

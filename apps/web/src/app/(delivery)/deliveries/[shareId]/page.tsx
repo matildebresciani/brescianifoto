@@ -66,12 +66,12 @@ export default async function ClientGalleryPage({
             />
             <main id="main-content" tabIndex={-1} className="delivery-content outline-none">
                 <GalleryLightbox photos={photos}>
-                    {gallery.blocks.map((block) =>
+                    {gallery.blocks.map((block, index) =>
                         block.type === 'text' ? (
                             <div
                                 key={block.id}
                                 className="delivery-text-section bg-bg-base text-fg-base"
-                                style={themeStyle(block.theme)}
+                                style={themeStyle(block.theme, gallery.blocks[index - 1]?.theme ?? gallery.theme)}
                             >
                                 <div className="delivery-section-inner">
                                     <div className="delivery-text">
@@ -85,6 +85,7 @@ export default async function ClientGalleryPage({
                                 block={block}
                                 desktopColumns={gallery.desktopColumns}
                                 photoSpacing={gallery.photoSpacing}
+                                previousTheme={gallery.blocks[index - 1]?.theme ?? gallery.theme}
                             />
                         ),
                     )}
@@ -95,11 +96,16 @@ export default async function ClientGalleryPage({
                     </p>
                 )}
             </main>
-            <footer className="mx-md flex flex-wrap items-center justify-between gap-md border-t border-border-base py-xl md:mx-xl">
-                <p className="body-sm">Photographs by brescianifoto</p>
-                <a href="#top" className="ui-text underline underline-offset-4 focus-ring">
-                    Back to top ↑
-                </a>
+            <footer
+                className="delivery-footer bg-bg-base px-md text-fg-base md:px-xl"
+                style={themeStyle(gallery.blocks.at(-1)?.theme ?? gallery.theme)}
+            >
+                <div className="flex flex-wrap items-center justify-between gap-md border-t border-border-base py-xl">
+                    <p className="body-sm">Photographs by Matilde Bresciani</p>
+                    <a href="#top" className="delivery-back-to-top ui-text underline underline-offset-4 focus-ring">
+                        Back to top <span aria-hidden="true">↑</span>
+                    </a>
+                </div>
             </footer>
         </div>
     );

@@ -3,6 +3,7 @@ import { resolveSectionTheme, themeDefaults } from '@/lib/client-deliveries/shar
 import type { DeliveryBlock, DeliveryPhoto } from '@/lib/client-deliveries/view';
 import { GalleryLightbox } from './GalleryLightbox';
 import { PhotoSection } from './PhotoSection';
+import '@/app/(delivery)/deliveries/delivery.css';
 
 const stage: DeliveryPhoto = {
     id: 'stage',
@@ -54,7 +55,7 @@ const meta = {
                 <PhotoSection block={first} />
                 <p className="body-md">Between the sets.</p>
                 <PhotoSection block={{ ...first, id: 'empty', anchor: 'empty', photos: [] }} />
-                <PhotoSection block={second} />
+                <PhotoSection block={second} previousTheme={first.theme} />
             </>
         ),
     },

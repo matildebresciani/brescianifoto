@@ -1,11 +1,12 @@
 'use client';
 
+import { Expand } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import Image from 'next/image';
 import { useCallback, useContext, useMemo, useState } from 'react';
 import RichText from '@/components/molecules/admin/RichText';
 import { getPhotoMasonry, type PhotoMasonryMeasurements } from '@/lib/client-deliveries/photo-masonry';
-import { themeStyle } from '@/lib/client-deliveries/shared';
+import { type DeliveryTheme, themeStyle } from '@/lib/client-deliveries/shared';
 import type { DeliveryBlock, PhotoSpacing } from '@/lib/client-deliveries/view';
 import { GalleryLightboxContext } from './GalleryLightbox';
 
@@ -13,10 +14,12 @@ export function PhotoSection({
     block,
     desktopColumns = 4,
     photoSpacing = 2,
+    previousTheme,
 }: {
     block: Extract<DeliveryBlock, { type: 'photos' }>;
     desktopColumns?: 3 | 4;
     photoSpacing?: PhotoSpacing;
+    previousTheme?: DeliveryTheme;
 }) {
     const openPhoto = useContext(GalleryLightboxContext);
     const shouldReduceMotion = useReducedMotion();
@@ -61,7 +64,7 @@ export function PhotoSection({
         () => (measurements ? getPhotoMasonry(block.photos, measurements) : null),
         [block.photos, measurements],
     );
-    const sectionStyle = themeStyle(block.theme);
+    const sectionStyle = themeStyle(block.theme, previousTheme);
     sectionStyle['--delivery-photo-desktop-columns'] = String(desktopColumns);
     sectionStyle['--delivery-photo-spacing'] = `${photoSpacing}px`;
     return (
@@ -112,7 +115,7 @@ export function PhotoSection({
                             >
                                 <button
                                     type="button"
-                                    className="group focus-ring-tight block h-full w-full overflow-hidden bg-bg-subtle"
+                                    className="delivery-photo-trigger group focus-ring-tight relative block h-full w-full overflow-hidden bg-bg-subtle"
                                     aria-label={`Open photo ${photoIndex + 1}: ${photo.name}`}
                                     onClick={() => openPhoto?.(photo, block.theme)}
                                 >
@@ -129,6 +132,9 @@ export function PhotoSection({
                                         loading="lazy"
                                         className="block h-full w-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
                                     />
+                                    <span className="delivery-photo-hint" aria-hidden="true">
+                                        <Expand size={18} strokeWidth={1.25} />
+                                    </span>
                                 </button>
                             </motion.figure>
                         );

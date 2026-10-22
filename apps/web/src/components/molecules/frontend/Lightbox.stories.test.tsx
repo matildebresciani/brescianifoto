@@ -148,7 +148,7 @@ describe('desktop lightbox', () => {
             .element(page.getByRole('button', { name: 'Go to photo 1', exact: true }))
             .toHaveAttribute('aria-current', 'true');
         await expectActiveThumbnailVisible();
-        expect(strip.scrollLeft).toBe(0);
+        await expect.poll(() => strip.scrollLeft).toBe(0);
         expect(window.scrollY).toBe(pageTop);
         expect(getViewport().getBoundingClientRect().top).toBe(photoTop);
     });

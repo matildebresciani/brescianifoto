@@ -15,6 +15,7 @@ type Props = {
     image: Media;
     onViewportChange?: (viewport: LightboxViewport) => void;
     onReady?: (size: string) => void;
+    onLoadError?: () => void;
     onNavigate: (direction: -1 | 1) => void;
 };
 
@@ -54,7 +55,7 @@ function clampPan(point: Point, limits: Point): Point {
 }
 
 /** Owns the photo's pointer gestures; remount for each photo to reset zoom and pan. */
-const LightboxImage = ({ image, onViewportChange, onReady, onNavigate }: Props) => {
+const LightboxImage = ({ image, onViewportChange, onReady, onLoadError, onNavigate }: Props) => {
     const viewportRef = useRef<HTMLButtonElement>(null);
     const gestureRef = useRef<Gesture | null>(null);
     const pointersRef = useRef(new Set<number>());
@@ -236,7 +237,7 @@ const LightboxImage = ({ image, onViewportChange, onReady, onNavigate }: Props) 
                 <span
                     className={cn(
                         'pointer-events-none relative flex h-full w-full items-center justify-center motion-reduce:transition-none',
-                        !isDragging && 'transition-transform duration-150 ease-out',
+                        !isDragging && 'transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
                     )}
                     style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${isZoomed ? zoomScale : 1})` }}
                 >
@@ -246,7 +247,7 @@ const LightboxImage = ({ image, onViewportChange, onReady, onNavigate }: Props) 
                             resource={image}
                             style={{ width: fitted.width, height: fitted.height }}
                             className={cn(
-                                'relative z-10 max-h-full max-w-full shrink-0 object-contain',
+                                'relative z-10 max-h-full max-w-full shrink-0 object-contain transition-opacity duration-300 motion-reduce:transition-none',
                                 !isLoaded && 'opacity-0',
                                 canZoom && isZoomed && !isDragging && 'pointer-events-auto cursor-zoom-out',
                             )}
@@ -258,7 +259,10 @@ const LightboxImage = ({ image, onViewportChange, onReady, onNavigate }: Props) 
                                 setHasFailed(false);
                                 if (requestedSize && !isZoomed) onReady?.(requestedSize);
                             }}
-                            onError={() => setHasFailed(true)}
+                            onError={() => {
+                                setHasFailed(true);
+                                onLoadError?.();
+                            }}
                         />
                     )}
                     {isLoading && (

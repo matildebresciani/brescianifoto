@@ -16,10 +16,15 @@ const data = {
     archive,
     isArchiveCurrent: true,
 };
-const request = (assetId: string) =>
-    GET(new Request('https://example.com/deliveries/link/download/file'), {
-        params: Promise.resolve({ shareId: 'a'.repeat(32), assetId }),
-    });
+const request = (assetId: string, hasJSONResponse = false) =>
+    GET(
+        new Request('https://example.com/deliveries/link/download/file', {
+            headers: hasJSONResponse ? { Accept: 'application/json' } : undefined,
+        }),
+        {
+            params: Promise.resolve({ shareId: 'a'.repeat(32), assetId }),
+        },
+    );
 
 beforeEach(() => {
     mocks.read.mockResolvedValue(data);
@@ -34,6 +39,24 @@ describe('client download authorization', () => {
         expect(response.headers.get('cache-control')).toContain('no-store');
         expect(response.headers.get('x-robots-tag')).toContain('noindex');
         expect(mocks.sign).toHaveBeenCalledWith(photo.storageKey, photo.originalFilename);
+    });
+    it('returns only a signed URL for download preparation, with private no-store headers', async () => {
+        const response = await request('archive', true);
+        expect(response.status).toBe(200);
+        expect(await response.json()).toEqual({ url: 'https://storage.example.test/signed-file' });
+        expect(response.headers.get('cache-control')).toBe('private, no-store');
+        expect(response.headers.get('x-robots-tag')).toContain('noindex');
+        expect(response.headers.get('vary')).toBe('Accept');
+        expect(mocks.sign).toHaveBeenCalledWith(archive.storageKey, archive.originalFilename);
+    });
+    it('keeps archive preparation behind publication, revision and download permission checks', async () => {
+        mocks.read.mockResolvedValueOnce(undefined);
+        expect((await request('archive', true)).status).toBe(404);
+        mocks.read.mockResolvedValueOnce({ ...data, isArchiveCurrent: false });
+        expect((await request('archive', true)).status).toBe(404);
+        mocks.read.mockResolvedValueOnce({ ...data, gallery: { ...data.gallery, canDownloadArchive: false } });
+        expect((await request('archive', true)).status).toBe(404);
+        expect(mocks.sign).not.toHaveBeenCalled();
     });
     it.each(['foreign-photo', 'cover-only'])('rejects unselected asset %s even when its ID is known', async (id) => {
         expect((await request(id)).status).toBe(404);

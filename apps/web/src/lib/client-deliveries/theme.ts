@@ -404,9 +404,10 @@ export function themeIssues(input: DeliveryTheme): string[] {
 }
 
 /** Apply semantic tokens to the page and portal dialog without leaking into the public portfolio. */
-export function themeStyle(input: DeliveryTheme): CSSProperties & Record<string, string> {
+export function themeStyle(input: DeliveryTheme, previous?: DeliveryTheme): CSSProperties & Record<string, string> {
     const theme = resolveThemeColors(input);
     const style: Record<string, string> = {
+        '--delivery-previous-background': resolveThemeColors(previous ?? input).background,
         '--bone': theme.background,
         '--paper': theme.surface,
         '--void': theme.text,

@@ -53,3 +53,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const GallerySections: Story = {};
+export const WithDownload: Story = {
+    args: { archive: { href: '/deliveries/example/download/archive', byteSize: 2_400_000_000 } },
+};

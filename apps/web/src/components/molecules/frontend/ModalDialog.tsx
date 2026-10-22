@@ -1,16 +1,19 @@
 'use client';
 
-import { type HTMLAttributes, useEffect, useRef } from 'react';
+import { type HTMLMotionProps, motion, useReducedMotion } from 'motion/react';
+import { useEffect, useRef } from 'react';
 
-type Props = HTMLAttributes<HTMLDivElement> & {
+type Props = HTMLMotionProps<'div'> & {
     isOpen?: boolean;
     onClose: () => void;
+    shouldAnimate?: boolean;
 };
 
 /** Render inside Portal so focus management starts after the dialog exists in the DOM. */
-export default function ModalDialog({ isOpen = true, onClose, children, ...props }: Props) {
+export default function ModalDialog({ isOpen = true, shouldAnimate = false, onClose, children, ...props }: Props) {
     const dialogRef = useRef<HTMLDivElement>(null);
     const closeRef = useRef(onClose);
+    const shouldReduceMotion = useReducedMotion();
     useEffect(() => {
         closeRef.current = onClose;
     }, [onClose]);
@@ -78,8 +81,19 @@ export default function ModalDialog({ isOpen = true, onClose, children, ...props
     }, [isOpen]);
 
     return (
-        <div {...props} ref={dialogRef} role="dialog" aria-modal="true" tabIndex={-1} inert={!isOpen}>
+        <motion.div
+            {...props}
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            tabIndex={-1}
+            inert={!isOpen}
+            initial={shouldAnimate && !shouldReduceMotion ? { opacity: 0 } : false}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: shouldAnimate && !shouldReduceMotion ? 0.24 : 0 }}
+        >
             {children}
-        </div>
+        </motion.div>
     );
 }

@@ -3,8 +3,9 @@
 import { ChevronDown } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import { useEffect, useId, useRef, useState } from 'react';
-import { type DeliveryTheme, formatBytes, themeStyle } from '@/lib/client-deliveries/shared';
+import { type DeliveryTheme, themeStyle } from '@/lib/client-deliveries/shared';
 import type { DeliveryView } from '@/lib/client-deliveries/view';
+import { DownloadArchiveButton } from './DownloadArchiveButton';
 
 export function SectionMenu({
     sections,
@@ -31,13 +32,18 @@ export function SectionMenu({
         resize.observe(element);
         const track = () => {
             const threshold = element.getBoundingClientRect().bottom;
-            const current = [...sections]
-                .reverse()
-                .find(
-                    (section) =>
-                        (document.getElementById(section.anchor)?.getBoundingClientRect().top ??
-                            Number.POSITIVE_INFINITY) <= threshold,
-                );
+            // A short final section cannot reach the bar once the document has reached its end.
+            const isAtEnd =
+                window.scrollY > 0 && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1;
+            const current = isAtEnd
+                ? sections.at(-1)
+                : [...sections].reverse().find((section) => {
+                      const target = document.getElementById(section.anchor);
+                      if (!target) return false;
+                      // Anchor navigation leaves the section below the sticky bar by its scroll margin.
+                      const scrollMargin = Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+                      return target.getBoundingClientRect().top <= Math.max(threshold, scrollMargin) + 1;
+                  });
             setActive(current?.anchor ?? sections[0]?.anchor);
         };
         let frame = 0;
@@ -57,7 +63,7 @@ export function SectionMenu({
         <a
             key={section.anchor}
             href={`#${section.anchor}`}
-            className="focus-ring ui-text"
+            className="delivery-nav-link focus-ring ui-text"
             aria-current={active === section.anchor ? 'location' : undefined}
             onClick={() => {
                 setActive(section.anchor);
@@ -65,7 +71,7 @@ export function SectionMenu({
                 requestAnimationFrame(() => document.getElementById(section.anchor)?.focus({ preventScroll: true }));
             }}
         >
-            {section.label}
+            <span>{section.label}</span>
         </a>
     ));
     return (
@@ -109,11 +115,7 @@ export function SectionMenu({
                     <div className="delivery-nav-links">{links}</div>
                 </motion.div>
             </div>
-            {archive && (
-                <a className="delivery-primary ui-text focus-ring" href={archive.href}>
-                    Download all <span className="metadata">{formatBytes(archive.byteSize)}</span>
-                </a>
-            )}
+            {archive && <DownloadArchiveButton key={archive.href} href={archive.href} byteSize={archive.byteSize} />}
         </nav>
     );
 }

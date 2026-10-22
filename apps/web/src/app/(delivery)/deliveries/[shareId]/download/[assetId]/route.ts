@@ -32,5 +32,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ shar
         () => 'Download temporarily unavailable. Please try again.',
     );
     if (url.isErr()) return new Response(url.error, { status: 503, headers });
+    if (request.headers.get('accept') === 'application/json') {
+        return Response.json({ url: url.value }, { headers: { ...headers, Vary: 'Accept' } });
+    }
     return new Response(null, { status: 302, headers: { ...headers, Location: url.value } });
 }

@@ -1,10 +1,10 @@
 'use client';
 
 import { Download } from 'lucide-react';
+import { AnimatePresence } from 'motion/react';
 import { createContext, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import Close from '@/components/atoms/frontend/buttons/Close';
 import ArrowIcon from '@/components/atoms/frontend/icons/ArrowIcon';
-import LightboxImage from '@/components/molecules/frontend/LightboxImage';
 import LightboxPreloader from '@/components/molecules/frontend/LightboxPreloader';
 import LightboxThumbnails from '@/components/molecules/frontend/LightboxThumbnails';
 import ModalDialog from '@/components/molecules/frontend/ModalDialog';
@@ -13,6 +13,7 @@ import { type DeliveryTheme, themeStyle } from '@/lib/client-deliveries/shared';
 import type { DeliveryPhoto } from '@/lib/client-deliveries/view';
 import { getLightboxImageKey, getLightboxImageSize, type LightboxViewport } from '@/lib/utilities/lightbox-images';
 import type { Media } from '@/payload-types';
+import { GalleryLightboxStage } from './GalleryLightboxStage';
 
 /** Lets photo sections open the same viewer without moving server-rendered content into the client bundle. */
 export const GalleryLightboxContext = createContext<((photo: DeliveryPhoto, theme: DeliveryTheme) => void) | null>(
@@ -38,21 +39,23 @@ export function GalleryLightbox({ photos, children }: { photos: DeliveryPhoto[];
     return (
         <GalleryLightboxContext.Provider value={openPhoto}>
             {children}
-            {viewer && (
-                <DeliveryLightbox
-                    photos={items}
-                    index={viewer.index}
-                    setIndex={navigate}
-                    close={close}
-                    theme={viewer.theme}
-                />
-            )}
+            <AnimatePresence>
+                {viewer && (
+                    <DeliveryLightbox
+                        photos={items}
+                        index={viewer.index}
+                        setIndex={navigate}
+                        close={close}
+                        theme={viewer.theme}
+                    />
+                )}
+            </AnimatePresence>
         </GalleryLightboxContext.Provider>
     );
 }
 
 const arrowClasses =
-    'focus-ring-tight hidden size-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border-base bg-transparent text-fg-base transition-colors duration-200 hover:bg-bg-pressed motion-reduce:transition-none md:flex';
+    'delivery-lightbox-control focus-ring-tight hidden size-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border-base bg-transparent text-fg-base md:flex';
 
 function DeliveryLightbox({
     photos,
@@ -113,6 +116,7 @@ function DeliveryLightbox({
         <Portal>
             <ModalDialog
                 onClose={close}
+                shouldAnimate
                 aria-label="Gallery photo viewer"
                 style={themeStyle(theme)}
                 className="delivery-lightbox modal--open fixed inset-0 z-50 flex flex-col bg-bg-base text-fg-base outline-none"
@@ -124,7 +128,7 @@ function DeliveryLightbox({
                     <div className="flex items-center gap-xs">
                         {current.downloadHref && (
                             <a
-                                className="focus-ring-tight inline-flex size-12 shrink-0 items-center justify-center rounded-full border-0 bg-transparent p-0 text-fg-base transition-colors duration-200 hover:bg-bg-pressed motion-reduce:transition-none"
+                                className="delivery-lightbox-control focus-ring-tight inline-flex size-12 shrink-0 items-center justify-center rounded-full border border-border-base bg-transparent p-0 text-fg-base"
                                 href={current.downloadHref}
                                 aria-label="Download original"
                                 title="Download original"
@@ -134,7 +138,7 @@ function DeliveryLightbox({
                         )}
                         <Close
                             onClick={close}
-                            className="size-12 rounded-full hover:bg-bg-pressed hover:text-fg-base"
+                            className="delivery-lightbox-control size-12 rounded-full border border-border-base hover:text-fg-base"
                         />
                     </div>
                 </div>
@@ -150,8 +154,7 @@ function DeliveryLightbox({
                             <ArrowIcon className="rotate-180" />
                         </button>
                     )}
-                    <LightboxImage
-                        key={getLightboxImageKey(image)}
+                    <GalleryLightboxStage
                         image={image}
                         onNavigate={navigate}
                         onViewportChange={measureViewport}
