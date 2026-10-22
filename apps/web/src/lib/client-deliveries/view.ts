@@ -18,7 +18,6 @@ export type DeliveryBlock = { theme: DeliveryTheme; hasCustomColors: boolean } &
           id: string;
           type: 'photos';
           anchor: string;
-          title: string;
           menuLabel: string;
           photos: DeliveryPhoto[];
           introduction?: SerializedEditorState | null;
@@ -26,12 +25,13 @@ export type DeliveryBlock = { theme: DeliveryTheme; hasCustomColors: boolean } &
 );
 export type DeliveryView = {
     title: string;
-    subtitle?: string | null;
     date?: string | null;
     location?: string | null;
     details?: SerializedEditorState | null;
     cover?: DeliveryPhoto;
     coverLayout: 'editorial' | 'overlay';
+    overlayColor: string;
+    overlayOpacity: number;
     alignment: 'left' | 'center' | 'right';
     focalX: number;
     focalY: number;

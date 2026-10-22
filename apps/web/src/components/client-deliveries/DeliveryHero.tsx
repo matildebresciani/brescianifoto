@@ -7,7 +7,6 @@ export function DeliveryHero({ gallery }: { gallery: DeliveryView }) {
     const content = (
         <div className="delivery-hero-copy" style={{ textAlign: gallery.alignment }}>
             <h1 className="statement">{gallery.title}</h1>
-            {gallery.subtitle && <p className="body-lg mt-md">{gallery.subtitle}</p>}
             {(gallery.date || gallery.location) && (
                 <p className="metadata mt-lg">
                     {gallery.date && (
@@ -24,7 +23,7 @@ export function DeliveryHero({ gallery }: { gallery: DeliveryView }) {
                     {gallery.location}
                 </p>
             )}
-            {gallery.details && <RichText data={gallery.details} enableGutter={false} className="mt-base" />}
+            {gallery.details && <RichText data={gallery.details} enableGutter={false} isDelivery className="mt-base" />}
         </div>
     );
     return (

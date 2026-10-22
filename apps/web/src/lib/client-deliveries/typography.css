@@ -1,0 +1,80 @@
+@import "../styles/typography-tokens.css";
+
+.delivery-editor {
+    @apply typography-tokens;
+}
+
+/* Both the editor and the visitor view use the shared fluid scale with gallery-specific font roles. */
+:is(.delivery-rich-text, .delivery-editor .ContentEditable__root) {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    font-weight: var(--weight-regular);
+    line-height: var(--leading-body);
+    text-transform: none;
+    overflow-wrap: anywhere;
+}
+
+:is(.delivery-rich-text, .delivery-editor .ContentEditable__root)
+    :is(h2, h3, h4) {
+    font-family: var(--font-statement);
+    font-weight: var(--weight-regular);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-heading);
+    text-transform: none;
+    overflow-wrap: anywhere;
+}
+
+:is(.delivery-rich-text, .delivery-editor .ContentEditable__root) h2 {
+    font-size: var(--text-heading-2);
+}
+
+:is(.delivery-rich-text, .delivery-editor .ContentEditable__root) h3 {
+    font-size: var(--text-heading-3);
+}
+
+:is(.delivery-rich-text, .delivery-editor .ContentEditable__root) h4 {
+    font-size: var(--text-heading-4);
+}
+
+:is(.delivery-rich-text, .delivery-editor .ContentEditable__root)
+    :is(p, li, blockquote) {
+    font-size: inherit;
+    line-height: var(--leading-body);
+    text-transform: none;
+}
+
+:is(.delivery-rich-text, .delivery-editor .ContentEditable__root) a {
+    font-family: var(--font-metadata);
+    font-size: inherit;
+    text-transform: none;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    color: inherit;
+}
+
+:is(.delivery-rich-text, .delivery-editor .ContentEditable__root)
+    [data-delivery-style="metadata"] {
+    font-family: var(--font-metadata);
+    font-size: var(--text-metadata);
+    font-weight: var(--weight-regular);
+    line-height: var(--leading-ui);
+    letter-spacing: var(--tracking-metadata);
+    text-transform: none;
+    color: var(--fg-faded, inherit);
+}
+
+/* A link keeps its mono font even when its text is marked as metadata. */
+:is(.delivery-rich-text, .delivery-editor .ContentEditable__root)
+    a
+    [data-delivery-style="metadata"] {
+    font-size: inherit;
+    color: inherit;
+}
+
+.delivery-editor .ContentEditable__root > * {
+    margin-block: 0 1rem;
+}
+
+.delivery-editor .ContentEditable__root > :last-child {
+    margin-bottom: 0;
+}

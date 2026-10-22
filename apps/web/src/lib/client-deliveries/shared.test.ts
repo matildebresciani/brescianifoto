@@ -4,6 +4,7 @@ import {
     contrastRatio,
     resolveSectionTheme,
     sectionColorsSchema,
+    sectionMenuLabel,
     sectionSchema,
     selectedPhotoIDs,
     themeDefaults,
@@ -45,10 +46,17 @@ describe('client gallery theme and photo revisions', () => {
     it('retains section introduction and color overrides when normalizing stable anchors', () => {
         const introduction = { root: { type: 'root', children: [] } };
         const colors = { background: '#151611', text: '#FAFFEF' };
-        expect(sectionSchema.parse({ blockType: 'photos', title: 'Ceremony', introduction, colors })).toMatchObject({
-            introduction,
-            colors,
-        });
+        expect(sectionSchema.parse({ blockType: 'photos', menuLabel: 'Ceremony', introduction, colors })).toMatchObject(
+            {
+                introduction,
+                colors,
+            },
+        );
+    });
+    it('resolves menu labels without requiring a separate title', () => {
+        expect(sectionMenuLabel({ menuLabel: ' Dinner ', title: 'Old title' })).toBe('Dinner');
+        expect(sectionMenuLabel({ title: 'Legacy section' })).toBe('Legacy section');
+        expect(sectionMenuLabel({})).toBe('Photos');
     });
     it('checks actual contrast on both backgrounds, including muted text', () => {
         expect(contrastRatio('#000000', '#ffffff')).toBeCloseTo(21);
@@ -64,7 +72,7 @@ describe('client gallery theme and photo revisions', () => {
         expect(
             selectedPhotoIDs([
                 { blockType: 'text', photos: ['secret'] },
-                { blockType: 'photos', title: 'Ceremony', photos: ['b', { id: 'a' }, 'b'] },
+                { blockType: 'photos', menuLabel: 'Ceremony', photos: ['b', { id: 'a' }, 'b'] },
                 { blockType: 'photos', title: 'Reception', photos: [{ id: 'b' }] },
             ]),
         ).toEqual(['a', 'b']);

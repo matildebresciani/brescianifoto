@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { archivo, ibmPlexMono, instrumentSerif } from '@/lib/styles/fonts';
 import '../../(frontend)/globals.css';
 import './delivery.css';
+import '@/lib/client-deliveries/typography.css';
 
 export const metadata: Metadata = {
     title: 'Client gallery · brescianifoto',

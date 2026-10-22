@@ -46,8 +46,8 @@ const gallery: ClientGallery = {
     createdAt: now,
     updatedAt: now,
     blocks: [
-        { blockType: 'photos', id: 'section-1', title: 'Ceremony', anchor: 'section-stable', photos: [photo.id] },
-        { blockType: 'photos', id: 'section-2', title: 'Empty', photos: [] },
+        { blockType: 'photos', id: 'section-1', menuLabel: 'Ceremony', anchor: 'section-stable', photos: [photo.id] },
+        { blockType: 'photos', id: 'section-2', menuLabel: 'Empty', photos: [] },
     ],
 };
 
@@ -59,6 +59,17 @@ beforeEach(() => {
 });
 
 describe('unlisted delivery reads', () => {
+    it.each([
+        { preferences: {}, color: '#151611', opacity: 72 },
+        { preferences: { overlayColor: '#25261F', overlayOpacity: 35 }, color: '#25261F', opacity: 35 },
+        { preferences: { overlayColor: '#151611', overlayOpacity: 0 }, color: '#151611', opacity: 0 },
+    ])('resolves cover overlay preferences: $preferences', async ({ preferences, color, opacity }) => {
+        const view = await deliveryView(
+            { gallery: { ...gallery, ...preferences }, photos: [photo], archive: undefined, isArchiveCurrent: false },
+            false,
+        );
+        expect(view).toMatchObject({ overlayColor: color, overlayOpacity: opacity });
+    });
     it('projects photo introductions and themes without affecting neighboring sections', async () => {
         const content = {
             root: { type: 'root', children: [], direction: null, format: '', indent: 0, version: 1 },
@@ -72,13 +83,13 @@ describe('unlisted delivery reads', () => {
                     blocks: [
                         {
                             blockType: 'photos',
-                            title: 'Ceremony',
+                            menuLabel: 'Ceremony',
                             anchor: 'one',
                             photos: [photo.id],
                             introduction: content,
                             colors: { background: '#151611', text: '#FAFFEF' },
                         },
-                        { blockType: 'photos', title: 'Reception', anchor: 'two', photos: [photo.id] },
+                        { blockType: 'photos', menuLabel: 'Reception', anchor: 'two', photos: [photo.id] },
                         { blockType: 'text', content, colors: { background: '#FFFFFF', text: '#000000' } },
                     ],
                 },
@@ -89,16 +100,43 @@ describe('unlisted delivery reads', () => {
             false,
         );
         expect(view.blocks[0]).toMatchObject({
+            menuLabel: 'Ceremony',
+            anchor: 'one',
             introduction: content,
             hasCustomColors: true,
             theme: { background: '#151611', text: '#FAFFEF', muted: '#FAFFEF' },
         });
+        expect(view.blocks[0]).not.toHaveProperty('title');
         expect(view.blocks[1]).toMatchObject({ hasCustomColors: false, theme: view.theme });
         expect(view.blocks[2]).toMatchObject({
             content,
             hasCustomColors: true,
             theme: { background: '#FFFFFF', text: '#000000' },
         });
+    });
+    it('uses legacy titles only as a fallback menu label', async () => {
+        const data = await readDelivery('a'.repeat(32));
+        if (!data) throw new Error('Expected gallery');
+        const view = await deliveryView(
+            {
+                ...data,
+                gallery: {
+                    ...gallery,
+                    blocks: [
+                        {
+                            blockType: 'photos',
+                            menuLabel: '',
+                            title: 'Old title',
+                            anchor: 'section-stable',
+                            photos: [photo.id],
+                        },
+                    ],
+                },
+            },
+            false,
+        );
+        expect(view.blocks[0]).toMatchObject({ menuLabel: 'Old title', anchor: 'section-stable' });
+        expect(view.blocks[0]).not.toHaveProperty('title');
     });
     it('does not query for invalid links or allow unauthenticated draft previews', async () => {
         expect(await readDelivery('guessable-slug')).toBeUndefined();

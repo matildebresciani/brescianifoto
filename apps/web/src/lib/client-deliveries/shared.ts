@@ -12,13 +12,18 @@ export const sectionSchema = z.object({
     blockType: z.literal('photos'),
     id: z.string().optional(),
     anchor: z.string().optional().nullable(),
-    title: z.string(),
+    title: z.string().optional().nullable(),
     menuLabel: z.string().optional().nullable(),
     introduction: z.unknown().optional(),
     colors: z.unknown().optional(),
     photos: z.array(z.unknown()).optional().nullable(),
     blockName: z.string().optional().nullable(),
 });
+
+/** Older galleries used a separate visible title before menu labels became required. */
+export function sectionMenuLabel(section: { menuLabel?: string | null; title?: string | null }): string {
+    return section.menuLabel?.trim() || section.title?.trim() || 'Photos';
+}
 
 /** Deduplication means moving or reordering a photo does not invalidate a ZIP. */
 export function selectedPhotoIDs(blocks: unknown): string[] {

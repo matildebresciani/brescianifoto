@@ -6,6 +6,7 @@ import {
     RichText as RichTextWithoutBlocks,
 } from '@payloadcms/richtext-lexical/react';
 import { createElement, type HTMLAttributes } from 'react';
+import { z } from 'zod';
 
 import { cn } from '@/lib/utilities/ui';
 
@@ -20,25 +21,32 @@ const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
     return relationTo === 'posts' ? `/posts/${slug}` : `/${slug}`;
 };
 
-const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) => {
-    const convertText = defaultConverters.text;
+const metadataState = z.object({ $: z.object({ deliveryStyle: z.literal('metadata') }) });
 
-    return {
-        ...defaultConverters,
-        ...LinkJSXConverter({ internalDocToHref }),
-        text: (args) => {
-            if (typeof convertText !== 'function') return convertText ?? args.node.text;
+const jsxConverters =
+    (isDelivery: boolean): JSXConvertersFunction<NodeTypes> =>
+    ({ defaultConverters }) => {
+        const convertText = defaultConverters.text;
 
-            // Old editor content can contain fixed sizes; presentation now comes from the fluid roles.
-            const style = args.node.style
-                .split(';')
-                .filter((declaration) => !/^\s*font-size\s*:/i.test(declaration))
-                .join(';');
+        return {
+            ...defaultConverters,
+            ...LinkJSXConverter({ internalDocToHref }),
+            text: (args) => {
+                if (typeof convertText !== 'function') return convertText ?? args.node.text;
 
-            return convertText({ ...args, node: { ...args.node, style } });
-        },
+                // Old editor content can contain fixed sizes; presentation now comes from the fluid roles.
+                const style = args.node.style
+                    .split(';')
+                    .filter((declaration) => !/^\s*font-size\s*:/i.test(declaration))
+                    .join(';');
+
+                const text = convertText({ ...args, node: { ...args.node, style } });
+                return isDelivery && metadataState.safeParse(args.node).success
+                    ? createElement('span', { 'data-delivery-style': 'metadata' }, text)
+                    : text;
+            },
+        };
     };
-};
 
 type Props = {
     /** Saved content is rendered without changing its text, structure, or stored formatting. */
@@ -47,17 +55,20 @@ type Props = {
     enableGutter?: boolean;
     /** Apply the shared fluid body and rich-text styles. */
     enableProse?: boolean;
+    /** Use the client-gallery font roles and authored case, including explicit metadata marks. */
+    isDelivery?: boolean;
 } & HTMLAttributes<HTMLDivElement>;
 
 export default function RichText(props: Props) {
-    const { className, enableProse = true, enableGutter = true, ...rest } = props;
+    const { className, enableProse = true, enableGutter = true, isDelivery = false, ...rest } = props;
     return createElement(RichTextWithoutBlocks, {
-        converters: jsxConverters,
+        converters: jsxConverters(isDelivery),
         className: cn(
             {
                 'container ': enableGutter,
                 'max-w-none': !enableGutter,
                 'mx-auto body-md wysiwyg': enableProse,
+                'delivery-rich-text': isDelivery,
             },
             className,
         ),

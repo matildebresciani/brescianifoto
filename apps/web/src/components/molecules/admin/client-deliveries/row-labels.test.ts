@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { sectionRowLabel } from './row-labels';
 
 describe('gallery section labels', () => {
-    it('shows the current photo title and selection count', () => {
+    it('shows the current menu label and selection count, with a legacy title fallback', () => {
+        expect(
+            sectionRowLabel({ blockType: 'photos', menuLabel: ' Dinner ', title: 'Old title', photos: ['one'] }),
+        ).toBe('Dinner · 1 photo');
         expect(sectionRowLabel({ blockType: 'photos', title: ' The ceremony ', photos: ['one'] })).toBe(
             'The ceremony · 1 photo',
         );

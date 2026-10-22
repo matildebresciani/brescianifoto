@@ -145,53 +145,50 @@ export function PhotoSection({ block }: { block: Extract<DeliveryBlock, { type: 
         <section
             id={block.anchor}
             tabIndex={-1}
-            className={`delivery-section bg-bg-base text-fg-base outline-none${block.hasCustomColors ? ' delivery-section-custom' : ''}`}
+            className="delivery-section bg-bg-base text-fg-base outline-none"
             style={themeStyle(block.theme)}
-            aria-labelledby={`${block.anchor}-title`}
+            aria-label={block.menuLabel}
         >
-            <div className="flex flex-wrap items-baseline justify-between gap-base mb-xl">
-                <h2 id={`${block.anchor}-title`} className="heading-2">
-                    {block.title}
-                </h2>
-                <p className="metadata text-fg-subtle">{block.photos.length} photographs</p>
-            </div>
-            {block.introduction && (
-                <div className="delivery-section-introduction">
-                    <RichText data={block.introduction} enableGutter={false} />
-                </div>
-            )}
-            <div className="delivery-photo-grid">
-                {block.photos.map((photo, photoIndex) => (
-                    <motion.figure
-                        key={`${photo.id}-${photoIndex}`}
-                        className="delivery-photo m-0"
-                        initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.05 }}
-                        transition={{
-                            duration: shouldReduceMotion ? 0 : 0.6,
-                            delay: shouldReduceMotion ? 0 : (photoIndex % 3) * 0.06,
-                            ease: [0.22, 1, 0.36, 1],
-                        }}
-                    >
-                        <button
-                            type="button"
-                            className="group focus-ring-tight block w-full overflow-hidden bg-bg-subtle"
-                            aria-label={`Open photo ${photoIndex + 1}: ${photo.name}`}
-                            onClick={() => setIndex(photoIndex)}
+            <div className="delivery-section-inner">
+                {block.introduction && (
+                    <div className="delivery-section-introduction">
+                        <RichText data={block.introduction} enableGutter={false} isDelivery />
+                    </div>
+                )}
+                <div className="delivery-photo-grid">
+                    {block.photos.map((photo, photoIndex) => (
+                        <motion.figure
+                            key={`${photo.id}-${photoIndex}`}
+                            className="delivery-photo m-0"
+                            // The reduced-motion media rule supplies the static state before hydration too.
+                            initial={{ opacity: 0, y: 16 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, amount: 0.05 }}
+                            transition={{
+                                duration: shouldReduceMotion ? 0 : 0.6,
+                                delay: shouldReduceMotion ? 0 : (photoIndex % 3) * 0.06,
+                                ease: [0.22, 1, 0.36, 1],
+                            }}
                         >
-                            <Image
-                                src={photo.src}
-                                alt={photo.name}
-                                width={photo.width}
-                                height={photo.height}
-                                sizes="(min-width: 1024px) 32vw, 48vw"
-                                loading="lazy"
-                                className="h-auto w-full transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
-                            />
-                        </button>
-                    </motion.figure>
-                ))}
+                            <button
+                                type="button"
+                                className="group focus-ring-tight block w-full overflow-hidden bg-bg-subtle"
+                                aria-label={`Open photo ${photoIndex + 1}: ${photo.name}`}
+                                onClick={() => setIndex(photoIndex)}
+                            >
+                                <Image
+                                    src={photo.src}
+                                    alt={photo.name}
+                                    width={photo.width}
+                                    height={photo.height}
+                                    sizes="(min-width: 1024px) 32vw, 48vw"
+                                    loading="lazy"
+                                    className="h-auto w-full transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
+                                />
+                            </button>
+                        </motion.figure>
+                    ))}
+                </div>
             </div>
             {index !== null && (
                 <DeliveryLightbox

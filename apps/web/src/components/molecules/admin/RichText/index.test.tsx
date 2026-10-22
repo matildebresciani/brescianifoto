@@ -23,6 +23,31 @@ const block = (type: string, children: SerializedTextNode[]): SerializedElementN
 });
 
 describe('frontend rich-text typography', () => {
+    it('renders gallery metadata marks and authored headings without changing saved text or sizes', () => {
+        const data = {
+            root: {
+                ...block('root', []),
+                children: [
+                    { ...block('heading', [text('Keep MiXeD case')]), tag: 'h2' },
+                    block('paragraph', [
+                        { ...text('Venue · Mixed Case', 3, 'font-size:48px;'), $: { deliveryStyle: 'metadata' } },
+                    ]),
+                ],
+            },
+        };
+        const original = JSON.stringify(data);
+        const html = renderToStaticMarkup(createElement(RichText, { data, isDelivery: true, enableGutter: false }));
+        expect(html).toContain('delivery-rich-text');
+        expect(html).toContain('<h2>Keep MiXeD case</h2>');
+        expect(html).toContain(
+            '<span data-delivery-style="metadata"><em><strong>Venue · Mixed Case</strong></em></span>',
+        );
+        expect(html).not.toContain('font-size');
+        expect(JSON.stringify(data)).toBe(original);
+        const portfolio = renderToStaticMarkup(createElement(RichText, { data, enableGutter: false }));
+        expect(portfolio).not.toContain('delivery-rich-text');
+        expect(portfolio).not.toContain('data-delivery-style');
+    });
     it('ignores legacy inline sizing without changing case, headings, emphasis, or saved content', () => {
         const data = {
             root: {

@@ -1,7 +1,14 @@
 import { initPayload } from '@/lib/config';
 import type { ClientPhoto } from '@/payload-types';
 import { photoSetRevision } from './revision';
-import { relationshipID, resolveSectionTheme, selectedPhotoIDs, themeSchema } from './shared';
+import {
+    relationshipID,
+    resolveSectionTheme,
+    sectionMenuLabel,
+    selectedPhotoIDs,
+    themeDefaults,
+    themeSchema,
+} from './shared';
 import { assetURL } from './storage';
 import type { DeliveryBlock, DeliveryPhoto, DeliveryView } from './view';
 
@@ -102,8 +109,7 @@ export async function deliveryView(
                 id: block.id || block.anchor,
                 type: 'photos',
                 anchor: block.anchor,
-                title: block.title,
-                menuLabel: block.menuLabel || block.title,
+                menuLabel: sectionMenuLabel(block),
                 photos: items,
                 introduction: block.introduction,
                 ...sectionTheme,
@@ -113,12 +119,13 @@ export async function deliveryView(
     const cover = coverID ? byID.get(coverID) : undefined;
     return {
         title: gallery.title,
-        subtitle: gallery.subtitle,
         date: gallery.date,
         location: gallery.location,
         details: gallery.details,
         cover,
         coverLayout: gallery.coverLayout || 'editorial',
+        overlayColor: gallery.overlayColor || themeDefaults.text,
+        overlayOpacity: gallery.overlayOpacity ?? 72,
         alignment: gallery.alignment || 'center',
         focalX: gallery.focalX ?? 50,
         focalY: gallery.focalY ?? 50,

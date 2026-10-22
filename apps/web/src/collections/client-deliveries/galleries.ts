@@ -1,6 +1,5 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 import { colorPickerField } from '@innovixx/payload-color-picker-field';
-import { FixedToolbarFeature, HeadingFeature, LinkFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 import {
     APIError,
     type BlocksFieldValidation,
@@ -16,6 +15,7 @@ import { blocks as validateBlocks, upload as validateUpload } from 'payload/shar
 import { z } from 'zod';
 import { authenticated } from '@/access/authenticated';
 import { normalizeDetails } from '@/lib/client-deliveries/details';
+import { deliveryEditor } from '@/lib/client-deliveries/editor';
 import { photoSetRevision } from '@/lib/client-deliveries/revision';
 import {
     assignPaletteKeys,
@@ -23,6 +23,7 @@ import {
     relationshipID,
     resolveSectionTheme,
     sectionColorIssues,
+    sectionMenuLabel,
     sectionSchema,
     selectedPhotoIDs,
     themeDefaults,
@@ -63,8 +64,9 @@ const prepareGallery: CollectionBeforeValidateHook = async ({ data, originalDoc,
                 .find((item) => item.success && item.data.id === parsed.data.id);
             return {
                 ...parsed.data,
+                menuLabel: (parsed.data.menuLabel ?? parsed.data.title)?.trim(),
                 colors: nextColors,
-                anchor: oldBlock?.success ? oldBlock.data.anchor : `section-${randomUUID()}`,
+                anchor: oldBlock?.success && oldBlock.data.anchor ? oldBlock.data.anchor : `section-${randomUUID()}`,
             };
         });
     }
@@ -85,10 +87,7 @@ const prepareGallery: CollectionBeforeValidateHook = async ({ data, originalDoc,
     for (const [index, block] of (Array.isArray(blocks) ? blocks : []).entries()) {
         const issues = sectionColorIssues(theme, block.colors);
         if (issues.length)
-            throw new APIError(
-                `Section ${index + 1}${block.title ? ` (${block.title})` : ''}: ${issues.join(' ')}`,
-                400,
-            );
+            throw new APIError(`Section ${index + 1} (${sectionMenuLabel(block)}): ${issues.join(' ')}`, 400);
     }
     const ids = selectedPhotoIDs(blocks);
     if (ids.length > 500) throw new APIError('A client gallery supports up to 500 photos.', 400);
@@ -165,17 +164,6 @@ const prepareGallery: CollectionBeforeValidateHook = async ({ data, originalDoc,
         throw new ValidationError({ collection: 'client-galleries', errors: publicationErrors, req });
     return data;
 };
-
-// Include all standard text-formatting features, while assets stay in the isolated photo sections.
-const deliveryEditor = () =>
-    lexicalEditor({
-        features: ({ defaultFeatures }) => [
-            ...defaultFeatures.filter(({ key }) => !['heading', 'link', 'relationship', 'upload'].includes(key)),
-            HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
-            LinkFeature({ enabledCollections: [] }),
-            FixedToolbarFeature(),
-        ],
-    });
 
 const sectionColorFields = (): Field[] => [
     {
@@ -366,7 +354,6 @@ export const ClientGalleries: CollectionConfig = {
                                 },
                             },
                         },
-                        { name: 'subtitle', type: 'text' },
                         { name: 'date', type: 'date', admin: { date: { pickerAppearance: 'dayOnly' } } },
                         { name: 'location', type: 'text' },
                         {
@@ -392,6 +379,37 @@ export const ClientGalleries: CollectionConfig = {
                                         { label: 'Text above image', value: 'editorial' },
                                         { label: 'Text over image', value: 'overlay' },
                                     ],
+                                    admin: {
+                                        description:
+                                            'Text over image fills the viewport and places the transparent header over the photograph.',
+                                    },
+                                },
+                                colorPickerField({
+                                    name: 'overlayColor',
+                                    label: 'Overlay color',
+                                    defaultValue: themeDefaults.text,
+                                    colors: Object.values(themeDefaults),
+                                    admin: {
+                                        condition: (data) => data.coverLayout === 'overlay',
+                                        description: 'A tint above the photograph, behind the text and header.',
+                                    },
+                                    validate: (value: unknown) =>
+                                        !value || (typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value))
+                                            ? true
+                                            : 'Enter a six-digit hex color.',
+                                }),
+                                {
+                                    name: 'overlayOpacity',
+                                    label: 'Overlay opacity (%)',
+                                    type: 'number',
+                                    defaultValue: 72,
+                                    min: 0,
+                                    max: 100,
+                                    admin: {
+                                        condition: (data) => data.coverLayout === 'overlay',
+                                        description: '0 shows the original photograph; 100 is a solid color.',
+                                        step: 1,
+                                    },
                                 },
                                 {
                                     name: 'alignment',
@@ -469,8 +487,21 @@ export const ClientGalleries: CollectionConfig = {
                                         },
                                     },
                                     fields: [
-                                        { name: 'title', type: 'text', required: true },
-                                        { name: 'menuLabel', type: 'text' },
+                                        // Keep legacy titles readable without presenting a second authoring field.
+                                        { name: 'title', type: 'text', admin: { hidden: true } },
+                                        {
+                                            name: 'menuLabel',
+                                            label: 'Menu label',
+                                            type: 'text',
+                                            required: true,
+                                            hooks: {
+                                                afterRead: [({ value, siblingData }) => value ?? siblingData.title],
+                                            },
+                                            admin: {
+                                                description:
+                                                    'Used in the section menu. Add a visible heading in the introduction using H2.',
+                                            },
+                                        },
                                         { name: 'anchor', type: 'text', admin: { hidden: true } },
                                         {
                                             name: 'introduction',

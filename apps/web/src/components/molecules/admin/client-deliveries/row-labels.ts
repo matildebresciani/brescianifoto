@@ -18,6 +18,7 @@ const section = z.object({
     blockType: z.string().optional(),
     blockName: z.string().nullable().optional(),
     title: z.string().nullable().optional(),
+    menuLabel: z.string().nullable().optional(),
     photos: z.array(z.unknown()).nullable().optional(),
     content: z.unknown().optional(),
 });
@@ -26,10 +27,10 @@ const section = z.object({
 export function sectionRowLabel(input: unknown): string {
     const parsed = section.safeParse(input);
     if (!parsed.success) return 'Section';
-    const { blockType, title, photos, blockName, content } = parsed.data;
+    const { blockType, title, menuLabel, photos, blockName, content } = parsed.data;
     if (blockType === 'photos') {
         const count = photos?.length ?? 0;
-        return `${title?.trim() || 'Photo section'} · ${count} ${count === 1 ? 'photo' : 'photos'}`;
+        return `${menuLabel?.trim() || title?.trim() || 'Photo section'} · ${count} ${count === 1 ? 'photo' : 'photos'}`;
     }
     const name = blockName?.trim();
     if (name) return name;

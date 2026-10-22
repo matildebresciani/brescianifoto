@@ -33,11 +33,14 @@ export default async function ClientGalleryPage({
     const result = await readDelivery(shareId, isPreview, isPreview ? new Headers(await headers()) : undefined);
     if (!result) notFound();
     const gallery = await deliveryView(result, isPreview);
+    const style = themeStyle(gallery.theme);
+    style['--delivery-overlay-color'] = gallery.overlayColor;
+    style['--delivery-overlay-opacity'] = `${gallery.overlayOpacity}%`;
     const sections = gallery.blocks.flatMap((block) =>
         block.type === 'photos' ? [{ anchor: block.anchor, label: block.menuLabel }] : [],
     );
     return (
-        <div className="delivery-page min-h-svh bg-bg-base text-fg-base" style={themeStyle(gallery.theme)}>
+        <div className="delivery-page min-h-svh bg-bg-base text-fg-base" style={style}>
             {isPreview && <LivePreviewListener />}
             <a href="#main-content" className="skip-link ui-text">
                 Skip to photographs
@@ -47,22 +50,26 @@ export default async function ClientGalleryPage({
                     Saved draft preview · Only signed-in administrators can see this version.
                 </aside>
             )}
-            <div className="flex items-center justify-between gap-base px-md py-md md:px-xl">
-                <span className="delivery-wordmark">brescianifoto</span>
-                <span className="metadata">{gallery.photoCount} photographs</span>
+            <div className={`relative${gallery.coverLayout === 'overlay' ? ' delivery-cover-area-overlay' : ''}`}>
+                <div className="delivery-masthead flex items-center justify-between gap-base px-md py-md md:px-xl">
+                    <span className="delivery-wordmark">brescianifoto</span>
+                    <span className="metadata">{gallery.photoCount} photographs</span>
+                </div>
+                <DeliveryHero gallery={gallery} />
             </div>
-            <DeliveryHero gallery={gallery} />
             <SectionMenu sections={sections} archive={gallery.archive} />
             <main id="main-content" tabIndex={-1} className="delivery-content outline-none">
                 {gallery.blocks.map((block) =>
                     block.type === 'text' ? (
                         <div
                             key={block.id}
-                            className={`delivery-text-section bg-bg-base text-fg-base${block.hasCustomColors ? ' delivery-section-custom' : ''}`}
+                            className="delivery-text-section bg-bg-base text-fg-base"
                             style={themeStyle(block.theme)}
                         >
-                            <div className="delivery-text">
-                                <RichText data={block.content} enableGutter={false} />
+                            <div className="delivery-section-inner">
+                                <div className="delivery-text">
+                                    <RichText data={block.content} enableGutter={false} isDelivery />
+                                </div>
                             </div>
                         </div>
                     ) : (
@@ -70,7 +77,9 @@ export default async function ClientGalleryPage({
                     ),
                 )}
                 {!gallery.blocks.length && isPreview && (
-                    <p className="body-lg py-section">Add text and photo sections in the gallery editor.</p>
+                    <p className="delivery-section-inner body-lg py-section">
+                        Add text and photo sections in the gallery editor.
+                    </p>
                 )}
             </main>
             <footer className="mx-md flex flex-wrap items-center justify-between gap-md border-t border-border-base py-xl md:mx-xl">
