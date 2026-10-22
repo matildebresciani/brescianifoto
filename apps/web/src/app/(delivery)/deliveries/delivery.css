@@ -454,10 +454,24 @@
     color: var(--delivery-cover-text);
     right: calc(var(--space-md) + env(safe-area-inset-right, 0px));
     bottom: calc(var(--space-md) + env(safe-area-inset-bottom, 0px));
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    translate: 0 var(--space-base);
     transition:
+        opacity 240ms ease,
+        translate 360ms var(--delivery-ease),
+        visibility 0s 240ms,
         color 240ms ease,
         background-color 240ms ease,
         border-color 240ms ease;
+}
+.delivery-back-to-top[data-visible="true"] {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    translate: 0 0;
+    transition-delay: 0s;
 }
 .delivery-back-to-top:is(:active, :focus-visible) {
     background: var(--delivery-cover-text);
