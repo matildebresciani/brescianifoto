@@ -63,7 +63,8 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
     assertLocale(locale);
 
     meta.metadataBase = new URL(getServerSideURL());
-    meta.title = formatPageTitle(presentationCopy.homepageTitle);
+    const options = await getCachedOptions(locale);
+    meta.title = formatPageTitle(presentationCopy.homepageTitle, options.meta);
     meta.icons = metadataIcons;
 
     const ogImage = await getDefaultOgImage(locale);

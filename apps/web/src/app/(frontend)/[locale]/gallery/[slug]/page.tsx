@@ -6,6 +6,7 @@ import GalleryHero from '@/components/molecules/frontend/GalleryHero';
 import BaseBlock from '@/components/organisms/blocks/base-block/BaseBlock';
 import { generateGalleryPageMetadata } from '@/lib/data/gallery-page-metadata';
 import { getCachedEntryBySlug } from '@/lib/data/payload/get-cached-entry-by-slug';
+import { getCachedOptions } from '@/lib/data/payload/get-cached-options';
 import { assertLocale } from '@/lib/utilities/assert-locale';
 import { payloadObject } from '@/lib/utilities/composables';
 import { formatGalleryArchiveLink, formatLinkByCollection } from '@/lib/utilities/format-link';
@@ -56,6 +57,9 @@ export const dynamic = 'force-static';
 export async function generateMetadata({ params }: Props) {
     const { locale, slug } = await params;
     assertLocale(locale);
-    const gallery = await getCachedEntryBySlug({ collection: 'galleries', slug, locale });
-    return gallery ? generateGalleryPageMetadata(gallery, locale, getServerSideURL()) : {};
+    const [gallery, options] = await Promise.all([
+        getCachedEntryBySlug({ collection: 'galleries', slug, locale }),
+        getCachedOptions(locale),
+    ]);
+    return gallery ? generateGalleryPageMetadata(gallery, locale, getServerSideURL(), options.meta) : {};
 }

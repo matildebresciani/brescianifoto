@@ -28,12 +28,20 @@ export const seoFields: Field[] = [
                         label: 'Default Meta Title Prefix',
                         type: 'text',
                         localized: true,
+                        admin: {
+                            description:
+                                'Added before every page and social title. Include a separator, e.g. "Studio | ". Leave blank for no prefix.',
+                        },
                     },
                     {
                         name: 'metaTitleSuffix',
                         label: 'Default Meta Title Suffix',
                         type: 'text',
                         localized: true,
+                        admin: {
+                            description:
+                                'Added after every page and social title. Include a separator, e.g. " | Studio". Leave blank for no suffix.',
+                        },
                     },
                 ],
             },

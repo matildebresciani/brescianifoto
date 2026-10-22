@@ -3,12 +3,17 @@ import type { Locale } from '@/i18n/localized-collections';
 import { getGalleryCoverImage, payloadObject } from '@/lib/utilities/composables';
 import { formatLinkByCollection } from '@/lib/utilities/format-link';
 import { formatGalleryMetadata } from '@/lib/utilities/gallery-metadata';
-import type { Gallery } from '@/payload-types';
+import type { Gallery, Option } from '@/payload-types';
 import { formatPageTitle } from './metadata-title';
 
 /** Uses editor overrides when present and the gallery's own identity and cover otherwise. */
-export function generateGalleryPageMetadata(gallery: Gallery, locale: Locale, serverURL: string): Metadata {
-    const title = formatPageTitle(gallery.meta?.title?.trim() || gallery.title);
+export function generateGalleryPageMetadata(
+    gallery: Gallery,
+    locale: Locale,
+    serverURL: string,
+    settings: Option['meta'],
+): Metadata {
+    const title = formatPageTitle(gallery.meta?.title?.trim() || gallery.title, settings);
     const description =
         gallery.meta?.description?.trim() ||
         gallery.contentMeta?.excerpt?.trim() ||

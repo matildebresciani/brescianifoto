@@ -70,7 +70,7 @@ export const generateEntryMetadata = async (slug: string, collection: Collection
 
     if (!entry) return meta;
 
-    const title = `${options.meta?.metaTitlePrefix ?? ''}${entry.meta?.title?.length ? entry.meta.title : entry.title}${options.meta?.metaTitleSuffix ?? ''}`;
+    const title = entry.meta?.title?.trim() || entry.title;
     if (entry.meta?.description) meta.description = entry.meta.description;
 
     if (entry.meta?.image) {
@@ -96,7 +96,7 @@ export const generateEntryMetadata = async (slug: string, collection: Collection
         };
     }
 
-    return withPageTitle(meta, title);
+    return withPageTitle(meta, title, options.meta);
 };
 
 type ArchiveMetadataProps = {
@@ -162,5 +162,9 @@ export const generateArchiveMetadata = async (props: ArchiveMetadataProps) => {
         canonical: canonicalUrl,
     };
 
-    return withPageTitle(metadata, typeof metadata.title === 'string' ? metadata.title : presentationCopy.postsTitle);
+    return withPageTitle(
+        metadata,
+        typeof metadata.title === 'string' ? metadata.title : presentationCopy.postsTitle,
+        options.meta,
+    );
 };

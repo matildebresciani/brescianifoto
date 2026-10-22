@@ -61,7 +61,10 @@ export const generateMetadata = async ({ params: paramsPromise }: Props): Promis
 
     const metadata = await generateEntryMetadata(page.slug ?? slug, collection, locale);
     if (slug === '') metadata.alternates = { canonical: locale === defaultLocale ? '/' : `/${locale}` };
-    if (slug === '' && !page.meta?.title?.trim()) return withPageTitle(metadata, presentationCopy.homepageTitle);
+    if (slug === '' && !page.meta?.title?.trim()) {
+        const options = await getCachedOptions(locale);
+        return withPageTitle(metadata, presentationCopy.homepageTitle, options.meta);
+    }
     return metadata;
 };
 

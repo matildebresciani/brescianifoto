@@ -1,10 +1,11 @@
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ClientGallery, ClientPhoto } from '@/payload-types';
 import { deliveryMetadata, featuredPhoto, renderSocialImage, socialCrop } from './social';
 
-const mocks = vi.hoisted(() => ({ read: vi.fn(), url: vi.fn() }));
+const mocks = vi.hoisted(() => ({ read: vi.fn(), url: vi.fn(), options: vi.fn() }));
+vi.mock('@/lib/data/payload/get-cached-options', () => ({ getCachedOptions: mocks.options }));
 vi.mock('./read', () => ({ readDelivery: mocks.read }));
 vi.mock('./storage', () => ({ assetURL: mocks.url }));
 vi.mock('@/lib/utilities/get-url', () => ({ getServerSideURL: () => 'https://example.test' }));
@@ -40,18 +41,31 @@ const gallery: ClientGallery = {
 };
 const data = { gallery, photos: [photo], archive: undefined, isArchiveCurrent: false };
 
+beforeEach(() => mocks.options.mockResolvedValue({ meta: { metaTitleSuffix: ' | brescianifoto' } }));
+
 afterEach(() => vi.unstubAllGlobals());
 
 describe('delivery social previews', () => {
+    it('uses the CMS prefix for browser and social titles', async () => {
+        mocks.options.mockResolvedValue({ meta: { metaTitlePrefix: 'Studio | ' } });
+        mocks.read.mockResolvedValue(data);
+        expect(await deliveryMetadata('a'.repeat(32), false)).toMatchObject({
+            title: 'Studio | Alex & Jamie',
+            openGraph: { title: 'Studio | Alex & Jamie' },
+            twitter: { title: 'Studio | Alex & Jamie' },
+        });
+        expect(mocks.options).toHaveBeenCalledWith('da');
+    });
+
     it('uses one featured image with a stable absolute revision-qualified URL', async () => {
         mocks.read.mockResolvedValue(data);
         const metadata = await deliveryMetadata('a'.repeat(32), false);
         expect(metadata).toMatchObject({
-            title: 'brescianifoto | Alex & Jamie',
+            title: 'Alex & Jamie | brescianifoto',
             description: '17. oktober 2026 · København',
             alternates: { canonical: `https://example.test/deliveries/${'a'.repeat(32)}` },
             openGraph: {
-                title: 'brescianifoto | Alex & Jamie',
+                title: 'Alex & Jamie | brescianifoto',
                 description: '17. oktober 2026 · København',
                 siteName: 'brescianifoto',
                 locale: 'da_DK',
@@ -69,7 +83,7 @@ describe('delivery social previews', () => {
             },
             twitter: {
                 card: 'summary_large_image',
-                title: 'brescianifoto | Alex & Jamie',
+                title: 'Alex & Jamie | brescianifoto',
                 description: '17. oktober 2026 · København',
             },
         });
@@ -83,7 +97,7 @@ describe('delivery social previews', () => {
         mocks.read.mockResolvedValue({ ...data, gallery: { ...gallery, date: null, location: null } });
         expect(await deliveryMetadata('a'.repeat(32), false)).toMatchObject({
             description: 'Billedgalleri med Alex & Jamie.',
-            openGraph: { title: 'brescianifoto | Alex & Jamie', description: 'Billedgalleri med Alex & Jamie.' },
+            openGraph: { title: 'Alex & Jamie | brescianifoto', description: 'Billedgalleri med Alex & Jamie.' },
         });
     });
     it('never queries or exposes draft content in preview metadata', async () => {

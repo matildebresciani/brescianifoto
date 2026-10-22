@@ -5,6 +5,7 @@ import GalleryCard from '@/components/molecules/frontend/GalleryCard';
 import BaseBlock from '@/components/organisms/blocks/base-block/BaseBlock';
 import { generateGalleryArchiveMetadata } from '@/lib/data/gallery-archive-metadata';
 import { getCachedCollection } from '@/lib/data/payload/get-cached-collection';
+import { getCachedOptions } from '@/lib/data/payload/get-cached-options';
 import { getGalleryArchive } from '@/lib/data/payload/get-gallery-archive';
 import { assertLocale } from '@/lib/utilities/assert-locale';
 import { getGallerySortValue } from '@/lib/utilities/festival-gallery';
@@ -61,7 +62,8 @@ export async function generateMetadata({ params: paramsPromise }: Props): Promis
     assertLocale(locale);
     const archive = await getGalleryArchive(tag, locale);
     if (!archive) return notFound();
-    return generateGalleryArchiveMetadata(archive, locale);
+    const options = await getCachedOptions(locale);
+    return generateGalleryArchiveMetadata(archive, locale, options.meta);
 }
 
 export const dynamic = 'force-static';

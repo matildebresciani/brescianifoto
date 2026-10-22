@@ -3,6 +3,8 @@ import { imageMock } from '@/__mocks__/storybook-mocks';
 import type { Gallery } from '@/payload-types';
 import { generateGalleryPageMetadata } from './gallery-page-metadata';
 
+const settings = { metaTitleSuffix: ' | brescianifoto' };
+
 const gallery: Gallery = {
     id: 'show',
     title: 'Artist',
@@ -16,9 +18,9 @@ const gallery: Gallery = {
 
 describe('gallery sharing metadata', () => {
     it('uses identity, a canonical URL, and the cover when editor overrides are absent', () => {
-        const metadata = generateGalleryPageMetadata(gallery, 'da', 'https://brescianifoto.vercel.app');
+        const metadata = generateGalleryPageMetadata(gallery, 'da', 'https://brescianifoto.vercel.app', settings);
         expect(metadata).toMatchObject({
-            title: 'brescianifoto | Artist',
+            title: 'Artist | brescianifoto',
             description: 'Artist · 15 Oct 2026 / 1 image',
             alternates: { canonical: '/gallery/artist-at-vega' },
             openGraph: { images: [{ url: 'https://brescianifoto.vercel.app/images/__mocks__/placeholder.jpg' }] },
@@ -31,9 +33,10 @@ describe('gallery sharing metadata', () => {
                 { ...gallery, gallery: [], meta: { title: 'Editorial title', description: 'Editorial description' } },
                 'en',
                 'https://example.com',
+                settings,
             ),
         ).toMatchObject({
-            title: 'brescianifoto | Editorial title',
+            title: 'Editorial title | brescianifoto',
             description: 'Editorial description',
             alternates: { canonical: '/en/gallery/artist-at-vega' },
             openGraph: { images: undefined },

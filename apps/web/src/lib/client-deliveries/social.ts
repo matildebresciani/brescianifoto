@@ -1,7 +1,9 @@
 import { createHash } from 'node:crypto';
 import type { Metadata } from 'next';
 import sharp from 'sharp';
+import { defaultLocale } from '@/i18n/localized-collections';
 import { formatPageTitle } from '@/lib/data/metadata-title';
+import { getCachedOptions } from '@/lib/data/payload/get-cached-options';
 import { getServerSideURL } from '@/lib/utilities/get-url';
 import { readDelivery } from './read';
 import { maxPhotoBytes, relationshipID } from './shared';
@@ -18,12 +20,18 @@ export function featuredPhoto(data: NonNullable<Awaited<ReturnType<typeof readDe
 
 /** Social metadata never reads draft content, even in an authenticated preview. */
 export async function deliveryMetadata(shareId: string, isPreview: boolean): Promise<Metadata> {
-    if (isPreview) return { title: formatPageTitle('Forhåndsvisning'), openGraph: null, twitter: null };
+    const options = await getCachedOptions(defaultLocale);
+    if (isPreview) return { title: formatPageTitle('Forhåndsvisning', options.meta), openGraph: null, twitter: null };
     const data = await readDelivery(shareId);
-    if (!data) return { title: formatPageTitle('Galleriet er ikke tilgængeligt'), openGraph: null, twitter: null };
+    if (!data)
+        return {
+            title: formatPageTitle('Galleriet er ikke tilgængeligt', options.meta),
+            openGraph: null,
+            twitter: null,
+        };
     const { gallery } = data;
     const photo = featuredPhoto(data);
-    const title = formatPageTitle(gallery.title);
+    const title = formatPageTitle(gallery.title, options.meta);
     const description =
         [
             gallery.date &&

@@ -4,7 +4,12 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import GallerySinglePage from './page';
 
-const mocks = vi.hoisted(() => ({ getCachedEntryBySlug: vi.fn(), payloadRedirects: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+    getCachedEntryBySlug: vi.fn(),
+    payloadRedirects: vi.fn(),
+    getCachedOptions: vi.fn(),
+}));
+vi.mock('@/lib/data/payload/get-cached-options', () => ({ getCachedOptions: mocks.getCachedOptions }));
 vi.mock('@/lib/data/payload/get-cached-entry-by-slug', () => ({ getCachedEntryBySlug: mocks.getCachedEntryBySlug }));
 vi.mock('@/lib/utilities/payload-redirects', () => ({ payloadRedirects: mocks.payloadRedirects }));
 vi.mock('next/navigation', () => ({

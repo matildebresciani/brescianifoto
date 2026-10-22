@@ -10,13 +10,25 @@ vi.mock('../utilities/get-url', () => ({ getServerSideURL: () => 'https://exampl
 
 beforeEach(() => {
     mocks.entry.mockResolvedValue({ title: 'Contact', slug: 'contact', meta: { description: 'Get in touch.' } });
-    mocks.options.mockResolvedValue({});
+    mocks.options.mockResolvedValue({ meta: { metaTitleSuffix: ' | brescianifoto' } });
 });
 
 describe('public page metadata branding', () => {
-    it('prefixes ordinary pages without replacing inherited social images', async () => {
+    it('uses the requested locale and reflects prefix, suffix, and blank settings', async () => {
+        mocks.options.mockResolvedValueOnce({ meta: { metaTitlePrefix: 'Studio | ' } });
+        expect(await generateEntryMetadata('contact', 'pages', 'en')).toMatchObject({ title: 'Studio | Contact' });
+        expect(mocks.options).toHaveBeenLastCalledWith('en');
+        mocks.options.mockResolvedValueOnce({ meta: { metaTitleSuffix: ' — Photographer' } });
+        expect(await generateEntryMetadata('contact', 'pages', 'en')).toMatchObject({
+            title: 'Contact — Photographer',
+        });
+        mocks.options.mockResolvedValueOnce({ meta: { metaTitlePrefix: '', metaTitleSuffix: '' } });
+        expect(await generateEntryMetadata('contact', 'pages', 'en')).toMatchObject({ title: 'Contact' });
+    });
+
+    it('applies the CMS suffix to ordinary pages without replacing inherited social images', async () => {
         expect(await generateEntryMetadata('contact', 'pages', 'da')).toEqual({
-            title: 'brescianifoto | Contact',
+            title: 'Contact | brescianifoto',
             description: 'Get in touch.',
             alternates: { canonical: '/contact' },
         });
@@ -26,20 +38,21 @@ describe('public page metadata branding', () => {
         mocks.entry.mockResolvedValue({
             title: 'Contact',
             slug: 'contact',
-            meta: { title: 'Book a shoot', image: 'photo' },
+            meta: { title: 'brescianifoto — Book a shoot', image: 'photo' },
         });
         mocks.options.mockResolvedValue({
-            meta: { metaTitlePrefix: 'brescianifoto | ', metaTitleSuffix: ' — brescianifoto' },
+            meta: { metaTitleSuffix: ' | brescianifoto' },
         });
         mocks.image.mockResolvedValue('/cover.jpg');
         expect(await generateEntryMetadata('contact', 'pages', 'da')).toMatchObject({
-            title: 'brescianifoto | Book a shoot',
-            openGraph: { title: 'brescianifoto | Book a shoot', images: [{ url: 'https://example.test/cover.jpg' }] },
+            title: 'Book a shoot | brescianifoto',
+            openGraph: { title: 'Book a shoot | brescianifoto', images: [{ url: 'https://example.test/cover.jpg' }] },
         });
     });
 
-    it('prefixes post archives and retains their authored description and image', async () => {
+    it('applies the CMS suffix to post archives and retains their authored description and image', async () => {
         mocks.options.mockResolvedValue({
+            meta: { metaTitleSuffix: ' | brescianifoto' },
             archives: {
                 postsArchiveMeta: {
                     title: 'Backstage',
@@ -51,9 +64,9 @@ describe('public page metadata branding', () => {
         expect(
             await generateArchiveMetadata({ collection: 'posts', slug: undefined, locale: 'da', pageNumber: 1 }),
         ).toMatchObject({
-            title: 'brescianifoto | Backstage',
+            title: 'Backstage | brescianifoto',
             description: 'Stories from the pit.',
-            openGraph: { title: 'brescianifoto | Backstage', images: [{ url: 'https://example.test/archive.jpg' }] },
+            openGraph: { title: 'Backstage | brescianifoto', images: [{ url: 'https://example.test/archive.jpg' }] },
         });
     });
 });

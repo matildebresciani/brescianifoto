@@ -8,9 +8,11 @@ import GalleryArchivePage, { generateMetadata } from './page';
 
 const mocks = vi.hoisted(() => ({
     getCachedCollection: vi.fn(),
+    getCachedOptions: vi.fn(),
     getTranslations: vi.fn(),
 }));
 
+vi.mock('@/lib/data/payload/get-cached-options', () => ({ getCachedOptions: mocks.getCachedOptions }));
 vi.mock('@/lib/data/payload/get-cached-collection', () => ({ getCachedCollection: mocks.getCachedCollection }));
 vi.mock('next/navigation', () => ({
     notFound: () => {
@@ -55,6 +57,7 @@ const galleries = [
 
 beforeEach(() => {
     vi.stubGlobal('React', React);
+    mocks.getCachedOptions.mockResolvedValue({ meta: { metaTitleSuffix: ' | brescianifoto' } });
     mocks.getTranslations.mockResolvedValue(() => 'No galleries yet.');
     mocks.getCachedCollection.mockImplementation(
         ({
@@ -191,11 +194,11 @@ describe('shared gallery archive pages', () => {
 
     it('generates localized canonical URLs without a groups segment', async () => {
         expect(await generateMetadata({ params: params('concerts') })).toMatchObject({
-            title: 'brescianifoto | Concerts',
+            title: 'Concerts | brescianifoto',
             alternates: { canonical: '/galleries/concerts' },
         });
         expect(await generateMetadata({ params: params('band', 'en') })).toMatchObject({
-            title: 'brescianifoto | The band',
+            title: 'The band | brescianifoto',
             alternates: { canonical: '/en/galleries/band' },
         });
     });
