@@ -4,6 +4,7 @@ import type { DeliveryTheme } from './shared';
 export type DeliveryPhoto = {
     id: string;
     src: string;
+    imageVersion: string;
     width: number;
     height: number;
     name: string;

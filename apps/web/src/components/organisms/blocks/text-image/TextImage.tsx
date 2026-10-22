@@ -5,6 +5,7 @@ import RichText from '@/components/molecules/admin/RichText';
 import type { BC } from '@/lib/types/block-props';
 import { getLinkTarget } from '@/lib/utilities/composables';
 import { formatLink } from '@/lib/utilities/format-link';
+import { textImageSizes } from '@/lib/utilities/portfolio-image-sizes';
 import { cn } from '@/lib/utilities/ui';
 import type { TextImage as TextImageProps } from '@/payload-types';
 import BaseBlock from '../base-block/BaseBlock';
@@ -22,7 +23,7 @@ const TextImageBlock: BC<TextImageProps> = ({ block, locale }) => {
                         order === 'image-right' && 'lg:col-start-2 lg:row-start-1',
                     )}
                 >
-                    <ImageMedia resource={image} fill className="object-cover" size="(min-width: 1024px) 50vw, 100vw" />
+                    <ImageMedia resource={image} fill className="object-cover" size={textImageSizes} />
                 </div>
                 <div className={cn('min-w-0', order === 'image-right' && 'lg:order-first')}>
                     {richText && <RichText data={richText} enableGutter={false} />}

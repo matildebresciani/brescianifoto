@@ -2,12 +2,10 @@
 import type { StaticImageData } from 'next/image';
 import NextImage from 'next/image';
 import type React from 'react';
-import { cssVariables } from '@/cssVariables';
 import { getMediaUrl } from '@/lib/utilities/get-media-url';
+import { getMediaImageVersion } from '@/lib/utilities/media-image-version';
 import { cn } from '@/lib/utilities/ui';
 import type { Props as MediaProps } from './image-media-types';
-
-const { breakpoints } = cssVariables;
 
 export const ImageMedia: React.FC<MediaProps> = (props) => {
     const {
@@ -23,6 +21,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         fetchPriority,
         onLoad,
         onError,
+        style,
     } = props;
 
     let width: number | undefined;
@@ -37,7 +36,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         height = fullHeight ?? undefined;
         alt = altFromProps ?? altFromResource ?? '';
 
-        const cacheTag = resource.updatedAt;
+        const cacheTag = getMediaImageVersion(resource);
 
         src = getMediaUrl(url, cacheTag);
     }
@@ -45,11 +44,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     const loading = loadingFromProps || (!priority ? 'lazy' : undefined);
 
     // NOTE: this is used by the browser to determine which image to download at different screen sizes
-    const sizes = sizeFromProps
-        ? sizeFromProps
-        : Object.entries(breakpoints)
-              .map(([, value]) => `(max-width: ${value}px) ${value * 2}w`)
-              .join(', ');
+    const sizes = sizeFromProps || '100vw';
 
     const focalX = typeof resource === 'object' ? (resource?.focalX ?? 50) : 50;
     const focalY = typeof resource === 'object' ? (resource?.focalY ?? 50) : 50;
@@ -58,7 +53,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         <NextImage
             alt={alt || ''}
             className={cn(className)}
-            style={{ objectPosition: `${focalX}% ${focalY}%` }}
+            style={{ objectPosition: `${focalX}% ${focalY}%`, ...style }}
             fill={fill}
             height={!fill ? height : undefined}
             priority={priority}

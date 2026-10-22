@@ -7,6 +7,7 @@ import { cssVariables } from '@/cssVariables';
 import { downUpToggle } from '@/lib/motion/motion-variants';
 import { payloadObject } from '@/lib/utilities/composables';
 import { type GalleryLayoutMeasurements, getGalleryColumns } from '@/lib/utilities/gallery-columns';
+import { galleryImageSizes } from '@/lib/utilities/portfolio-image-sizes';
 import { cn } from '@/lib/utilities/ui';
 import type { Media } from '@/payload-types';
 import Lightbox from './Lightbox';
@@ -117,7 +118,7 @@ const Gallery = ({ images, className, priorityCount = 3 }: Props) => {
                                     <ImageMedia
                                         resource={item}
                                         className="w-full h-auto align-bottom transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
-                                        size={`(min-width: ${cssVariables.breakpoints.lg}px) 33vw, 50vw`}
+                                        size={galleryImageSizes}
                                         priority={isAboveFold}
                                         fetchPriority={isAboveFold ? 'high' : undefined}
                                     />

@@ -26,7 +26,7 @@ function remember(cache: Set<string>, key: string) {
     if (cache.size > 12 && oldest !== undefined) cache.delete(oldest);
 }
 
-/** Warms at most two neighbors, one request at a time, after the selected photo has loaded. */
+/** Warms only the next slide after the selected photo has loaded. */
 export default function LightboxPreloader({ items, index, viewport, isCurrentReady }: Props) {
     const completedRef = useRef(new Set<string>());
     const [request, setRequest] = useState<Request | null>(null);

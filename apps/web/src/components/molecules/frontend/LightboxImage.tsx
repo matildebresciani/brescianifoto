@@ -1,16 +1,20 @@
 'use client';
 
-import { type MouseEvent, type PointerEvent, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { type MouseEvent, type PointerEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { ImageMedia } from '@/components/atoms/frontend/media/ImageMedia';
 import { cssVariables } from '@/cssVariables';
-import { getLightboxImageSize, type LightboxViewport } from '@/lib/utilities/lightbox-images';
+import {
+    getLightboxImageDimensions,
+    getLightboxImageSize,
+    type LightboxViewport,
+} from '@/lib/utilities/lightbox-images';
 import { cn } from '@/lib/utilities/ui';
 import type { Media } from '@/payload-types';
 
 type Props = {
     image: Media;
     onViewportChange?: (viewport: LightboxViewport) => void;
-    onReady?: () => void;
+    onReady?: (size: string) => void;
     onNavigate: (direction: -1 | 1) => void;
 };
 
@@ -61,10 +65,12 @@ const LightboxImage = ({ image, onViewportChange, onReady, onNavigate }: Props) 
     const [isDragging, setIsDragging] = useState(false);
     const [pan, setPan] = useState(origin);
     const [isLoaded, setIsLoaded] = useState(false);
+    const [hasFailed, setHasFailed] = useState(false);
+    const [retryCount, setRetryCount] = useState(0);
     const [viewport, setViewport] = useState<LightboxViewport | null>(null);
     const canZoom = useSyncExternalStore(subscribeToDesktop, getIsDesktop, getServerIsDesktop);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const element = viewportRef.current;
         if (!element) return;
 
@@ -154,6 +160,7 @@ const LightboxImage = ({ image, onViewportChange, onReady, onNavigate }: Props) 
     };
 
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+        if (!isLoaded || hasFailed) return;
         const isKeyboardClick = event.detail === 0;
         if (!canZoom || (!isKeyboardClick && pointerTypeRef.current !== 'mouse')) return;
         if (!isKeyboardClick && shouldSuppressClickRef.current) {
@@ -201,59 +208,94 @@ const LightboxImage = ({ image, onViewportChange, onReady, onNavigate }: Props) 
         setIsZoomed(true);
     };
 
+    const fitted = viewport ? getLightboxImageDimensions(image, viewport) : null;
+    const requestedSize = viewport ? getLightboxImageSize(image, viewport, isZoomed ? zoomScale : 1) : undefined;
+    const isLoading = !isLoaded && !hasFailed;
+
     return (
-        <button
-            ref={viewportRef}
-            type="button"
-            aria-label={canZoom ? (isZoomed ? 'Zoom out' : 'Zoom in') : 'Photo viewer'}
-            aria-pressed={canZoom ? isZoomed : undefined}
-            tabIndex={canZoom ? 0 : -1}
-            className={cn(
-                'focus-ring-tight block h-full min-h-0 min-w-0 flex-1 touch-pan-y touch-pinch-zoom select-none overflow-hidden border-0 bg-transparent p-0',
-                canZoom ? (isZoomed ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in') : '',
-            )}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerCancel}
-            onLostPointerCapture={handlePointerCancel}
-            onDragStart={(event) => event.preventDefault()}
-            onClick={handleClick}
-        >
-            <span
+        <div className="relative h-full min-h-0 min-w-0 flex-1">
+            <button
+                ref={viewportRef}
+                type="button"
+                aria-label={canZoom ? (isZoomed ? 'Zoom out' : 'Zoom in') : 'Photo viewer'}
+                aria-pressed={canZoom ? isZoomed : undefined}
+                aria-busy={isLoading}
+                tabIndex={canZoom ? 0 : -1}
                 className={cn(
-                    'pointer-events-none relative flex h-full w-full items-center justify-center motion-reduce:transition-none',
-                    !isDragging && 'transition-transform duration-150 ease-out',
+                    'focus-ring-tight block h-full w-full min-h-0 min-w-0 touch-pan-y touch-pinch-zoom select-none overflow-hidden border-0 bg-transparent p-0',
+                    canZoom ? (isZoomed ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in') : '',
                 )}
-                style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${isZoomed ? zoomScale : 1})` }}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerCancel}
+                onLostPointerCapture={handlePointerCancel}
+                onDragStart={(event) => event.preventDefault()}
+                onClick={handleClick}
             >
-                {viewport && (
-                    <ImageMedia
-                        resource={image}
-                        className={cn(
-                            'relative z-10 h-auto max-h-full w-auto max-w-full object-contain',
-                            canZoom && isZoomed && !isDragging && 'pointer-events-auto cursor-zoom-out',
-                        )}
-                        size={getLightboxImageSize(image, viewport, isZoomed ? zoomScale : 1)}
-                        loading="eager"
-                        fetchPriority="high"
-                        onLoad={() => {
-                            setIsLoaded(true);
-                            onReady?.();
+                <span
+                    className={cn(
+                        'pointer-events-none relative flex h-full w-full items-center justify-center motion-reduce:transition-none',
+                        !isDragging && 'transition-transform duration-150 ease-out',
+                    )}
+                    style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${isZoomed ? zoomScale : 1})` }}
+                >
+                    {fitted && (
+                        <ImageMedia
+                            key={retryCount}
+                            resource={image}
+                            style={{ width: fitted.width, height: fitted.height }}
+                            className={cn(
+                                'relative z-10 max-h-full max-w-full shrink-0 object-contain',
+                                !isLoaded && 'opacity-0',
+                                canZoom && isZoomed && !isDragging && 'pointer-events-auto cursor-zoom-out',
+                            )}
+                            size={requestedSize}
+                            loading="eager"
+                            fetchPriority="high"
+                            onLoad={() => {
+                                setIsLoaded(true);
+                                setHasFailed(false);
+                                if (requestedSize && !isZoomed) onReady?.(requestedSize);
+                            }}
+                            onError={() => setHasFailed(true)}
+                        />
+                    )}
+                    {isLoading && (
+                        <span
+                            aria-hidden="true"
+                            data-lightbox-skeleton=""
+                            className="absolute max-h-full max-w-full animate-pulse border border-border-base bg-bg-subtle motion-reduce:animate-none"
+                            style={fitted ?? { width: '100%', height: '100%' }}
+                        />
+                    )}
+                </span>
+            </button>
+            {isLoading && <output className="sr-only">Loading photo</output>}
+            {hasFailed && (
+                <div
+                    className={cn(
+                        'absolute inset-x-0 flex flex-col items-center justify-center gap-base bg-bg-base p-base',
+                        isLoaded ? 'bottom-0' : 'inset-y-0',
+                    )}
+                >
+                    <output className="body-sm">Photo could not load.</output>
+                    <button
+                        type="button"
+                        className="focus-ring-tight ui-text rounded-btn border border-border-base bg-transparent px-base py-xs text-fg-base"
+                        onClick={() => {
+                            setHasFailed(false);
+                            setIsLoaded(false);
+                            setIsZoomed(false);
+                            setPan(origin);
+                            setRetryCount((count) => count + 1);
                         }}
-                    />
-                )}
-                {!isLoaded && (
-                    <ImageMedia
-                        resource={image}
-                        alt=""
-                        className="absolute h-auto max-h-full w-auto max-w-full object-contain"
-                        size="56px"
-                        loading="eager"
-                    />
-                )}
-            </span>
-        </button>
+                    >
+                        Retry
+                    </button>
+                </div>
+            )}
+        </div>
     );
 };
 

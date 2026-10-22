@@ -1,11 +1,12 @@
 import type { Media } from '@/payload-types';
+import { getMediaImageVersion } from './media-image-version';
 import { wrapIndex } from './wrap-index';
 
 /** Available photo area, excluding the lightbox controls and thumbnails, in CSS pixels. */
 export type LightboxViewport = { width: number; height: number };
 
-/** Matches object-contain sizing; only an explicit zoom requests a larger candidate. */
-export function getLightboxImageSize(image: Media, viewport: LightboxViewport, scale = 1): string {
+/** Reserves the same fitted area for both the skeleton and the decoded photograph. */
+export function getLightboxImageDimensions(image: Media, viewport: LightboxViewport): LightboxViewport {
     const { width, height } = image;
     const hasDimensions =
         typeof width === 'number' &&
@@ -14,32 +15,28 @@ export function getLightboxImageSize(image: Media, viewport: LightboxViewport, s
         Number.isFinite(height) &&
         width > 0 &&
         height > 0;
-    const fittedWidth = hasDimensions
-        ? Math.min(viewport.width, viewport.height * (width / height), width)
-        : viewport.width;
-    return `${Math.max(1, Math.ceil(fittedWidth * scale))}px`;
+    if (!hasDimensions) return viewport;
+    const scale = Math.min(viewport.width / width, viewport.height / height, 1);
+    return { width: width * scale, height: height * scale };
+}
+
+/** Only an explicit zoom requests a larger candidate. */
+export function getLightboxImageSize(image: Media, viewport: LightboxViewport, scale = 1): string {
+    return `${Math.max(1, Math.ceil(getLightboxImageDimensions(image, viewport).width * scale))}px`;
 }
 
 /** Identifies the same source and cache version across main images and speculative requests. */
 export function getLightboxImageKey(image: Media): string {
-    return JSON.stringify([image.url, image.updatedAt]);
+    return JSON.stringify([image.url, getMediaImageVersion(image)]);
 }
 
-/** The next and previous photos only, excluding duplicate sources and the selected photo. */
+/** Warm only the next slide; backward navigation uses the browser cache or skeleton. */
 export function getLightboxNeighbors(items: Media[], index: number): Media[] {
     const current = items[index];
     if (!current || items.length < 2) return [];
-    const seen = new Set([getLightboxImageKey(current)]);
-    const neighbors: Media[] = [];
-    for (const offset of [1, -1]) {
-        const image = items[wrapIndex(index, offset, items.length)];
-        if (!image?.url) continue;
-        const key = getLightboxImageKey(image);
-        if (seen.has(key)) continue;
-        seen.add(key);
-        neighbors.push(image);
-    }
-    return neighbors;
+    const next = items[wrapIndex(index, 1, items.length)];
+    if (!next?.url || getLightboxImageKey(next) === getLightboxImageKey(current)) return [];
+    return [next];
 }
 
 /** Avoid speculative transfers when the browser reports data saving or a very slow connection. */

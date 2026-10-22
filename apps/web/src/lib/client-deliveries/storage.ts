@@ -26,8 +26,8 @@ export function deliveryStorage() {
     };
 }
 
-/** Sign image reads without a public bucket or DNS changes; callers must authorize the asset first. */
-export async function assetURL(key: string): Promise<string> {
+/** Callers authorize first; half-day UTC windows leave at least 12 hours of signed source access per render. */
+export async function assetURL(key: string, now = new Date()): Promise<string> {
     // The isolated QA fixtures serve placeholder files locally and must never require production credentials.
     if (
         process.env.NODE_ENV === 'development' &&
@@ -38,7 +38,10 @@ export async function assetURL(key: string): Promise<string> {
         return `${base.replace(/\/+$/, '')}/${key.split('/').map(encodeURIComponent).join('/')}`;
     }
     const { client, bucket } = deliveryStorage();
-    return getSignedUrl(client, new GetObjectCommand({ Bucket: bucket, Key: key }), { expiresIn: 86400 });
+    const windowMilliseconds = 12 * 60 * 60 * 1000;
+    const signingDate = new Date(Math.floor(now.getTime() / windowMilliseconds) * windowMilliseconds);
+    // Source identity must stay stable between page loads, rather than changing with every signature timestamp.
+    return getSignedUrl(client, new GetObjectCommand({ Bucket: bucket, Key: key }), { expiresIn: 86400, signingDate });
 }
 
 export function attachmentName(filename: string): string {
