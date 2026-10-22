@@ -56,6 +56,13 @@ export const ClientPhotos: CollectionConfig = {
         useAsTitle: 'originalFilename',
         description: 'Upload photos from their client gallery. These files never enter the public portfolio.',
         defaultColumns: ['filename', 'byteSize'],
+        components: {
+            views: {
+                list: {
+                    Component: '@/components/molecules/admin/client-deliveries/ClientPhotoPicker#ClientPhotoPicker',
+                },
+            },
+        },
     },
     fields: [
         ...fields,

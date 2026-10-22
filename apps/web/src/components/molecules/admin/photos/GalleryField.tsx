@@ -2,6 +2,7 @@
 
 import { UploadField } from '@payloadcms/ui';
 import type { UploadFieldClientProps } from 'payload';
+import { SectionPhotoPickerProvider } from '../client-deliveries/SectionPhotoPickerContext';
 import { PhotoViewToggle, usePhotoView } from './PhotoViewToggle';
 
 /** Retains Payload's upload and sortable behavior while making the photographs visible. */
@@ -16,7 +17,13 @@ export function GalleryField(props: UploadFieldClientProps) {
                 )}
                 <PhotoViewToggle view={view} onChange={changeView} label="Gallery photo layout" />
             </div>
-            <UploadField {...props} />
+            {props.field.relationTo === 'client-photos' && props.field.hasMany ? (
+                <SectionPhotoPickerProvider>
+                    <UploadField {...props} />
+                </SectionPhotoPickerProvider>
+            ) : (
+                <UploadField {...props} />
+            )}
         </div>
     );
 }

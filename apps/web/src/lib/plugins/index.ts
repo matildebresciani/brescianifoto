@@ -33,17 +33,6 @@ export const plugins: Plugin[] = [
         lightbox: true,
         edit: true,
     }),
-    mediaGalleryPlugin({
-        collections: ['client-photos'],
-        defaultView: 'grid',
-        layouts: {
-            grid: { enabled: true, footer: 'always' },
-            justified: false,
-            masonry: false,
-        },
-        lightbox: true,
-        edit: false,
-    }),
     seoPlugin({
         generateTitle,
         generateURL,
