@@ -16,33 +16,6 @@ import { getCachedEntryBySlug } from './payload/get-cached-entry-by-slug';
 import { getCachedOptions } from './payload/get-cached-options';
 import { getImageSlugFromMedia } from './payload/get-image-url';
 
-export const metadataIcons = {
-    icon: [
-        {
-            url: '/images/favicons/favicon-16x16.png',
-            sizes: '16x16',
-            type: 'image/png',
-        },
-        {
-            url: '/images/favicons/favicon-32x32.png',
-            sizes: '32x32',
-            type: 'image/png',
-        },
-        {
-            url: '/images/favicons/favicon-96x96.png',
-            sizes: '96x96',
-            type: 'image/png',
-        },
-    ],
-    apple: [
-        {
-            url: '/images/favicons/apple-touch-icon.png',
-            sizes: '180x180',
-            type: 'image/png',
-        },
-    ],
-};
-
 export const getDefaultOgImage = async (locale: Locale) => {
     const [payload, options] = await Promise.all([initPayload(), getCachedOptions(locale)]);
 
