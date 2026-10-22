@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import ArrowIcon from '@/components/atoms/frontend/icons/ArrowIcon';
+import { themeDefaults, themeStyle } from '@/lib/client-deliveries/theme';
 
 /** Keeps the return control available after the gallery cover has left the viewport. */
 export function BackToTop() {
@@ -24,6 +25,7 @@ export function BackToTop() {
             type="button"
             aria-label="Til toppen"
             hidden={!hasPassedCover}
+            style={themeStyle(themeDefaults)}
             className="delivery-back-to-top focus-ring-tight fixed z-10 inline-flex size-12 cursor-pointer items-center justify-center rounded-[var(--btn-radius)] border border-border-base bg-bg-base text-fg-base"
             onClick={() => {
                 const target = document.getElementById('top');
