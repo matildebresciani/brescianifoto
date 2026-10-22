@@ -113,8 +113,7 @@
     justify-content: flex-end;
     max-width: none;
     width: 100%;
-    min-height: 0;
-    aspect-ratio: 4 / 5;
+    min-height: 100svh;
     margin: 0;
     padding: var(--space-section-wide) var(--space-md) var(--space-xl);
     color: var(--delivery-cover-text);
@@ -445,8 +444,6 @@
         padding: 0;
     }
     .delivery-hero-overlay .delivery-hero-copy {
-        min-height: 100svh;
-        aspect-ratio: auto;
         padding-inline: var(--space-2xl);
     }
     .delivery-section-inner {
