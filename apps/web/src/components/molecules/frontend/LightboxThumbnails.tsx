@@ -1,6 +1,6 @@
 'use client';
 
-import { type MouseEvent, type PointerEvent, useRef, useState } from 'react';
+import { type MouseEvent, type PointerEvent, useLayoutEffect, useRef, useState } from 'react';
 import { ImageMedia } from '@/components/atoms/frontend/media/ImageMedia';
 import { cn } from '@/lib/utilities/ui';
 import type { Media } from '@/payload-types';
@@ -23,9 +23,31 @@ const dragThreshold = 6;
 
 /** Adds mouse dragging without replacing native touch scrolling or thumbnail clicks. */
 const LightboxThumbnails = ({ items, index, onNavigate }: Props) => {
+    const stripRef = useRef<HTMLFieldSetElement>(null);
+    const activeRef = useRef<HTMLButtonElement>(null);
     const gestureRef = useRef<DragGesture | null>(null);
     const shouldSuppressClickRef = useRef(false);
     const [isDragging, setIsDragging] = useState(false);
+
+    useLayoutEffect(() => {
+        const strip = stripRef.current;
+        const active = activeRef.current;
+        if (!strip || !active || !items[index]) return;
+
+        const followActivePhoto = () => {
+            const stripRect = strip.getBoundingClientRect();
+            const activeRect = active.getBoundingClientRect();
+            // Scroll only the strip so following a photo never moves the viewer or the page behind it.
+            strip.scrollTo({
+                left: strip.scrollLeft + activeRect.left - stripRect.left - (strip.clientWidth - activeRect.width) / 2,
+                behavior: 'instant',
+            });
+        };
+        followActivePhoto();
+        const observer = new ResizeObserver(followActivePhoto);
+        observer.observe(strip);
+        return () => observer.disconnect();
+    }, [index, items]);
 
     const handlePointerDown = (event: PointerEvent<HTMLFieldSetElement>) => {
         if (event.pointerType !== 'mouse' || event.button !== 0 || !event.isPrimary) return;
@@ -85,6 +107,7 @@ const LightboxThumbnails = ({ items, index, onNavigate }: Props) => {
 
     return (
         <fieldset
+            ref={stripRef}
             aria-label="Photo thumbnails"
             className={cn(
                 'flex min-w-0 gap-xs select-none overflow-x-auto scroll-auto! border-0 p-base',
@@ -101,6 +124,7 @@ const LightboxThumbnails = ({ items, index, onNavigate }: Props) => {
             {items.map((item, i) => (
                 <button
                     key={item.id}
+                    ref={i === index ? activeRef : undefined}
                     type="button"
                     title={item.alt || `Photo ${i + 1}`}
                     aria-label={`Go to photo ${i + 1}`}

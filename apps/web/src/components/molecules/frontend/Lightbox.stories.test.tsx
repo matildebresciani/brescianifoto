@@ -47,6 +47,19 @@ async function expectPhoto(alt: string) {
     await expect.poll(() => getPhoto().alt).toBe(alt);
 }
 
+async function expectActiveThumbnailVisible() {
+    await expect
+        .poll(() => {
+            const active = document.querySelector('fieldset[aria-label="Photo thumbnails"] [aria-current="true"]');
+            const strip = active?.parentElement;
+            if (!active || !strip) return false;
+            const photoRect = active.getBoundingClientRect();
+            const stripRect = strip.getBoundingClientRect();
+            return photoRect.left >= stripRect.left && photoRect.right <= stripRect.right;
+        })
+        .toBe(true);
+}
+
 async function drag(x: number, y: number) {
     const viewport = getViewport();
     const rect = viewport.getBoundingClientRect();
@@ -112,6 +125,34 @@ afterEach(async () => {
 });
 
 describe('desktop lightbox', () => {
+    it('follows arrows and keyboard navigation, including wraparound, without scrolling the page', async () => {
+        await ManyPhotos.run();
+        const strip = page.getByRole('group', { name: 'Photo thumbnails' }).element();
+        const pageTop = window.scrollY;
+        const photoTop = getViewport().getBoundingClientRect().top;
+        await page.getByRole('button', { name: 'Previous image', exact: true }).click();
+        await expect
+            .element(page.getByRole('button', { name: 'Go to photo 24', exact: true }))
+            .toHaveAttribute('aria-current', 'true');
+        await expectActiveThumbnailVisible();
+        expect(strip.scrollLeft).toBeGreaterThan(0);
+        await userEvent.keyboard('{ArrowLeft}');
+        await expect
+            .element(page.getByRole('button', { name: 'Go to photo 23', exact: true }))
+            .toHaveAttribute('aria-current', 'true');
+        await expectActiveThumbnailVisible();
+        await page.viewport(800, 800);
+        await expectActiveThumbnailVisible();
+        await userEvent.keyboard('{ArrowRight}{ArrowRight}');
+        await expect
+            .element(page.getByRole('button', { name: 'Go to photo 1', exact: true }))
+            .toHaveAttribute('aria-current', 'true');
+        await expectActiveThumbnailVisible();
+        expect(strip.scrollLeft).toBe(0);
+        expect(window.scrollY).toBe(pageTop);
+        expect(getViewport().getBoundingClientRect().top).toBe(photoTop);
+    });
+
     it('drags the thumbnail strip both ways without selecting a photo, then allows clicks and keyboard selection', async () => {
         await ManyPhotos.run();
         await expectPhoto('Concert stage');
@@ -254,6 +295,20 @@ describe('desktop lightbox', () => {
 describe('mobile lightbox', () => {
     beforeEach(async () => {
         await page.viewport(390, 844);
+    });
+
+    it('keeps the selected thumbnail visible when swiping across the ends of the gallery', async () => {
+        await ManyPhotos.run();
+        await nativeSwipe(100);
+        await expect
+            .element(page.getByRole('button', { name: 'Go to photo 24', exact: true }))
+            .toHaveAttribute('aria-current', 'true');
+        await expectActiveThumbnailVisible();
+        await nativeSwipe(-100);
+        await expect
+            .element(page.getByRole('button', { name: 'Go to photo 1', exact: true }))
+            .toHaveAttribute('aria-current', 'true');
+        await expectActiveThumbnailVisible();
     });
 
     it('removes arrow space and fits landscape and portrait photos without cropping', async () => {
