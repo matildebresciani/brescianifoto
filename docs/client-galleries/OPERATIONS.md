@@ -12,7 +12,7 @@
 
 Changing selected photos marks the archive stale and hides Download all. Upload a replacement ZIP, or check **I confirm this ZIP contains exactly the currently selected photos** and save if the archive is still correct. Confirmation applies only to that photo revision. Rearranging photos does not invalidate the archive.
 
-The links are unlisted, not private authentication. Anyone holding a link may share it. Unpublishing stops the gallery and new download redirects, but previously saved public R2 URLs remain usable; already issued signed download links last up to 15 minutes. Downloaded copies cannot be recalled.
+The links are unlisted, not private authentication. Anyone holding a link may share it. Unpublishing stops the gallery and new download redirects. Already issued signed image URLs last up to 24 hours and signed download links up to 15 minutes; optimized or downloaded copies can remain accessible after expiry. A page left open longer than 24 hours may need refreshing to load more photos. This is unlisted delivery, not immediate-revocation access control.
 
 ## What the collections mean
 
@@ -20,20 +20,37 @@ Client galleries stores each client page and its settings. Client photos stores 
 
 ## Hosting prerequisites
 
-Keep the existing Vercel/Payload/MongoDB deployment. Set the existing R2 variables in the intended Vercel environment:
+Keep the existing Vercel/Payload/MongoDB deployment. Keep portfolio `R2_*` settings unchanged. Add dedicated client settings in the intended Vercel environment (and in the ignored local environment file when testing locally):
 
-`R2_BUCKET`, `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_URL`.
+`CLIENT_R2_BUCKET`, `CLIENT_R2_ENDPOINT`, `CLIENT_R2_ACCESS_KEY_ID`, `CLIENT_R2_SECRET_ACCESS_KEY`.
 
-Use the intended public assets custom domain as `R2_PUBLIC_URL`, and the R2 S3 API endpoint as `R2_ENDPOINT`. Never put credentials in NEXT_PUBLIC variables. The scoped object prefix is `client-deliveries/`; public portfolio objects are untouched. Credentials need object read/write and multipart create/upload/complete/abort access to this bucket.
+Use `brescianifoto-client-galleries` as `CLIENT_R2_BUCKET`. Create an R2 S3 API token with **Object Read & Write** scoped only to that bucket; save its Access Key ID and Secret Access Key in the corresponding client variables. Use the bucket's S3 API endpoint, without a bucket path, as `CLIENT_R2_ENDPOINT` (including `.eu.` for an EU jurisdiction bucket).
+
+Keep the domain registration, DNS and nameservers at Simply. No client image subdomain or Cloudflare zone is needed. Leave the client bucket's **Public Development URL** disabled and do not connect a custom domain. Client images and admin thumbnails use temporary signed S3 GET URLs; original and ZIP downloads already use signed URLs. `CLIENT_R2_PUBLIC_URL` is no longer used and should be removed if it was added. Never put credentials in NEXT_PUBLIC variables. The scoped object prefix remains `client-deliveries/`. There is no fallback to portfolio storage when client settings are missing.
+
+Deploy the code change together with the four client environment variables; redeploy after setting them so Next image optimization allows the S3 endpoint and client bucket prefix. Existing client asset records contain object keys rather than bucket names: if client files were already uploaded to the portfolio bucket, copy them to the dedicated bucket with the exact same keys before switching. Include `.thumb.webp` objects. Do not delete originals until migrated galleries and downloads have been verified.
+
+### Gallery folders in R2
+
+New uploads use the saved gallery ID as a stable folder prefix:
+
+```text
+client-deliveries/<gallery-id>/
+  photos/<unique-file-id>.jpg
+  thumbnails/<unique-file-id>.webp
+  downloads/<unique-file-id>.zip
+```
+
+These folders appear automatically as files are uploaded; there is no separate folder-creation step. Renaming a gallery does not move its files. Duplicate filenames get unique storage keys, while downloads retain the original filenames. Existing objects keep their recorded paths, and multipart uploads started under the previous layout can still complete. No migration or deletion of existing files is performed.
 
 ### CORS
 
-Merge these rules with existing bucket CORS; do not remove portfolio rules. Replace origins with the actual production/preview domains. Add localhost only to a development bucket if needed.
+Apply these rules to the dedicated client bucket. The admin runs at `https://brescianifoto.dk/admin`, so its allowed origin is `https://brescianifoto.dk` (no `/admin` path). Add other exact origins only if they actually host the admin, such as a preview deployment. Add localhost only to a development bucket if needed.
 
 ```json
 [
   {
-    "AllowedOrigins": ["https://YOUR-WEBSITE-DOMAIN"],
+    "AllowedOrigins": ["https://brescianifoto.dk"],
     "AllowedMethods": ["GET", "HEAD", "PUT"],
     "AllowedHeaders": ["*"],
     "ExposeHeaders": ["ETag"],
@@ -50,11 +67,7 @@ Add an R2 lifecycle rule **only for prefix `client-deliveries/`** to abort incom
 
 ### Search indexing and delivery
 
-On the public R2 custom domain, add a response-header rule for paths beginning `/client-deliveries/`:
-
-`X-Robots-Tag: noindex, nofollow, noimageindex`
-
-Object custom metadata does **not** automatically emit this HTTP header. Check the actual response after configuring the rule. The application adds noindex metadata/headers to delivery pages, download redirects, and the optimized client-image route. Leave delivery page paths crawlable so compliant crawlers can read the noindex directive. Do not add client collections to sitemap or search plugins.
+No Cloudflare domain or response-header rule is required. The application adds noindex metadata/headers to delivery pages, download redirects and optimized client-image responses. Leave delivery page paths crawlable so compliant crawlers can read the noindex directive. Do not add client collections to sitemap or search plugins. Raw S3 image links are temporary bearer links; the S3 endpoint does not supply our application noindex header. Keep public bucket access disabled.
 
 Individual and ZIP downloads redirect to short-lived R2 S3 URLs with attachment filenames, allowing native browser streaming/resume without loading the archive into JavaScript or a Vercel function. The gallery itself stays on the photographer's domain; the storage transfer uses R2's API hostname. Do not proxy large downloads through Vercel to disguise that hostname.
 
@@ -63,7 +76,7 @@ Individual and ZIP downloads redirect to short-lived R2 S3 URLs with attachment 
 - Use a dedicated staging gallery and representative JPEGs with EXIF/IPTC/XMP and ICC data. Download the original and compare SHA-256 with the source, then inspect the metadata. An optimized WebP is a viewing preview and is not the metadata-preserving deliverable.
 - Upload a multi-gigabyte ZIP; interrupt a part, retry, cancel, and replace the archive. Confirm byte-identical archive download and the expected filename. Inspect CORS response headers.
 - Make photo-selection changes after attaching the ZIP. Confirm Download all disappears until replacement or explicit confirmation.
-- Verify published links in a signed-out browser, drafts and unpublishing, cross-gallery asset denial, and noindex headers on original/optimized images.
+- Verify published links in a signed-out browser, drafts and unpublishing, cross-gallery asset denial, and noindex headers on gallery pages and optimized images. Verify unsigned S3 object requests fail and signed original requests work.
 - Test 500 photos with throttled networking. Initial viewing must fetch only the cover and near-viewport optimized previews. No original/ZIP network download should occur until requested.
 - Test on an actual phone, including pinch zoom, touch swipes, menu anchors, and downloads through the phone's file interface.
 - Verify existing public portfolio pages, galleries, image mixes and admin navigation still work.
@@ -74,9 +87,11 @@ The first wedding's real photos, cover choice, text and ZIP have not been suppli
 
 Use a separate local MongoDB database and a second Next build directory to avoid changing the photographer's working content. `NEXT_BUILD_DIR=.next-delivery-qa` allows another dev server on port 3001. QA assets under `public/images/client-delivery-qa/` are ignored by Git and must never be deployed as client content.
 
-From `apps/web`, run `pnpm exec tsx --tsconfig tsconfig.json ../../scripts/check-client-gallery.mts` with local MongoDB running. This repeatable integration check forces the dedicated loopback database `brescianifoto_client_delivery_qa`, creates a QA user and placeholder gallery, tests publication/ownership/contrast/archive revisions, and prints its local preview URL. Temporary QA login details are stored with owner-only permissions in `client-gallery-qa.json` in the operating system's temporary directory; they are never printed or committed. Start its preview with `DATABASE_URI=mongodb://127.0.0.1:27017/brescianifoto_client_delivery_qa R2_PUBLIC_URL=http://localhost:3001 NEXT_PUBLIC_SERVER_URL=http://localhost:3001 NEXT_BUILD_DIR=.next-delivery-qa pnpm dev --port 3001`. Use an environment without `R2_BUCKET` for this local fixture. The fixture uses placeholder images, not real wedding photographs.
+From `apps/web`, run `pnpm exec tsx --tsconfig tsconfig.json ../../scripts/check-client-gallery.mts` with local MongoDB running. This repeatable integration check forces the dedicated loopback database `brescianifoto_client_delivery_qa`, creates a QA user and placeholder gallery, tests publication/ownership/contrast/archive revisions, and prints its local preview URL. Temporary QA login details are stored with owner-only permissions in `client-gallery-qa.json` in the operating system's temporary directory; they are never printed or committed. Start its preview with `DATABASE_URI=mongodb://127.0.0.1:27017/brescianifoto_client_delivery_qa R2_PUBLIC_URL=http://localhost:3001 NEXT_PUBLIC_SERVER_URL=http://localhost:3001 NEXT_BUILD_DIR=.next-delivery-qa pnpm dev --port 3001`. Use an environment without `R2_BUCKET` or `CLIENT_R2_BUCKET` for this local fixture. The fixture uses placeholder images, not real wedding photographs.
 
 From `apps/web`: `pnpm test:unit --run`, `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, and `pnpm build`. If Turbopack stalls in the sandbox, `pnpm build --webpack` checks the same application with Webpack. A build with placeholder R2 settings proves compilation only, not a working storage deployment.
+
+For token/highlight integration checks, run `pnpm exec tsx --tsconfig tsconfig.json ../../scripts/check-client-gallery-colors.mts` from `apps/web`. It uses the separate `brescianifoto_client_colors_qa` database and creates only local placeholder content. QA credentials are stored with owner-only permissions in `client-gallery-colors-qa.json` in the operating system temporary directory. Preview with `DATABASE_URI=mongodb://127.0.0.1:27017/brescianifoto_client_colors_qa CLIENT_R2_BUCKET= R2_BUCKET= NEXT_PUBLIC_SERVER_URL=http://localhost:3002 NEXT_BUILD_DIR=.next-colors-qa pnpm dev --port 3002`.
 
 ## Rollout and recovery
 

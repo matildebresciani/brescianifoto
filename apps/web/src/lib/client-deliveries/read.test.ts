@@ -5,6 +5,7 @@ import { photoSetRevision } from './revision';
 
 const mocks = vi.hoisted(() => ({ find: vi.fn(), auth: vi.fn() }));
 vi.mock('@/lib/config', () => ({ initPayload: async () => mocks }));
+vi.mock('./storage', () => ({ assetURL: async (key: string) => `https://storage.example.test/${key}?signed=image` }));
 const now = '2026-10-21T00:00:00.000Z';
 const photo: ClientPhoto = {
     id: 'photo-1',
@@ -58,13 +59,13 @@ beforeEach(() => {
 });
 
 describe('unlisted delivery reads', () => {
-    it('projects photo introductions and themes without affecting neighboring sections', () => {
+    it('projects photo introductions and themes without affecting neighboring sections', async () => {
         const content = {
             root: { type: 'root', children: [], direction: null, format: '', indent: 0, version: 1 },
         } satisfies NonNullable<
             Extract<NonNullable<ClientGallery['blocks']>[number], { blockType: 'text' }>['content']
         >;
-        const view = deliveryView(
+        const view = await deliveryView(
             {
                 gallery: {
                     ...gallery,
@@ -131,7 +132,7 @@ describe('unlisted delivery reads', () => {
         const data = await readDelivery('a'.repeat(32));
         expect(data).toBeDefined();
         if (!data) return;
-        const view = deliveryView(data, false);
+        const view = await deliveryView(data, false);
         expect(view.archive).toBeUndefined();
         expect(view.blocks).toHaveLength(1);
         expect(view.photoCount).toBe(1);
@@ -162,7 +163,7 @@ describe('unlisted delivery reads', () => {
         }));
         const data = await readDelivery('a'.repeat(32));
         if (!data) throw new Error('Expected gallery');
-        expect(deliveryView(data, false).photoCount).toBe(500);
+        expect((await deliveryView(data, false)).photoCount).toBe(500);
         expect(mocks.find).toHaveBeenCalledTimes(3);
     });
 });

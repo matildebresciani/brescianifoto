@@ -21,7 +21,7 @@ export default async function ClientGalleryPage({
     const isPreview = (await searchParams).preview === '1';
     const result = await readDelivery(shareId, isPreview, isPreview ? new Headers(await headers()) : undefined);
     if (!result) notFound();
-    const gallery = deliveryView(result, isPreview);
+    const gallery = await deliveryView(result, isPreview);
     const sections = gallery.blocks.flatMap((block) =>
         block.type === 'photos' ? [{ anchor: block.anchor, label: block.menuLabel }] : [],
     );

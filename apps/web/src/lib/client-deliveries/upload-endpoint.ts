@@ -83,7 +83,7 @@ async function handleUpload(req: PayloadRequest): Promise<Response> {
         }
         const gallery = await galleryForUpload(req, body.galleryId);
         if (!gallery) return fail('Save the client gallery before uploading.', 404);
-        const key = `client-deliveries/${randomUUID()}/${randomUUID()}.${isPhoto ? 'jpg' : 'zip'}`;
+        const key = `client-deliveries/${gallery.id}/${isPhoto ? 'photos' : 'downloads'}/${randomUUID()}.${isPhoto ? 'jpg' : 'zip'}`;
         const upload = await client.send(
             new CreateMultipartUploadCommand({
                 Bucket: bucket,
@@ -174,7 +174,11 @@ async function handleUpload(req: PayloadRequest): Promise<Response> {
         return fail(inspected.error);
     }
     const { checksum, thumbnail, width, height } = inspected.value;
-    const thumbnailKey = `${session.key}.thumb.webp`;
+    const photoPrefix = `client-deliveries/${session.galleryId}/photos/`;
+    // Preserve the thumbnail location for multipart sessions started before gallery folders were introduced.
+    const thumbnailKey = session.key.startsWith(photoPrefix)
+        ? `client-deliveries/${session.galleryId}/thumbnails/${session.key.slice(photoPrefix.length).replace(/\.jpg$/, '.webp')}`
+        : `${session.key}.thumb.webp`;
     await client.send(
         new PutObjectCommand({
             Bucket: bucket,

@@ -85,8 +85,35 @@ describe('multipart upload completion', () => {
         expect((await call({ action: 'start' }, false)).status).toBe(401);
         expect(mocks.send).not.toHaveBeenCalled();
     });
-    it('preserves original bytes and only writes the separate thumbnail on completion', async () => {
-        const token = signUploadSession(session(), payload.config.secret);
+    it.each([
+        'gallery',
+        'another-gallery',
+    ])('groups duplicate photo names under %s with unique keys', async (galleryId) => {
+        mocks.find.mockResolvedValue({ docs: [{ id: galleryId, photoRevision: 'photo-set' }] });
+        for (let index = 0; index < 2; index++) {
+            const response = await call({
+                action: 'start',
+                galleryId,
+                filename: 'Wedding.jpg',
+                byteSize: bytes.length,
+                kind: 'photo',
+            });
+            expect(response.status).toBe(200);
+        }
+        const keys = mocks.send.mock.calls.flatMap(([command]) =>
+            command instanceof CreateMultipartUploadCommand ? [command.input.Key] : [],
+        );
+        expect(keys).toHaveLength(2);
+        expect(new Set(keys).size).toBe(2);
+        for (const key of keys) {
+            expect(key).toMatch(new RegExp(`^client-deliveries/${galleryId}/photos/[a-f0-9-]+\\.jpg$`));
+        }
+    });
+    it.each([
+        ['client-deliveries/random/original.jpg', 'client-deliveries/random/original.jpg.thumb.webp'],
+        ['client-deliveries/gallery/photos/original.jpg', 'client-deliveries/gallery/thumbnails/original.webp'],
+    ])('preserves originals and creates the separate thumbnail for %s', async (key, thumbnailKey) => {
+        const token = signUploadSession({ ...session(), key }, payload.config.secret);
         const response = await call({ action: 'complete', token, parts: [{ PartNumber: 1, ETag: 'part-etag' }] });
         expect(response.status).toBe(200);
         expect(mocks.send.mock.calls.some(([command]) => command instanceof CompleteMultipartUploadCommand)).toBe(true);
@@ -94,7 +121,8 @@ describe('multipart upload completion', () => {
             command instanceof PutObjectCommand ? [command.input] : [],
         );
         expect(writes).toHaveLength(1);
-        expect(writes[0]?.Key).toBe(`${session().key}.thumb.webp`);
+        expect(writes[0]?.Key).toBe(thumbnailKey);
+        expect(mocks.create.mock.calls[0]?.[0].data).toMatchObject({ storageKey: key, thumbnailKey });
         expect(mocks.create.mock.calls[0]?.[0].data.checksum).toBe(createHash('sha256').update(bytes).digest('hex'));
     });
     it('makes completion retries idempotent after a saved asset', async () => {
@@ -167,6 +195,7 @@ describe('multipart upload completion', () => {
         expect(command).toBeInstanceOf(CreateMultipartUploadCommand);
         expect(command.input.ContentType).toBe('application/zip');
         expect(command.input.ContentDisposition).toContain('Wedding.zip');
+        expect(command.input.Key).toMatch(/^client-deliveries\/gallery\/downloads\/[a-f0-9-]+\.zip$/);
     });
     it('verifies an archive header and binds it to the photo revision from upload start', async () => {
         bytes = Buffer.from([0x50, 0x4b, 0x03, 0x04, 0, 0, 0, 0]);

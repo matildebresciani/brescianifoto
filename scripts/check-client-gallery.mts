@@ -13,6 +13,8 @@ process.loadEnvFile('.env.development');
 process.env.NODE_ENV = 'development';
 process.env.DATABASE_URI = 'mongodb://127.0.0.1:27017/brescianifoto_client_delivery_qa';
 process.env.R2_PUBLIC_URL = 'http://localhost:3001';
+process.env.NEXT_PUBLIC_SERVER_URL = 'http://localhost:3001';
+delete process.env.CLIENT_R2_BUCKET;
 delete process.env.R2_BUCKET;
 const { default: config } = await import('../apps/web/src/payload.config.ts');
 const payload = await getPayload({ config });

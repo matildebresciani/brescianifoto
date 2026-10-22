@@ -4,33 +4,41 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { z } from 'zod';
 
 const environmentSchema = z.object({
-    R2_BUCKET: z.string().min(1),
-    R2_ENDPOINT: z.url(),
-    R2_PUBLIC_URL: z.url(),
-    R2_ACCESS_KEY_ID: z.string().min(1),
-    R2_SECRET_ACCESS_KEY: z.string().min(1),
+    CLIENT_R2_BUCKET: z.string().min(1),
+    CLIENT_R2_ENDPOINT: z.url(),
+    CLIENT_R2_ACCESS_KEY_ID: z.string().min(1),
+    CLIENT_R2_SECRET_ACCESS_KEY: z.string().min(1),
 });
 
-/** Resolve lazily so building the frontend does not contact storage. */
+/** Require dedicated client settings so delivery assets never fall back to the public portfolio bucket. */
 export function deliveryStorage() {
     const env = environmentSchema.parse(process.env);
     return {
-        bucket: env.R2_BUCKET,
-        publicURL: env.R2_PUBLIC_URL.replace(/\/+$/, ''),
+        bucket: env.CLIENT_R2_BUCKET,
         client: new S3Client({
-            endpoint: env.R2_ENDPOINT,
+            endpoint: env.CLIENT_R2_ENDPOINT,
             region: 'auto',
             forcePathStyle: true,
-            credentials: { accessKeyId: env.R2_ACCESS_KEY_ID, secretAccessKey: env.R2_SECRET_ACCESS_KEY },
+            credentials: { accessKeyId: env.CLIENT_R2_ACCESS_KEY_ID, secretAccessKey: env.CLIENT_R2_SECRET_ACCESS_KEY },
             requestChecksumCalculation: 'WHEN_REQUIRED',
             responseChecksumValidation: 'WHEN_REQUIRED',
         }),
     };
 }
 
-export function assetURL(key: string): string {
-    const base = process.env.R2_PUBLIC_URL?.replace(/\/+$/, '');
-    return `${base}/${key.split('/').map(encodeURIComponent).join('/')}`;
+/** Sign image reads without a public bucket or DNS changes; callers must authorize the asset first. */
+export async function assetURL(key: string): Promise<string> {
+    // The isolated QA fixtures serve placeholder files locally and must never require production credentials.
+    if (
+        process.env.NODE_ENV === 'development' &&
+        !process.env.CLIENT_R2_BUCKET &&
+        key.startsWith('images/client-delivery-qa/')
+    ) {
+        const base = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000';
+        return `${base.replace(/\/+$/, '')}/${key.split('/').map(encodeURIComponent).join('/')}`;
+    }
+    const { client, bucket } = deliveryStorage();
+    return getSignedUrl(client, new GetObjectCommand({ Bucket: bucket, Key: key }), { expiresIn: 86400 });
 }
 
 export function attachmentName(filename: string): string {

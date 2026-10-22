@@ -6,7 +6,7 @@ Read this file before starting a gallery task. Update task status, notes and ver
 
 ## Accepted specification
 
-Build an unlisted, editorial wedding gallery experience at `/deliveries/<unique-link>`, managed in Payload, hosted on Vercel and Cloudflare R2. Support up to 500 edited JPEGs, custom colors with the existing Instrument Serif/Archivo/IBM Plex Mono fonts, independent rich-text and photo-section blocks, original individual downloads and a manually uploaded ZIP. No passwords or accounts for recipients. Saved file URLs can remain accessible after unpublishing.
+Build an unlisted, editorial wedding gallery experience at `/deliveries/<unique-link>`, managed in Payload, hosted on Vercel and Cloudflare R2. Support up to 500 edited JPEGs, custom colors with the existing Instrument Serif/Archivo/IBM Plex Mono fonts, independent rich-text and photo-section blocks, original individual downloads and a manually uploaded ZIP. No passwords or accounts for recipients. Issued signed URLs and cached/downloaded copies can remain accessible after unpublishing. Domain registration, DNS and nameservers stay at Simply. The dedicated client R2 bucket uses signed image/download URLs without a custom domain.
 
 ### Independent client area
 
@@ -38,7 +38,7 @@ Automatic ZIP creation, selectable fonts, passwords, favorites/proofing, print s
 
 - 2026-10-21: Scope accepted by photographer. Vercel + R2 confirmed.
 - Use dedicated client asset records and signed direct R2 uploads so Payload image processing cannot rewrite original files. The public portfolio media pipeline remains unchanged.
-- Object metadata alone cannot set X-Robots-Tag on a public R2 custom domain; configure that response header for the client prefix in Cloudflare.
+- Client pages and optimized image responses emit noindex. Client objects stay in a private R2 bucket and are served with signed S3 URLs; no Cloudflare domain/header setup or DNS move is required.
 - Progress is derived from the records below; this dashboard is never deployed with the photography site.
 
 ## DIF comparison — architecture review (2026-10-21)
@@ -122,12 +122,14 @@ See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPE
     ],
     "notes": [
       "Implementation complete. Live R2 transfer and maximum-size photo verification await R2 environment configuration.",
-      "JPEG upload controls now live inside each Photo section and automatically append successful files. Gallery-library and ZIP uploads share the same progress/retry panel. Live R2 verification is still required."
+      "JPEG upload controls now live inside each Photo section and automatically append successful files. Gallery-library and ZIP uploads share the same progress/retry panel. Live R2 verification is still required.",
+      "2026-10-22: New objects are grouped under client-deliveries/<gallery-id>/photos, thumbnails and downloads. Gallery IDs keep paths stable across renames; unique object filenames prevent collisions. Existing objects and older multipart sessions retain compatible paths; no remote migration performed."
     ],
     "evidence": [
-      "Unit tests cover preserved source bytes and EXIF/XMP/ICC, SHA-256, separate thumbnails, multipart completion/idempotency/cancel and size limits."
+      "Unit tests cover preserved source bytes and EXIF/XMP/ICC, SHA-256, separate thumbnails, multipart completion/idempotency/cancel and size limits.",
+      "Gallery-folder follow-up: all 11 upload endpoint tests pass, including same-name uniqueness, gallery grouping, ZIP folder placement and new/legacy thumbnail completion. Typecheck and changed-file Biome checks pass."
     ],
-    "updatedAt": "2026-10-21"
+    "updatedAt": "2026-10-22"
   },
   {
     "id": "CG-04",
@@ -312,22 +314,26 @@ See [VALIDATION.md](./VALIDATION.md) for test evidence and [OPERATIONS.md](./OPE
   {
     "id": "CG-12",
     "title": "First delivery and handover",
-    "description": "Production R2 CORS/lifecycle/header configuration and deployment. First supplied wedding gallery tested on the live domain and a real phone; handover documented.",
+    "description": "Production R2 CORS/lifecycle/private-bucket configuration and deployment. First supplied wedding gallery tested on the live domain and a real phone; handover documented.",
     "dependencies": [
       "CG-11"
     ],
     "status": "Blocked",
     "acceptance": [
-      "Production R2 CORS/lifecycle/header configuration and deployment.",
+      "Production R2 CORS/lifecycle/private-bucket configuration and deployment.",
       "First supplied wedding gallery tested on the live domain and a real phone; handover documented."
     ],
     "notes": [
-      "Needs production Vercel/R2 access/configuration and the actual wedding photos, cover, text and ZIP. No production deployment or client sharing performed."
+      "Needs production Vercel/R2 access/configuration and the actual wedding photos, cover, text and ZIP. No production deployment or client sharing performed.",
+      "2026-10-22: User created the dedicated client bucket. Client storage now requires CLIENT_R2_* settings and never falls back to portfolio R2_* settings. Token, CORS, lifecycle, deployment and live transfers remain pending.",
+      "User explicitly keeps registration, DNS and nameservers at Simply. Use signed S3 URLs for client images/admin thumbnails and downloads, keep bucket public access disabled, and configure only the four CLIENT_R2 bucket/endpoint/credential variables. No custom domain or CLIENT_R2_PUBLIC_URL."
     ],
     "evidence": [
-      "Operations guide documents CORS, lifecycle cleanup, noindex headers, deployment, verification and rollback."
+      "Operations guide documents CORS, lifecycle cleanup, noindex headers, deployment, verification and rollback.",
+      "Dedicated storage follow-up: 36 client-delivery unit tests and typecheck pass; five new tests verify client image/download routing and missing-setting rejection. Setup is documented for brescianifoto.dk/admin.",
+      "Cloudflare-only commit independently validated against HEAD: 40 client-delivery tests, generated types/import map, typecheck and changed-file Biome checks pass without concurrent gallery editor/design changes."
     ],
-    "updatedAt": "2026-10-21"
+    "updatedAt": "2026-10-22"
   }
 ]
 ```

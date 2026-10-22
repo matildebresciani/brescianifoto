@@ -57,14 +57,14 @@ export async function readDelivery(shareId: string, isPreview = false, requestHe
     return { gallery, photos, archive, isArchiveCurrent };
 }
 
-export function deliveryView(
+export async function deliveryView(
     data: NonNullable<Awaited<ReturnType<typeof readDelivery>>>,
     isPreview: boolean,
-): DeliveryView {
+): Promise<DeliveryView> {
     const { gallery, photos, archive, isArchiveCurrent } = data;
-    const toPhoto = (photo: ClientPhoto): DeliveryPhoto => ({
+    const toPhoto = async (photo: ClientPhoto): Promise<DeliveryPhoto> => ({
         id: photo.id,
-        src: assetURL(photo.storageKey),
+        src: await assetURL(photo.storageKey),
         width: photo.width,
         height: photo.height,
         name: photo.originalFilename,
@@ -74,7 +74,8 @@ export function deliveryView(
             ? { downloadHref: `/deliveries/${gallery.shareId}/download/${photo.id}${isPreview ? '?preview=1' : ''}` }
             : {}),
     });
-    const byID = new Map(photos.map((photo) => [photo.id, photo]));
+    const signedPhotos = await Promise.all(photos.map(toPhoto));
+    const byID = new Map(signedPhotos.map((photo) => [photo.id, photo]));
     const blocks: DeliveryBlock[] = [];
     const theme = themeSchema.parse(gallery.theme ?? {});
     for (const block of gallery.blocks ?? []) {
@@ -92,7 +93,7 @@ export function deliveryView(
         const items = (block.photos ?? []).flatMap((photo) => {
             const id = relationshipID(photo);
             const resolved = id ? byID.get(id) : undefined;
-            return resolved ? [toPhoto(resolved)] : [];
+            return resolved ? [resolved] : [];
         });
         if (items.length && block.anchor)
             blocks.push({
@@ -114,7 +115,7 @@ export function deliveryView(
         date: gallery.date,
         location: gallery.location,
         details: gallery.details,
-        cover: cover ? toPhoto(cover) : undefined,
+        cover,
         coverLayout: gallery.coverLayout || 'editorial',
         alignment: gallery.alignment || 'center',
         focalX: gallery.focalX ?? 50,

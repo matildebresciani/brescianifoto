@@ -28,17 +28,17 @@ export const ClientPhotos: CollectionConfig = {
         crop: false,
         focalPoint: false,
         mimeTypes: ['image/jpeg'],
-        adminThumbnail: ({ doc }) => (typeof doc.thumbnailKey === 'string' ? assetURL(doc.thumbnailKey) : null),
+        adminThumbnail: ({ doc }) => (typeof doc.thumbnailURL === 'string' ? doc.thumbnailURL : null),
     },
     hooks: {
         afterRead: [
-            ({ doc }) => ({
+            async ({ doc }) => ({
                 ...doc,
                 // Adapt legacy records too: IDs and stored object keys do not change.
                 filename: doc.originalFilename,
                 filesize: doc.byteSize,
-                url: typeof doc.storageKey === 'string' ? assetURL(doc.storageKey) : undefined,
-                thumbnailURL: typeof doc.thumbnailKey === 'string' ? assetURL(doc.thumbnailKey) : undefined,
+                url: typeof doc.storageKey === 'string' ? await assetURL(doc.storageKey) : undefined,
+                thumbnailURL: typeof doc.thumbnailKey === 'string' ? await assetURL(doc.thumbnailKey) : undefined,
             }),
         ],
     },

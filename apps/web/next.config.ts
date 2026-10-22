@@ -11,6 +11,18 @@ const isHttpOrHttps = (proto: string) => proto === 'http' || proto === 'https';
 
 const withNextIntl = createNextIntlPlugin();
 
+// Allow signed image queries only for this client's bucket and photo prefix.
+const clientImagePatterns: NonNullable<NonNullable<NextConfig['images']>['remotePatterns']> =
+    process.env.CLIENT_R2_ENDPOINT && process.env.CLIENT_R2_BUCKET
+        ? [
+              {
+                  protocol: 'https',
+                  hostname: new URL(process.env.CLIENT_R2_ENDPOINT).hostname,
+                  pathname: `/${process.env.CLIENT_R2_BUCKET}/client-deliveries/**`,
+              },
+          ]
+        : [];
+
 const nextConfig: NextConfig = {
     // The color-picker package ships JSX source rather than compiled JavaScript.
     transpilePackages: ['@innovixx/payload-color-picker-field'],
@@ -19,6 +31,7 @@ const nextConfig: NextConfig = {
     images: {
         formats: ['image/webp'],
         remotePatterns: [
+            ...clientImagePatterns,
             ...[NEXT_PUBLIC_SERVER_URL, process.env.R2_PUBLIC_URL]
                 .filter((item): item is string => Boolean(item))
                 .map((item): { hostname: string; protocol: 'http' | 'https'; port: string } => {

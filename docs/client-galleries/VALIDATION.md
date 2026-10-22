@@ -1,4 +1,18 @@
-# Client gallery validation — 2026-10-21
+# Client gallery validation — 2026-10-22
+
+## Cloudflare-only commit validation — 2026-10-22
+
+Validated an isolated HEAD snapshot containing only the Cloudflare changes, excluding concurrent gallery editor/design work. All 40 client-delivery tests pass, Payload and Next types/import map regenerate, typecheck passes, and Biome checks pass for the changed application files. This verifies the commit independently of uncommitted features; production R2 transfers remain unverified.
+
+## Gallery folder organization — 2026-10-22
+
+New uploads are grouped by gallery ID into photos, thumbnails and downloads. All 11 upload endpoint tests pass, covering unique keys for duplicate filenames, gallery grouping, ZIP placement, preserved original bytes and compatible new/legacy thumbnail completion. Typecheck and Biome checks on the two changed TypeScript files pass. Vitest emits the previously recorded Storybook preset warnings but completes successfully. No live R2 upload or migration was performed; deployment remains pending.
+
+## Dedicated client bucket configuration
+
+- Client storage now uses only `CLIENT_R2_*` variables, including its own bucket, endpoint and credentials. Images and admin thumbnails now use signed S3 URLs without a public hostname or DNS changes. Portfolio settings remain unchanged. Next image optimization accepts the client S3 endpoint scoped to the bucket/client prefix. Local QA placeholders resolve locally only in development with no client bucket configured.
+- All 44 client-delivery unit tests pass, including six storage tests that check image/download routing and reject missing client configuration instead of using portfolio settings. Typecheck passes. Vitest also emitted missing Storybook builder preset warnings; these did not prevent the unit tests from running or passing.
+- Production bucket creation was reported by the user. Token/CORS/lifecycle/private-bucket configuration, deployment and a live R2 round trip are not yet verified. No DNS, nameserver or remote bucket changes were made.
 
 ## DIF / native Payload refactor
 
