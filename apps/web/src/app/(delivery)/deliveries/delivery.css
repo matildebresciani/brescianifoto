@@ -1,7 +1,6 @@
 .delivery-page {
     --delivery-ease: cubic-bezier(0.22, 1, 0.36, 1);
     --delivery-color-duration: 600ms;
-    --delivery-blend-height: clamp(3rem, 1.857rem + 5.714vw, 7rem);
     --delivery-nav-height: 80px;
     --delivery-overlay-color: var(--void);
     --delivery-overlay-opacity: 72%;
@@ -116,11 +115,29 @@
     gap: var(--space-base);
     justify-content: space-between;
     padding: var(--space-base) var(--space-md);
-    border-bottom: 1px solid var(--border-base);
+}
+.delivery-sections,
+.delivery-nav {
     transition:
         background-color var(--delivery-color-duration) ease,
-        color var(--delivery-color-duration) ease,
-        border-color var(--delivery-color-duration) ease;
+        color var(--delivery-color-duration) ease;
+}
+:is(.delivery-content, .delivery-footer)
+    :is(
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p,
+        a,
+        li,
+        blockquote,
+        .metadata,
+        .delivery-rich-text
+    ) {
+    transition: color var(--delivery-color-duration) ease;
 }
 .delivery-nav-desktop {
     display: none;
@@ -214,6 +231,50 @@
     background: var(--bg-invert);
     color: var(--fg-on-color);
 }
+.delivery-download {
+    --delivery-button-roll-duration: 520ms;
+    --delivery-button-roll-stagger: 12ms;
+}
+.delivery-download-character,
+.delivery-download-icon {
+    transition: transform var(--delivery-button-roll-duration)
+        var(--delivery-ease);
+}
+.delivery-download-character {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    white-space: pre;
+    transition-delay: calc(
+        var(--roll-index) *
+        var(--delivery-button-roll-stagger)
+    );
+}
+.delivery-download-character::after {
+    content: attr(data-character);
+    position: absolute;
+    top: 100%;
+    left: 0;
+}
+.delivery-download:enabled:focus-visible .delivery-download-character {
+    transform: translateY(-100%);
+}
+.delivery-download:enabled:focus-visible .delivery-download-icon {
+    transform: translateY(100%);
+}
+@media (hover: hover) and (pointer: fine) {
+    .delivery-download:enabled:hover .delivery-download-character {
+        transform: translateY(-100%);
+    }
+    .delivery-download:enabled:hover .delivery-download-icon {
+        transform: translateY(100%);
+    }
+}
+.delivery-download:disabled .delivery-download-character,
+.delivery-download:disabled .delivery-download-icon {
+    transition: none;
+    transform: none;
+}
 .delivery-icon {
     display: flex;
     width: 48px;
@@ -234,14 +295,6 @@
 .delivery-section,
 .delivery-text-section {
     padding-block: var(--space-lg);
-    background-image: linear-gradient(
-        to bottom,
-        var(--delivery-previous-background, var(--bg-base)),
-        var(--bg-base)
-    );
-    background-size: 100% var(--delivery-blend-height);
-    background-repeat: no-repeat;
-    padding-top: calc(var(--delivery-blend-height) + var(--space-base));
 }
 .delivery-section-inner {
     width: 100%;
@@ -249,7 +302,8 @@
     margin-inline: auto;
     padding-inline: var(--space-base);
 }
-.delivery-section {
+.delivery-section,
+.delivery-text-section {
     scroll-margin-top: calc(var(--delivery-nav-height) + var(--space-lg));
 }
 .delivery-section:focus-visible {
@@ -318,28 +372,6 @@
     border: 1px solid var(--fg-base);
     pointer-events: none;
 }
-.delivery-photo-hint {
-    position: absolute;
-    inset: auto var(--space-base) var(--space-base) auto;
-    display: flex;
-    width: 40px;
-    height: 40px;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-base);
-    color: var(--fg-base);
-    border: 1px solid var(--border-base);
-    border-radius: 999px;
-    opacity: 0;
-    transform: translateY(8px);
-    transition:
-        opacity 300ms var(--delivery-ease),
-        transform 300ms var(--delivery-ease);
-}
-.delivery-photo-trigger:focus-visible .delivery-photo-hint {
-    opacity: 1;
-    transform: none;
-}
 .delivery-back-to-top span {
     display: inline-block;
     transition: transform 300ms var(--delivery-ease);
@@ -347,12 +379,6 @@
 .delivery-back-to-top:hover span,
 .delivery-back-to-top:focus-visible span {
     transform: translateY(-3px);
-}
-@media (hover: hover) and (pointer: fine) {
-    .delivery-photo-trigger:hover .delivery-photo-hint {
-        opacity: 1;
-        transform: none;
-    }
 }
 @keyframes delivery-reveal {
     from {
@@ -387,7 +413,7 @@
     }
     .delivery-section,
     .delivery-text-section {
-        padding-bottom: var(--space-xl);
+        padding-block: var(--space-xl);
     }
     .delivery-section-introduction {
         margin-bottom: var(--space-lg);
@@ -423,6 +449,22 @@
     .delivery-hero-copy > * {
         animation: none;
     }
+    .delivery-sections,
+    :is(.delivery-content, .delivery-footer)
+        :is(
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            p,
+            a,
+            li,
+            blockquote,
+            .metadata,
+            .delivery-rich-text
+        ),
     .delivery-nav,
     .delivery-nav-panel,
     .delivery-nav-link::after,
@@ -431,11 +473,16 @@
     .delivery-nav-link:focus-visible span,
     .delivery-primary,
     .delivery-outline,
+    .delivery-download .delivery-download-character,
+    .delivery-download .delivery-download-icon,
+    .delivery-download:enabled:is(:hover, :focus-visible)
+        .delivery-download-character,
+    .delivery-download:enabled:is(:hover, :focus-visible)
+        .delivery-download-icon,
     .delivery-lightbox-control,
     .delivery-lightbox-control svg,
     .delivery-lightbox-control[aria-label="Next photo"]:hover svg,
     .delivery-lightbox-control[aria-label="Previous photo"]:hover svg,
-    .delivery-photo-hint,
     .delivery-back-to-top span,
     .delivery-back-to-top:hover span,
     .delivery-back-to-top:focus-visible span {

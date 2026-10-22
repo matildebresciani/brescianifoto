@@ -50,6 +50,28 @@ afterEach(async () => {
 });
 
 describe('one lightbox for the complete client gallery', () => {
+    it('keeps the selection and keyboard focus on the current thumbnail after clicking and navigating', async () => {
+        await MultipleSections.run();
+        await page.getByRole('button', { name: 'Open photo 1: Concert stage', exact: true }).click();
+        const clicked = page.getByRole('button', { name: 'Go to photo 1', exact: true });
+        await clicked.click();
+        await userEvent.keyboard('{ArrowRight}');
+        const selected = page.getByRole('button', { name: 'Go to photo 2', exact: true });
+        await expect.element(selected).toHaveAttribute('aria-current', 'true');
+        await expect.element(selected).toHaveFocus();
+        await expect.element(clicked).toHaveAttribute('aria-current', 'false');
+        expect(getComputedStyle(clicked.element()).outlineWidth).toBe('0px');
+        await clicked.hover();
+        await expect
+            .poll(() => getComputedStyle(clicked.element()).borderColor)
+            .not.toBe(getComputedStyle(selected.element()).borderColor);
+        expect(document.querySelectorAll('.lightbox-thumbnail[aria-current="true"]')).toHaveLength(1);
+        await userEvent.keyboard('{ArrowRight}');
+        await expect.element(page.getByRole('button', { name: 'Go to photo 3', exact: true })).toHaveFocus();
+        await userEvent.keyboard('{ArrowLeft}');
+        await expect.element(selected).toHaveFocus();
+    });
+
     it('crosses section boundaries, skips text and empty sections, and wraps across the whole gallery', async () => {
         await MultipleSections.run();
         await page.getByRole('button', { name: 'Open photo 2: Artist portrait', exact: true }).click();

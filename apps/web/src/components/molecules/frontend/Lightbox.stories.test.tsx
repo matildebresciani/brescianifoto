@@ -21,7 +21,7 @@ vi.mock('next/image', () => ({
 const { Default, SinglePhoto, ManyPhotos, WithOpener } = composeStories(stories);
 
 function getViewport() {
-    const viewport = document.querySelector('button[aria-pressed], button[aria-label="Photo viewer"]');
+    const viewport = document.querySelector('[data-lightbox-slide]:not([inert]) button');
     if (!(viewport instanceof HTMLButtonElement)) throw new Error('Photo viewport is missing');
     return viewport;
 }

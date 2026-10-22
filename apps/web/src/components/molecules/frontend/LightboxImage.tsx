@@ -13,6 +13,7 @@ import type { Media } from '@/payload-types';
 
 type Props = {
     image: Media;
+    isActive?: boolean;
     onViewportChange?: (viewport: LightboxViewport) => void;
     onReady?: (size: string) => void;
     onLoadError?: () => void;
@@ -55,7 +56,7 @@ function clampPan(point: Point, limits: Point): Point {
 }
 
 /** Owns the photo's pointer gestures; remount for each photo to reset zoom and pan. */
-const LightboxImage = ({ image, onViewportChange, onReady, onLoadError, onNavigate }: Props) => {
+const LightboxImage = ({ image, isActive = true, onViewportChange, onReady, onLoadError, onNavigate }: Props) => {
     const viewportRef = useRef<HTMLButtonElement>(null);
     const gestureRef = useRef<Gesture | null>(null);
     const pointersRef = useRef(new Set<number>());
@@ -73,7 +74,7 @@ const LightboxImage = ({ image, onViewportChange, onReady, onLoadError, onNaviga
 
     useLayoutEffect(() => {
         const element = viewportRef.current;
-        if (!element) return;
+        if (!element || !isActive) return;
 
         const measure = () => {
             const { width, height } = element.getBoundingClientRect();
@@ -93,7 +94,7 @@ const LightboxImage = ({ image, onViewportChange, onReady, onLoadError, onNaviga
         const observer = new ResizeObserver(measure);
         observer.observe(element);
         return () => observer.disconnect();
-    }, [onViewportChange]);
+    }, [isActive, onViewportChange]);
 
     const handlePointerDown = (event: PointerEvent<HTMLButtonElement>) => {
         if (event.pointerType === 'mouse' && event.button !== 0) return;
@@ -247,7 +248,7 @@ const LightboxImage = ({ image, onViewportChange, onReady, onLoadError, onNaviga
                             resource={image}
                             style={{ width: fitted.width, height: fitted.height }}
                             className={cn(
-                                'relative z-10 max-h-full max-w-full shrink-0 object-contain transition-opacity duration-300 motion-reduce:transition-none',
+                                'relative z-10 max-h-full max-w-full shrink-0 object-contain',
                                 !isLoaded && 'opacity-0',
                                 canZoom && isZoomed && !isDragging && 'pointer-events-auto cursor-zoom-out',
                             )}

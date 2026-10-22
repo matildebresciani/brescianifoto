@@ -3,7 +3,13 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { cdp, page } from 'vitest/browser';
 import * as stories from './SectionMenu.stories';
 
-const { GallerySections } = composeStories(stories);
+const { GallerySections, WithTextSection } = composeStories(stories);
+
+function gallerySurface() {
+    const surface = document.querySelector('.delivery-sections');
+    if (!(surface instanceof HTMLElement)) throw new Error('Gallery surface is missing');
+    return surface;
+}
 
 beforeEach(async () => {
     await page.viewport(1200, 800);
@@ -13,10 +19,53 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+    document.documentElement.style.scrollBehavior = '';
     await cdp().send('Emulation.setEmulatedMedia', { features: [] });
 });
 
 describe('delivery section navigation', () => {
+    it('animates a uniform gallery background with the menu, without gradients or divider borders', async () => {
+        await cdp().send('Emulation.setEmulatedMedia', {
+            features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }],
+        });
+        document.documentElement.style.scrollBehavior = 'auto';
+        await GallerySections.run();
+        const surface = gallerySurface();
+        const nav = page.getByRole('navigation').element();
+        const first = document.getElementById('ceremony');
+        const footer = document.querySelector('footer');
+        if (!first || !footer) throw new Error('Gallery section or footer is missing');
+        expect(getComputedStyle(surface).backgroundColor).toBe('rgb(21, 22, 17)');
+        expect(getComputedStyle(surface).transitionDuration).toBe('0.6s, 0.6s');
+        expect(getComputedStyle(first).backgroundImage).toBe('none');
+        expect(getComputedStyle(first).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+        expect(getComputedStyle(nav).borderBottomWidth).toBe('0px');
+        expect(getComputedStyle(footer).borderTopWidth).toBe('0px');
+        await page.getByRole('link', { name: 'Efter vielsen', exact: true }).click();
+        await expect
+            .poll(() => surface.getAnimations().some((animation) => animation instanceof CSSTransition))
+            .toBe(true);
+        expect(getComputedStyle(surface).backgroundColor).not.toBe('rgb(250, 255, 239)');
+        await expect.poll(() => getComputedStyle(surface).backgroundColor).toBe('rgb(250, 255, 239)');
+        expect(getComputedStyle(nav).backgroundColor).toBe(getComputedStyle(surface).backgroundColor);
+        expect(getComputedStyle(first.querySelector('h2') ?? first).color).toBe('rgb(21, 22, 17)');
+        await page.getByRole('link', { name: 'Vielsen', exact: true }).click();
+        await expect.poll(() => getComputedStyle(surface).backgroundColor).toBe('rgb(21, 22, 17)');
+    });
+
+    it('updates the shared theme for text sections while keeping photo navigation active', async () => {
+        await WithTextSection.run();
+        const note = document.getElementById('gallery-note');
+        if (!note) throw new Error('Text section is missing');
+        note.scrollIntoView({ behavior: 'instant' });
+        await expect.poll(() => getComputedStyle(gallerySurface()).backgroundColor).toBe('rgb(240, 243, 230)');
+        await expect
+            .element(page.getByRole('link', { name: 'Vielsen', exact: true }))
+            .toHaveAttribute('aria-current', 'location');
+        expect(gallerySurface().getAnimations()).toHaveLength(0);
+        expect(getComputedStyle(gallerySurface()).transitionProperty).toBe('none');
+    });
+
     it('keeps the selected section active after scrolling to its anchor offset', async () => {
         await GallerySections.run();
         const last = page.getByRole('link', { name: 'Efter vielsen', exact: true });

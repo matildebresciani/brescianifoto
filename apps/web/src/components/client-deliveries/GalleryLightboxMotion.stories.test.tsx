@@ -55,7 +55,39 @@ afterEach(async () => {
 });
 
 describe('delivery lightbox transitions', () => {
-    it('holds the previous photo while loading, then fades and removes it', async () => {
+    it('keeps an opaque photo behind every frame of the replacement fade', async () => {
+        await MultipleSections.run();
+        await page.getByRole('button', { name: 'Open photo 1: Concert stage', exact: true }).click();
+        settlePhoto();
+        const previous = currentSlide();
+        await expect.poll(() => getComputedStyle(previous).opacity).toBe('1');
+        await page.getByRole('button', { name: 'Next photo', exact: true }).click();
+        const incoming = currentSlide();
+        const photo = incoming.querySelector('img');
+        if (!photo) throw new Error('Incoming photo is missing');
+        settlePhoto();
+        const frames: { backing: string; photo: string }[] = [];
+        await new Promise<void>((resolve) => {
+            const sample = () => {
+                if (!previous.isConnected) {
+                    resolve();
+                    return;
+                }
+                frames.push({
+                    backing: getComputedStyle(previous).opacity,
+                    photo: getComputedStyle(photo).opacity,
+                });
+                requestAnimationFrame(sample);
+            };
+            requestAnimationFrame(sample);
+        });
+        expect(frames.length).toBeGreaterThan(0);
+        expect(frames.every((frame) => frame.backing === '1' && frame.photo === '1')).toBe(true);
+        expect(getComputedStyle(photo).transitionProperty).not.toContain('opacity');
+        expect(getComputedStyle(incoming).opacity).toBe('1');
+    });
+
+    it('holds the previous photo until its replacement has finished fading in', async () => {
         await MultipleSections.run();
         await page.getByRole('button', { name: 'Open photo 1: Concert stage', exact: true }).click();
         settlePhoto();

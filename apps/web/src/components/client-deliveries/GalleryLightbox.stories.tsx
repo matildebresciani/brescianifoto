@@ -55,7 +55,7 @@ const meta = {
                 <PhotoSection block={first} />
                 <p className="body-md">Between the sets.</p>
                 <PhotoSection block={{ ...first, id: 'empty', anchor: 'empty', photos: [] }} />
-                <PhotoSection block={second} previousTheme={first.theme} />
+                <PhotoSection block={second} />
             </>
         ),
     },

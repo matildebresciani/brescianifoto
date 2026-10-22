@@ -6,6 +6,7 @@ import { createContext, type ReactNode, useCallback, useEffect, useMemo, useStat
 import Close from '@/components/atoms/frontend/buttons/Close';
 import ArrowIcon from '@/components/atoms/frontend/icons/ArrowIcon';
 import LightboxPreloader from '@/components/molecules/frontend/LightboxPreloader';
+import { LightboxStage } from '@/components/molecules/frontend/LightboxStage';
 import LightboxThumbnails from '@/components/molecules/frontend/LightboxThumbnails';
 import ModalDialog from '@/components/molecules/frontend/ModalDialog';
 import Portal from '@/components/molecules/Portal';
@@ -13,7 +14,6 @@ import { type DeliveryTheme, themeStyle } from '@/lib/client-deliveries/shared';
 import type { DeliveryPhoto } from '@/lib/client-deliveries/view';
 import { getLightboxImageKey, getLightboxImageSize, type LightboxViewport } from '@/lib/utilities/lightbox-images';
 import type { Media } from '@/payload-types';
-import { GalleryLightboxStage } from './GalleryLightboxStage';
 
 /** Lets photo sections open the same viewer without moving server-rendered content into the client bundle. */
 export const GalleryLightboxContext = createContext<((photo: DeliveryPhoto, theme: DeliveryTheme) => void) | null>(
@@ -154,7 +154,7 @@ function DeliveryLightbox({
                             <ArrowIcon className="rotate-180" />
                         </button>
                     )}
-                    <GalleryLightboxStage
+                    <LightboxStage
                         image={image}
                         onNavigate={navigate}
                         onViewportChange={measureViewport}

@@ -2,7 +2,7 @@
 
 import { Download, LoaderCircle } from 'lucide-react';
 import { ResultAsync } from 'neverthrow';
-import { useId, useRef, useState } from 'react';
+import { type CSSProperties, useId, useRef, useState } from 'react';
 import { z } from 'zod';
 import { formatBytes } from '@/lib/client-deliveries/shared';
 
@@ -65,25 +65,49 @@ export function DownloadArchiveButton({
         <div className="relative shrink-0">
             <button
                 type="button"
-                className="metadata focus-ring inline-flex min-h-12 items-center justify-center gap-xs rounded-[var(--btn-radius)] border border-bg-invert bg-bg-invert px-base py-xs text-fg-on-color transition-[background-color,color,border-color,opacity] duration-[360ms] ease-[var(--delivery-ease)] enabled:cursor-pointer enabled:hover:bg-bg-base enabled:hover:text-fg-base enabled:active:bg-bg-pressed disabled:cursor-not-allowed disabled:border-border-base disabled:bg-bg-subtle disabled:text-fg-subtle aria-busy:cursor-wait motion-reduce:transition-none"
+                className="delivery-download metadata focus-ring inline-flex min-h-12 items-center justify-center gap-xs rounded-[var(--btn-radius)] border border-bg-invert bg-bg-invert px-base py-xs text-fg-on-color transition-[background-color,color,border-color] duration-[360ms] ease-[var(--delivery-ease)] enabled:cursor-pointer enabled:active:bg-bg-pressed disabled:cursor-not-allowed disabled:border-border-base disabled:bg-bg-subtle disabled:text-fg-subtle aria-busy:cursor-wait motion-reduce:transition-none"
                 disabled={isDisabled || isPreparing}
                 aria-busy={isPreparing}
                 aria-describedby={statusId}
                 onClick={startDownload}
             >
-                <span className={`shrink-0${isPreparing ? ' animate-spin motion-reduce:animate-none' : ''}`}>
+                <span className="relative size-4 shrink-0 overflow-hidden" aria-hidden="true">
                     {isPreparing ? (
-                        <LoaderCircle size={16} strokeWidth={1.5} aria-hidden="true" />
+                        <span className="block animate-spin motion-reduce:animate-none">
+                            <LoaderCircle size={16} strokeWidth={1.5} aria-hidden="true" />
+                        </span>
                     ) : (
-                        <Download size={16} strokeWidth={1.5} aria-hidden="true" />
+                        <>
+                            <span className="delivery-download-icon block">
+                                <Download size={16} strokeWidth={1.5} aria-hidden="true" />
+                            </span>
+                            <span className="delivery-download-icon absolute -top-full left-0 block">
+                                <Download size={16} strokeWidth={1.5} aria-hidden="true" />
+                            </span>
+                        </>
                     )}
                 </span>
                 <span className="flex flex-col items-start gap-2xs sm:flex-row sm:items-center sm:gap-xs">
-                    <span className="grid text-left">
+                    <span className="sr-only">{label}</span>
+                    <span className="grid h-[1lh] overflow-hidden text-left" aria-hidden="true">
                         <span className="invisible col-start-1 row-start-1" aria-hidden="true">
                             Download again
                         </span>
-                        <span className="col-start-1 row-start-1">{label}</span>
+                        <span className="col-start-1 row-start-1 whitespace-nowrap">
+                            {Array.from(label).map((character, index) => {
+                                const style: CSSProperties & Record<string, number> = { '--roll-index': index };
+                                return (
+                                    <span
+                                        key={label.slice(0, index + 1)}
+                                        className="delivery-download-character"
+                                        data-character={character}
+                                        style={style}
+                                    >
+                                        {character}
+                                    </span>
+                                );
+                            })}
+                        </span>
                     </span>
                     <span className="whitespace-nowrap sm:border-l sm:border-current/30 sm:pl-xs">
                         {formatBytes(byteSize)}

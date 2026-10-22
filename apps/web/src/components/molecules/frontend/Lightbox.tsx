@@ -8,8 +8,8 @@ import Portal from '@/components/molecules/Portal';
 import { getLightboxImageKey, getLightboxImageSize, type LightboxViewport } from '@/lib/utilities/lightbox-images';
 import { wrapIndex } from '@/lib/utilities/wrap-index';
 import type { Media } from '@/payload-types';
-import LightboxImage from './LightboxImage';
 import LightboxPreloader from './LightboxPreloader';
+import { LightboxStage } from './LightboxStage';
 import LightboxThumbnails from './LightboxThumbnails';
 import ModalDialog from './ModalDialog';
 
@@ -77,8 +77,7 @@ const Lightbox = ({ items, index, onClose, onNavigate }: Props) => {
                         </button>
                     )}
 
-                    <LightboxImage
-                        key={`${getLightboxImageKey(current)}:${index}`}
+                    <LightboxStage
                         image={current}
                         onViewportChange={measureViewport}
                         onReady={(size) => setReadyKey(`${getLightboxImageKey(current)}:${size}`)}

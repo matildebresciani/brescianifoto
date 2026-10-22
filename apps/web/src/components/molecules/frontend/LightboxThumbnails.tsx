@@ -34,6 +34,10 @@ const LightboxThumbnails = ({ items, index, onNavigate }: Props) => {
         const strip = stripRef.current;
         const active = activeRef.current;
         if (!strip || !active || !items[index]) return;
+        // Arrow navigation should not leave the focus marker on a previously clicked thumbnail.
+        if (strip.contains(document.activeElement) && document.activeElement !== active) {
+            active.focus({ preventScroll: true });
+        }
 
         const followActivePhoto = (behavior: ScrollBehavior = 'instant') => {
             const stripRect = strip.getBoundingClientRect();
@@ -139,8 +143,8 @@ const LightboxThumbnails = ({ items, index, onNavigate }: Props) => {
                     aria-label={`Go to photo ${i + 1}`}
                     aria-current={i === index}
                     className={cn(
-                        'lightbox-thumbnail group relative size-12 shrink-0 cursor-[inherit] overflow-hidden rounded-none border transition-colors duration-200 motion-reduce:transition-none md:size-14',
-                        i === index ? 'border-border-highlight' : 'border-border-subtle hover:border-border-strong',
+                        'lightbox-thumbnail focus-ring group relative size-12 shrink-0 cursor-[inherit] overflow-hidden rounded-none border transition-colors duration-200 motion-reduce:transition-none md:size-14',
+                        i === index ? 'border-border-highlight' : 'border-border-subtle',
                     )}
                     onClick={() => onNavigate(i)}
                 >

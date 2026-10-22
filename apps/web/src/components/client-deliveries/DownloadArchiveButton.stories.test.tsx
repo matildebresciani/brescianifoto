@@ -1,6 +1,6 @@
 import { composeStories } from '@storybook/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cdp, page } from 'vitest/browser';
+import { cdp, page, userEvent } from 'vitest/browser';
 import * as stories from './DownloadArchiveButton.stories';
 import * as menuStories from './SectionMenu.stories';
 
@@ -28,6 +28,42 @@ afterEach(async () => {
 });
 
 describe('gallery archive download', () => {
+    it('rolls the label and icon on hover without changing the fill or button size', async () => {
+        await cdp().send('Emulation.setEmulatedMedia', {
+            features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }],
+        });
+        await Ready.run();
+        const button = page.getByRole('button', { name: /Download all/ });
+        const element = button.element();
+        const bounds = element.getBoundingClientRect();
+        const background = getComputedStyle(element).backgroundColor;
+        const character = element.querySelector('.delivery-download-character');
+        const icon = element.querySelector('.delivery-download-icon');
+        if (!character || !icon) throw new Error('Rolling label or icon is missing');
+        const translateY = (target: Element) => new DOMMatrixReadOnly(getComputedStyle(target).transform).m42;
+        await button.hover();
+        await expect
+            .poll(() => Math.round(translateY(character)))
+            .toBe(-Math.round(character.getBoundingClientRect().height));
+        await expect.poll(() => translateY(icon)).toBe(16);
+        expect(getComputedStyle(element).backgroundColor).toBe(background);
+        expect(element.getBoundingClientRect().width).toBe(bounds.width);
+        expect(element.getBoundingClientRect().height).toBe(bounds.height);
+        await cdp().send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 500, y: 300 });
+        await expect.poll(() => translateY(character)).toBe(0);
+        await expect.poll(() => translateY(icon)).toBe(0);
+    });
+
+    it('offers the same rolling feedback for keyboard focus with a single accessible label', async () => {
+        await Ready.run();
+        await userEvent.tab();
+        const button = page.getByRole('button', { name: 'Download all 2.2 GB', exact: true });
+        await expect.element(button).toHaveFocus();
+        const icon = button.element().querySelector('.delivery-download-icon');
+        if (!icon) throw new Error('Rolling icon is missing');
+        await expect.poll(() => new DOMMatrixReadOnly(getComputedStyle(icon).transform).m42).toBe(16);
+    });
+
     it('disables repeat clicks while preparing and hands only the signed URL to the browser', async () => {
         const pending = pendingResponse();
         fetchDownload.mockReturnValueOnce(pending.promise);
@@ -42,6 +78,10 @@ describe('gallery archive download', () => {
         const preparing = page.getByRole('button', { name: /Preparing/ });
         await expect.element(preparing).toBeDisabled();
         await expect.element(preparing).toHaveAttribute('aria-busy', 'true');
+        for (const character of preparing.element().querySelectorAll('.delivery-download-character')) {
+            expect(getComputedStyle(character).transform).toBe('none');
+            expect(getComputedStyle(character).transitionProperty).toBe('none');
+        }
         expect(fetchDownload).toHaveBeenCalledTimes(1);
         expect(fetchDownload).toHaveBeenCalledWith(
             stories.default.args?.href,
@@ -91,6 +131,10 @@ describe('gallery archive download', () => {
         const button = page.getByRole('button', { name: /Download all/ });
         await expect.element(button).toBeDisabled();
         const element = button.element();
+        await button.hover();
+        for (const character of element.querySelectorAll('.delivery-download-character')) {
+            expect(getComputedStyle(character).transform).toBe('none');
+        }
         if (element instanceof HTMLButtonElement) element.click();
         expect(fetchDownload).not.toHaveBeenCalled();
     });
@@ -125,5 +169,10 @@ describe('gallery archive download', () => {
         expect(getComputedStyle(button).transitionProperty).toBe('none');
         pending.resolve(new Response(null, { status: 503 }));
         await expect.element(page.getByRole('button', { name: /Download all/ })).toBeEnabled();
+        await page.getByRole('button', { name: /Download all/ }).hover();
+        for (const part of button.querySelectorAll('.delivery-download-character, .delivery-download-icon')) {
+            expect(getComputedStyle(part).transform).toBe('none');
+            expect(getComputedStyle(part).transitionProperty).toBe('none');
+        }
     });
 });
