@@ -13,18 +13,29 @@ vi.mock('next/image', () => ({
         priority,
         alt,
         style,
+        quality,
         ...props
-    }: ComponentProps<'img'> & { fill?: boolean; priority?: boolean }) => (
+    }: ComponentProps<'img'> & { fill?: boolean; priority?: boolean; quality?: number }) => (
         // biome-ignore lint/performance/noImgElement: Exercise real browser layout without the Next.js optimizer.
         <img
             {...props}
             alt={alt}
+            data-image-quality={quality}
             style={fill ? { ...style, position: 'absolute', inset: 0, width: '100%', height: '100%' } : style}
         />
     ),
 }));
 
 const { MultipleSections, SinglePhoto } = composeStories(stories);
+
+async function tap(element: Element) {
+    const rect = element.getBoundingClientRect();
+    const frame = window.frameElement?.getBoundingClientRect();
+    const x = rect.left + rect.width / 2 + (frame?.left ?? 0);
+    const y = rect.top + rect.height / 2 + (frame?.top ?? 0);
+    await cdp().send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
+    await cdp().send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+}
 
 async function expectPhoto(name: string, count: string) {
     await expect.poll(() => document.querySelector('[role="dialog"] .metadata')?.textContent).toBe(count);
@@ -40,16 +51,68 @@ async function expectPhoto(name: string, count: string) {
 }
 
 beforeEach(async () => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
     await page.viewport(1200, 800);
     await cdp().send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
 });
 
 afterEach(async () => {
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
     await cdp().send('Emulation.setTouchEmulationEnabled', { enabled: false });
     await cdp().send('Emulation.setEmulatedMedia', { features: [] });
 });
 
 describe('one lightbox for the complete client gallery', () => {
+    it('uses quality 90 for the opened phone photo and its next-photo preload', async () => {
+        await page.viewport(393, 852);
+        await MultipleSections.run();
+        await page.getByRole('button', { name: 'Åbn billede 1: Concert stage', exact: true }).click();
+        await expect
+            .poll(() => document.querySelector('[data-lightbox-slide] img')?.getAttribute('data-image-quality'))
+            .toBe('90');
+        await expect
+            .poll(() =>
+                document.querySelector('[role="dialog"] img[fetchpriority="low"]')?.getAttribute('data-image-quality'),
+            )
+            .toBe('90');
+    });
+    it('keeps mobile controls rectangular and centered after repeated touch taps, without instruction text', async () => {
+        await page.viewport(390, 844);
+        await cdp().send('Emulation.setTouchEmulationEnabled', { enabled: true });
+        await cdp().send('Emulation.setEmulatedMedia', {
+            features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }],
+        });
+        await MultipleSections.run();
+        await page.getByRole('button', { name: 'Åbn billede 1: Concert stage', exact: true }).click();
+        expect(page.getByRole('dialog').element().textContent).not.toContain('Stryg for at se flere');
+        for (const control of document.querySelectorAll('.delivery-lightbox-control')) {
+            const styles = getComputedStyle(control);
+            if (styles.display === 'none') continue;
+            expect(styles.borderRadius).toBe('2px');
+            expect(control.getBoundingClientRect().width).toBe(48);
+            expect(control.getBoundingClientRect().height).toBe(48);
+        }
+        const next = page.getByRole('button', { name: 'Næste billede', exact: true }).element();
+        const previous = page.getByRole('button', { name: 'Forrige billede', exact: true }).element();
+        const controls = [next, next, previous];
+        const counts = ['2 / 3', '3 / 3', '2 / 3'];
+        for (const [index, control] of controls.entries()) {
+            await tap(control);
+            await expect
+                .poll(() => document.querySelector('[role="dialog"] .metadata')?.textContent)
+                .toBe(counts[index]);
+            const icon = control.querySelector('svg');
+            if (!icon) throw new Error('Arrow is missing');
+            const buttonBounds = control.getBoundingClientRect();
+            const iconBounds = icon.getBoundingClientRect();
+            expect(iconBounds.x + iconBounds.width / 2).toBeCloseTo(buttonBounds.x + buttonBounds.width / 2, 1);
+            expect(iconBounds.y + iconBounds.height / 2).toBeCloseTo(buttonBounds.y + buttonBounds.height / 2, 1);
+            expect(getComputedStyle(icon).translate).toBe('none');
+            expect(control.matches(':active')).toBe(false);
+            await expect.poll(() => getComputedStyle(control).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+        }
+    });
+
     it('keeps the selection and keyboard focus on the current thumbnail after clicking and navigating', async () => {
         await MultipleSections.run();
         await page.getByRole('button', { name: 'Åbn billede 1: Concert stage', exact: true }).click();

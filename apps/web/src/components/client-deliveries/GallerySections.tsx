@@ -3,6 +3,7 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { type DeliveryTheme, themeStyle } from '@/lib/client-deliveries/shared';
 import type { DeliveryView } from '@/lib/client-deliveries/view';
+import { BackToTop } from './BackToTop';
 import { SectionMenu } from './SectionMenu';
 
 type SectionTheme = { anchor: string; theme: DeliveryTheme };
@@ -80,6 +81,7 @@ export function GallerySections({
                 {children}
             </main>
             {footer}
+            <BackToTop />
         </div>
     );
 }

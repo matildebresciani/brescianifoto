@@ -44,10 +44,10 @@ export function GalleryLightbox({ photos, children }: { photos: DeliveryPhoto[];
 }
 
 const arrowClasses =
-    'delivery-lightbox-control focus-ring-tight hidden size-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border-base bg-transparent text-fg-base md:flex';
+    'delivery-lightbox-control focus-ring-tight hidden size-12 shrink-0 cursor-pointer items-center justify-center rounded-[var(--btn-radius)] border border-border-base bg-transparent text-fg-base md:flex';
 
 const mobileArrowClasses =
-    'delivery-lightbox-control focus-ring-tight inline-flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border-base bg-transparent text-fg-base';
+    'delivery-lightbox-control focus-ring-tight inline-flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-[var(--btn-radius)] border border-border-base bg-transparent text-fg-base';
 const imageLabels = {
     zoomIn: 'Zoom ind',
     zoomOut: 'Zoom ud',
@@ -127,7 +127,7 @@ function DeliveryLightbox({
                     <div className="flex items-center gap-xs">
                         {current.downloadHref && (
                             <a
-                                className="delivery-lightbox-control focus-ring-tight inline-flex size-12 shrink-0 items-center justify-center rounded-full border border-border-base bg-transparent p-0 text-fg-base"
+                                className="delivery-lightbox-control focus-ring-tight inline-flex size-12 shrink-0 items-center justify-center rounded-[var(--btn-radius)] border border-border-base bg-transparent p-0 text-fg-base"
                                 href={current.downloadHref}
                                 aria-label="Download originalbillede"
                                 title="Download originalbillede"
@@ -138,7 +138,7 @@ function DeliveryLightbox({
                         <Close
                             label="Luk billedvisning"
                             onClick={close}
-                            className="delivery-lightbox-control size-12 rounded-full border border-border-base hover:text-fg-base"
+                            className="delivery-lightbox-control size-12 rounded-[var(--btn-radius)] border border-border-base hover:text-fg-base"
                         />
                     </div>
                 </div>
@@ -156,6 +156,7 @@ function DeliveryLightbox({
                     )}
                     <LightboxStage
                         image={image}
+                        quality={90}
                         shouldFade={false}
                         labels={imageLabels}
                         onNavigate={navigate}
@@ -185,7 +186,6 @@ function DeliveryLightbox({
                             >
                                 <ArrowIcon className="rotate-180" />
                             </button>
-                            <p className="body-xs">Stryg for at se flere</p>
                             <button
                                 type="button"
                                 className={mobileArrowClasses}
@@ -205,6 +205,7 @@ function DeliveryLightbox({
                 )}
                 <LightboxPreloader
                     items={items}
+                    quality={90}
                     index={index}
                     viewport={viewport}
                     isCurrentReady={Boolean(

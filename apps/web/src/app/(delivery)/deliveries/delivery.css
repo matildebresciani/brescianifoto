@@ -4,6 +4,7 @@
     --delivery-ease: cubic-bezier(0.22, 1, 0.36, 1);
     --delivery-color-duration: 600ms;
     --delivery-nav-height: 80px;
+    --delivery-text-nav: clamp(1rem, 0.964286rem + 0.178571vw, 1.125rem);
     --delivery-overlay-color: var(--void);
     --delivery-overlay-opacity: 42%;
     --delivery-cover-text: #faffef;
@@ -197,6 +198,17 @@
     min-width: 0;
     flex: 1;
 }
+.delivery-nav-mobile :is(.delivery-nav-toggle, .delivery-nav-link) {
+    min-height: var(--space-xl);
+    font-family: var(--font-body);
+    font-size: var(--delivery-text-nav);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-ui);
+}
+.delivery-nav-mobile .delivery-nav-link {
+    display: flex;
+    align-items: center;
+}
 .delivery-nav-toggle {
     display: flex;
     width: 100%;
@@ -349,7 +361,7 @@
     align-items: center;
     justify-content: center;
     border: 1px solid var(--border-base);
-    border-radius: 999px;
+    border-radius: var(--btn-radius);
     font-size: var(--text-heading-3);
 }
 .delivery-icon:disabled {
@@ -416,20 +428,17 @@
         background-color 240ms ease,
         border-color 240ms ease;
 }
-.delivery-lightbox .delivery-lightbox-control:hover,
-.delivery-lightbox .delivery-lightbox-control:focus-visible {
+.delivery-lightbox .delivery-lightbox-control:is(:active, :focus-visible) {
     background: var(--bg-invert);
     color: var(--fg-on-color);
     border-color: var(--bg-invert);
 }
-.delivery-lightbox-control svg {
-    transition: translate 320ms var(--delivery-ease);
-}
-.delivery-lightbox-control[aria-label="Næste billede"]:hover svg {
-    translate: 3px 0;
-}
-.delivery-lightbox-control[aria-label="Forrige billede"]:hover svg {
-    translate: -3px 0;
+@media (hover: hover) and (pointer: fine) {
+    .delivery-lightbox .delivery-lightbox-control:hover {
+        background: var(--bg-invert);
+        color: var(--fg-on-color);
+        border-color: var(--bg-invert);
+    }
 }
 .delivery-lightbox .lightbox-thumbnail[aria-current="true"]::after {
     content: "";
@@ -438,13 +447,35 @@
     border: 1px solid var(--fg-base);
     pointer-events: none;
 }
-.delivery-back-to-top span {
-    display: inline-block;
-    transition: transform 300ms var(--delivery-ease);
+.delivery-back-to-top {
+    right: calc(var(--space-md) + env(safe-area-inset-right, 0px));
+    bottom: calc(var(--space-md) + env(safe-area-inset-bottom, 0px));
+    transition:
+        color 240ms ease,
+        background-color 240ms ease,
+        border-color 240ms ease;
 }
-.delivery-back-to-top:hover span,
-.delivery-back-to-top:focus-visible span {
-    transform: translateY(-3px);
+.delivery-back-to-top:is(:active, :focus-visible) {
+    background: var(--bg-invert);
+    color: var(--fg-on-color);
+    border-color: var(--bg-invert);
+}
+@media (hover: hover) and (pointer: fine) {
+    .delivery-back-to-top:hover {
+        background: var(--bg-invert);
+        color: var(--fg-on-color);
+        border-color: var(--bg-invert);
+    }
+}
+body:has(.delivery-lightbox) .delivery-back-to-top {
+    visibility: hidden;
+}
+.delivery-footer > div {
+    padding-inline-end: calc(
+        var(--space-xl) +
+        var(--space-md) +
+        env(safe-area-inset-right, 0px)
+    );
 }
 @keyframes delivery-reveal {
     from {
@@ -547,12 +578,7 @@
     .delivery-download:enabled:is(:hover, :focus-visible)
         .delivery-download-icon,
     .delivery-lightbox-control,
-    .delivery-lightbox-control svg,
-    .delivery-lightbox-control[aria-label="Næste billede"]:hover svg,
-    .delivery-lightbox-control[aria-label="Forrige billede"]:hover svg,
-    .delivery-back-to-top span,
-    .delivery-back-to-top:hover span,
-    .delivery-back-to-top:focus-visible span {
+    .delivery-back-to-top {
         transition: none;
         transform: none;
         translate: none;

@@ -40,7 +40,7 @@ export function DeliveryHero({ gallery }: { gallery: DeliveryView }) {
     );
     return (
         <>
-            <header id="top" className={`delivery-hero ${isOverlay ? 'delivery-hero-overlay' : ''}`}>
+            <header className={`delivery-hero ${isOverlay ? 'delivery-hero-overlay' : ''}`}>
                 {!isOverlay && content}
                 {gallery.cover && (
                     <div className="delivery-cover-frame">

@@ -22,7 +22,12 @@ export function DeliveryGallery({ gallery }: { gallery: DeliveryView }) {
         theme: block.theme,
     }));
     return (
-        <div className="delivery-page min-h-svh bg-bg-base text-fg-base" style={style}>
+        <div
+            id="top"
+            tabIndex={-1}
+            className="delivery-page min-h-svh bg-bg-base text-fg-base outline-none"
+            style={style}
+        >
             {isPreview && <LivePreviewListener />}
             <a href="#main-content" className="skip-link ui-text">
                 Gå til billederne
@@ -48,12 +53,6 @@ export function DeliveryGallery({ gallery }: { gallery: DeliveryView }) {
                     <footer className="delivery-footer px-md text-fg-base md:px-xl">
                         <div className="flex flex-wrap items-center justify-between gap-md py-xl">
                             <p className="body-sm">Fotografier af Matilde Bresciani</p>
-                            <a
-                                href="#top"
-                                className="delivery-back-to-top ui-text underline underline-offset-4 focus-ring"
-                            >
-                                Til toppen <span aria-hidden="true">↑</span>
-                            </a>
                         </div>
                     </footer>
                 }

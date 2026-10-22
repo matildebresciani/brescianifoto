@@ -1,6 +1,6 @@
 import { composeStories } from '@storybook/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { cdp, page } from 'vitest/browser';
+import { cdp, page, userEvent } from 'vitest/browser';
 import * as stories from './SectionMenu.stories';
 
 const { GallerySections, WithTextSection, WithDownload, LongLabels } = composeStories(stories);
@@ -30,11 +30,23 @@ describe('delivery section navigation', () => {
         const toggle = page.getByRole('button', { name: 'Frederiksberg Have', exact: true });
         const label = toggle.element().querySelector('span');
         if (!label) throw new Error('Chapter label is missing');
+        const styles = getComputedStyle(label);
+        expect(Number.parseFloat(styles.fontSize)).toBeGreaterThanOrEqual(16);
+        expect(styles.fontFamily).toMatch(/Archivo/);
+        expect(styles.fontWeight).toBe('500');
+        expect(toggle.element().getBoundingClientRect().height).toBeGreaterThanOrEqual(48);
         expect(label.getBoundingClientRect().right).toBeLessThanOrEqual(toggle.element().getBoundingClientRect().right);
         expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(width);
         await toggle.click();
         await expect.element(page.getByRole('link', { name: 'Familie og venner', exact: true })).toBeVisible();
+        const sectionLink = page.getByRole('link', { name: 'Familie og venner', exact: true }).element();
+        expect(Number.parseFloat(getComputedStyle(sectionLink).fontSize)).toBeGreaterThanOrEqual(16);
+        expect(sectionLink.getBoundingClientRect().height).toBeGreaterThanOrEqual(48);
         expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(width);
+        if (sectionLink instanceof HTMLElement) sectionLink.focus();
+        await userEvent.keyboard('{Escape}');
+        await expect.element(toggle).toHaveAttribute('aria-expanded', 'false');
+        await expect.element(toggle).toHaveFocus();
     });
 
     it('jumps to the selected mobile chapter with motion enabled and keeps focus there', async () => {
