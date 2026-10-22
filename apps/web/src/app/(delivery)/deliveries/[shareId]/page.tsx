@@ -59,7 +59,11 @@ export default async function ClientGalleryPage({
                 </div>
                 <DeliveryHero gallery={gallery} />
             </div>
-            <SectionMenu sections={sections} archive={gallery.archive} />
+            <SectionMenu
+                sections={sections}
+                archive={gallery.archive}
+                theme={gallery.blocks.find((block) => block.type === 'photos')?.theme ?? gallery.theme}
+            />
             <main id="main-content" tabIndex={-1} className="delivery-content outline-none">
                 <GalleryLightbox photos={photos}>
                     {gallery.blocks.map((block) =>

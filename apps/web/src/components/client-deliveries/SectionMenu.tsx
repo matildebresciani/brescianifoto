@@ -1,15 +1,17 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { formatBytes } from '@/lib/client-deliveries/shared';
+import { type DeliveryTheme, formatBytes, themeStyle } from '@/lib/client-deliveries/shared';
 import type { DeliveryView } from '@/lib/client-deliveries/view';
 
 export function SectionMenu({
     sections,
     archive,
+    theme,
 }: {
     sections: { anchor: string; label: string }[];
     archive: DeliveryView['archive'];
+    theme: DeliveryTheme;
 }) {
     const [active, setActive] = useState(sections[0]?.anchor);
     const nav = useRef<HTMLElement>(null);
@@ -62,7 +64,12 @@ export function SectionMenu({
         </a>
     ));
     return (
-        <nav ref={nav} className="delivery-nav border-y border-border-base bg-bg-base" aria-label="Gallery sections">
+        <nav
+            ref={nav}
+            className="delivery-nav border-y border-border-base bg-bg-base text-fg-base"
+            style={themeStyle(theme)}
+            aria-label="Gallery sections"
+        >
             <div className="delivery-nav-desktop">{links}</div>
             <details ref={menu} className="delivery-nav-mobile">
                 <summary className="ui-text focus-ring">
