@@ -224,6 +224,9 @@
     margin-bottom: var(--space-xs);
 }
 .delivery-lightbox {
+    --color-border-highlight: var(--fg-base);
+    --color-border-subtle: color-mix(in srgb, var(--fg-base) 18%, transparent);
+    --color-border-strong: var(--fg-base);
     overscroll-behavior: contain;
 }
 @keyframes delivery-drift {

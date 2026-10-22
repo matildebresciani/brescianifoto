@@ -1,17 +1,24 @@
 'use client';
 
+import { Download } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import Close from '@/components/atoms/frontend/buttons/Close';
+import ArrowIcon from '@/components/atoms/frontend/icons/ArrowIcon';
 import RichText from '@/components/molecules/admin/RichText';
 import LightboxImage from '@/components/molecules/frontend/LightboxImage';
 import LightboxPreloader from '@/components/molecules/frontend/LightboxPreloader';
+import LightboxThumbnails from '@/components/molecules/frontend/LightboxThumbnails';
 import ModalDialog from '@/components/molecules/frontend/ModalDialog';
 import Portal from '@/components/molecules/Portal';
 import { type DeliveryTheme, themeStyle } from '@/lib/client-deliveries/shared';
 import type { DeliveryBlock, DeliveryPhoto } from '@/lib/client-deliveries/view';
 import { getLightboxImageKey, getLightboxImageSize, type LightboxViewport } from '@/lib/utilities/lightbox-images';
 import type { Media } from '@/payload-types';
+
+const arrowClasses =
+    'focus-ring-tight hidden size-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border-base bg-transparent text-fg-base transition-colors duration-200 hover:bg-bg-pressed motion-reduce:transition-none md:flex';
 
 function DeliveryLightbox({
     photos,
@@ -76,21 +83,39 @@ function DeliveryLightbox({
                 style={themeStyle(theme)}
                 className="delivery-lightbox modal--open fixed inset-0 z-50 flex flex-col bg-bg-base text-fg-base outline-none"
             >
-                <div className="flex flex-wrap items-center justify-between gap-base p-base">
+                <div className="flex shrink-0 items-center justify-between gap-base p-base">
                     <p className="metadata">
                         {index + 1} / {photos.length}
                     </p>
-                    <p className="body-sm max-w-[50%] break-words">{current.name}</p>
-                    <button
-                        type="button"
-                        className="delivery-icon focus-ring"
-                        onClick={close}
-                        aria-label="Close photo viewer"
-                    >
-                        ×
-                    </button>
+                    <div className="flex items-center gap-xs">
+                        {current.downloadHref && (
+                            <a
+                                className="focus-ring-tight inline-flex size-12 shrink-0 items-center justify-center rounded-full border-0 bg-transparent p-0 text-fg-base transition-colors duration-200 hover:bg-bg-pressed motion-reduce:transition-none"
+                                href={current.downloadHref}
+                                aria-label="Download original"
+                                title="Download original"
+                            >
+                                <Download size={20} strokeWidth={1.25} aria-hidden="true" />
+                            </a>
+                        )}
+                        <Close
+                            onClick={close}
+                            className="size-12 rounded-full hover:bg-bg-pressed hover:text-fg-base"
+                        />
+                    </div>
                 </div>
                 <div className="flex min-h-0 flex-1 items-center gap-xs px-xs">
+                    {photos.length > 1 && (
+                        <button
+                            type="button"
+                            className={arrowClasses}
+                            aria-label="Previous photo"
+                            title="Previous photo"
+                            onClick={() => navigate(-1)}
+                        >
+                            <ArrowIcon className="rotate-180" />
+                        </button>
+                    )}
                     <LightboxImage
                         key={getLightboxImageKey(image)}
                         image={image}
@@ -98,32 +123,19 @@ function DeliveryLightbox({
                         onViewportChange={measureViewport}
                         onReady={(size) => setReadyKey(`${getLightboxImageKey(image)}:${size}`)}
                     />
-                </div>
-                <div className="flex items-center justify-between gap-base p-base">
-                    <button
-                        type="button"
-                        className="delivery-icon focus-ring"
-                        aria-label="Previous photo"
-                        disabled={photos.length < 2}
-                        onClick={() => navigate(-1)}
-                    >
-                        ←
-                    </button>
-                    {current.downloadHref && (
-                        <a className="delivery-outline ui-text focus-ring" href={current.downloadHref}>
-                            Download original
-                        </a>
+                    {photos.length > 1 && (
+                        <button
+                            type="button"
+                            className={arrowClasses}
+                            aria-label="Next photo"
+                            title="Next photo"
+                            onClick={() => navigate(1)}
+                        >
+                            <ArrowIcon />
+                        </button>
                     )}
-                    <button
-                        type="button"
-                        className="delivery-icon focus-ring"
-                        aria-label="Next photo"
-                        disabled={photos.length < 2}
-                        onClick={() => navigate(1)}
-                    >
-                        →
-                    </button>
                 </div>
+                {photos.length > 1 && <LightboxThumbnails items={items} index={index} onNavigate={setIndex} />}
                 <LightboxPreloader
                     items={items}
                     index={index}
