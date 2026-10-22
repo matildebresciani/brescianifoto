@@ -191,11 +191,11 @@ describe('shared gallery archive pages', () => {
 
     it('generates localized canonical URLs without a groups segment', async () => {
         expect(await generateMetadata({ params: params('concerts') })).toMatchObject({
-            title: 'Concerts',
+            title: 'brescianifoto | Concerts',
             alternates: { canonical: '/galleries/concerts' },
         });
         expect(await generateMetadata({ params: params('band', 'en') })).toMatchObject({
-            title: 'The band',
+            title: 'brescianifoto | The band',
             alternates: { canonical: '/en/galleries/band' },
         });
     });

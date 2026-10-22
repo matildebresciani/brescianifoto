@@ -12,6 +12,7 @@ import { pageNumberSchema } from '../schemas/pages';
 import { trimTrailingSlash } from '../utilities/composables';
 import { formatLinkByCollection } from '../utilities/format-link';
 import { getServerSideURL } from '../utilities/get-url';
+import { withPageTitle } from './metadata-title';
 import { getCachedEntryBySlug } from './payload/get-cached-entry-by-slug';
 import { getCachedOptions } from './payload/get-cached-options';
 import { getImageSlugFromMedia } from './payload/get-image-url';
@@ -69,7 +70,7 @@ export const generateEntryMetadata = async (slug: string, collection: Collection
 
     if (!entry) return meta;
 
-    meta.title = `${options.meta?.metaTitlePrefix ?? ''}${entry.meta?.title?.length ? entry.meta.title : entry.title}${options.meta?.metaTitleSuffix ?? ''}`;
+    const title = `${options.meta?.metaTitlePrefix ?? ''}${entry.meta?.title?.length ? entry.meta.title : entry.title}${options.meta?.metaTitleSuffix ?? ''}`;
     if (entry.meta?.description) meta.description = entry.meta.description;
 
     if (entry.meta?.image) {
@@ -95,7 +96,7 @@ export const generateEntryMetadata = async (slug: string, collection: Collection
         };
     }
 
-    return meta;
+    return withPageTitle(meta, title);
 };
 
 type ArchiveMetadataProps = {
@@ -161,5 +162,5 @@ export const generateArchiveMetadata = async (props: ArchiveMetadataProps) => {
         canonical: canonicalUrl,
     };
 
-    return metadata;
+    return withPageTitle(metadata, typeof metadata.title === 'string' ? metadata.title : presentationCopy.postsTitle);
 };

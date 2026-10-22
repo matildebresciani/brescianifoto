@@ -7,6 +7,7 @@ import { RenderBlocks } from '@/components/organisms/blocks/RenderBlocks';
 import { defaultLocale, type Locale } from '@/i18n/localized-collections';
 import { presentationCopy } from '@/i18n/presentation';
 import { generateEntryMetadata } from '@/lib/data/metadata';
+import { withPageTitle } from '@/lib/data/metadata-title';
 import { getCachedEntryById } from '@/lib/data/payload/get-cached-entry-by-id';
 import { getCachedEntryBySlug } from '@/lib/data/payload/get-cached-entry-by-slug';
 import { getCachedOptions } from '@/lib/data/payload/get-cached-options';
@@ -59,8 +60,8 @@ export const generateMetadata = async ({ params: paramsPromise }: Props): Promis
     if (!page) return {};
 
     const metadata = await generateEntryMetadata(page.slug ?? slug, collection, locale);
-    if (slug === '' && !page.meta?.title?.trim()) metadata.title = presentationCopy.homepageTitle;
     if (slug === '') metadata.alternates = { canonical: locale === defaultLocale ? '/' : `/${locale}` };
+    if (slug === '' && !page.meta?.title?.trim()) return withPageTitle(metadata, presentationCopy.homepageTitle);
     return metadata;
 };
 

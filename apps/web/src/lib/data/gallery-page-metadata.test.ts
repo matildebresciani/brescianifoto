@@ -18,7 +18,7 @@ describe('gallery sharing metadata', () => {
     it('uses identity, a canonical URL, and the cover when editor overrides are absent', () => {
         const metadata = generateGalleryPageMetadata(gallery, 'da', 'https://brescianifoto.vercel.app');
         expect(metadata).toMatchObject({
-            title: 'Artist — brescianifoto',
+            title: 'brescianifoto | Artist',
             description: 'Artist · 15 Oct 2026 / 1 image',
             alternates: { canonical: '/gallery/artist-at-vega' },
             openGraph: { images: [{ url: 'https://brescianifoto.vercel.app/images/__mocks__/placeholder.jpg' }] },
@@ -33,7 +33,7 @@ describe('gallery sharing metadata', () => {
                 'https://example.com',
             ),
         ).toMatchObject({
-            title: 'Editorial title',
+            title: 'brescianifoto | Editorial title',
             description: 'Editorial description',
             alternates: { canonical: '/en/gallery/artist-at-vega' },
             openGraph: { images: undefined },

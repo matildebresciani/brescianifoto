@@ -47,11 +47,11 @@ describe('delivery social previews', () => {
         mocks.read.mockResolvedValue(data);
         const metadata = await deliveryMetadata('a'.repeat(32), false);
         expect(metadata).toMatchObject({
-            title: 'Alex & Jamie · brescianifoto',
+            title: 'brescianifoto | Alex & Jamie',
             description: '17. oktober 2026 · København',
             alternates: { canonical: `https://example.test/deliveries/${'a'.repeat(32)}` },
             openGraph: {
-                title: 'Alex & Jamie',
+                title: 'brescianifoto | Alex & Jamie',
                 description: '17. oktober 2026 · København',
                 siteName: 'brescianifoto',
                 locale: 'da_DK',
@@ -69,7 +69,7 @@ describe('delivery social previews', () => {
             },
             twitter: {
                 card: 'summary_large_image',
-                title: 'Alex & Jamie',
+                title: 'brescianifoto | Alex & Jamie',
                 description: '17. oktober 2026 · København',
             },
         });
@@ -83,7 +83,7 @@ describe('delivery social previews', () => {
         mocks.read.mockResolvedValue({ ...data, gallery: { ...gallery, date: null, location: null } });
         expect(await deliveryMetadata('a'.repeat(32), false)).toMatchObject({
             description: 'Billedgalleri med Alex & Jamie.',
-            openGraph: { title: 'Alex & Jamie', description: 'Billedgalleri med Alex & Jamie.' },
+            openGraph: { title: 'brescianifoto | Alex & Jamie', description: 'Billedgalleri med Alex & Jamie.' },
         });
     });
     it('never queries or exposes draft content in preview metadata', async () => {

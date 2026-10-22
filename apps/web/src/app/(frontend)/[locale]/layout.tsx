@@ -5,9 +5,10 @@ import StartBodyScripts from '@/components/organisms/global/body/StartBodyScript
 import { Footer } from '@/components/organisms/global/footer/Footer';
 import HeadScripts from '@/components/organisms/global/head/HeadScripts';
 import { Header } from '@/components/organisms/global/header/Header';
-import { presentationLanguage } from '@/i18n/presentation';
+import { presentationCopy, presentationLanguage } from '@/i18n/presentation';
 import { getDefaultOgImage } from '@/lib/data/metadata';
 import { metadataIcons } from '@/lib/data/metadata-icons';
+import { formatPageTitle } from '@/lib/data/metadata-title';
 import { getCachedOptions } from '@/lib/data/payload/get-cached-options';
 import { Providers } from '@/lib/providers/Providers';
 import { archivo, ibmPlexMono, instrumentSerif } from '@/lib/styles/fonts';
@@ -62,6 +63,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
     assertLocale(locale);
 
     meta.metadataBase = new URL(getServerSideURL());
+    meta.title = formatPageTitle(presentationCopy.homepageTitle);
     meta.icons = metadataIcons;
 
     const ogImage = await getDefaultOgImage(locale);

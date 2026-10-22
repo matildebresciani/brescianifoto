@@ -4,10 +4,11 @@ import { getGalleryCoverImage, payloadObject } from '@/lib/utilities/composables
 import { formatLinkByCollection } from '@/lib/utilities/format-link';
 import { formatGalleryMetadata } from '@/lib/utilities/gallery-metadata';
 import type { Gallery } from '@/payload-types';
+import { formatPageTitle } from './metadata-title';
 
 /** Uses editor overrides when present and the gallery's own identity and cover otherwise. */
 export function generateGalleryPageMetadata(gallery: Gallery, locale: Locale, serverURL: string): Metadata {
-    const title = gallery.meta?.title?.trim() || `${gallery.title} — brescianifoto`;
+    const title = formatPageTitle(gallery.meta?.title?.trim() || gallery.title);
     const description =
         gallery.meta?.description?.trim() ||
         gallery.contentMeta?.excerpt?.trim() ||

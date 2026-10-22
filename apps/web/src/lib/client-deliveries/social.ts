@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import type { Metadata } from 'next';
 import sharp from 'sharp';
+import { formatPageTitle } from '@/lib/data/metadata-title';
 import { getServerSideURL } from '@/lib/utilities/get-url';
 import { readDelivery } from './read';
 import { maxPhotoBytes, relationshipID } from './shared';
@@ -17,12 +18,12 @@ export function featuredPhoto(data: NonNullable<Awaited<ReturnType<typeof readDe
 
 /** Social metadata never reads draft content, even in an authenticated preview. */
 export async function deliveryMetadata(shareId: string, isPreview: boolean): Promise<Metadata> {
-    if (isPreview) return { title: 'Forhåndsvisning · brescianifoto', openGraph: null, twitter: null };
+    if (isPreview) return { title: formatPageTitle('Forhåndsvisning'), openGraph: null, twitter: null };
     const data = await readDelivery(shareId);
-    if (!data) return { title: 'Galleriet er ikke tilgængeligt · brescianifoto', openGraph: null, twitter: null };
+    if (!data) return { title: formatPageTitle('Galleriet er ikke tilgængeligt'), openGraph: null, twitter: null };
     const { gallery } = data;
     const photo = featuredPhoto(data);
-    const title = gallery.title;
+    const title = formatPageTitle(gallery.title);
     const description =
         [
             gallery.date &&
@@ -35,7 +36,7 @@ export async function deliveryMetadata(shareId: string, isPreview: boolean): Pro
             gallery.location,
         ]
             .filter(Boolean)
-            .join(' · ') || `Billedgalleri med ${title}.`;
+            .join(' · ') || `Billedgalleri med ${gallery.title}.`;
     const url = new URL(`/deliveries/${shareId}`, getServerSideURL()).toString();
     const revision = createHash('sha256')
         .update(JSON.stringify([gallery.updatedAt, photo?.checksum, gallery.focalX ?? 50, gallery.focalY ?? 50]))
@@ -46,13 +47,13 @@ export async function deliveryMetadata(shareId: string, isPreview: boolean): Pro
               {
                   url: `${url}/social-image?v=${revision}`,
                   ...socialImageSize,
-                  alt: `${title} — forsidebillede`,
+                  alt: `${gallery.title} — forsidebillede`,
                   type: 'image/jpeg',
               },
           ]
         : [];
     return {
-        title: `${title} · brescianifoto`,
+        title,
         description,
         alternates: { canonical: url },
         openGraph: { type: 'website', title, description, siteName: 'brescianifoto', locale: 'da_DK', url, images },
