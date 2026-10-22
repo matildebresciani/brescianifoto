@@ -52,12 +52,11 @@ describe('delivery section navigation', () => {
             .element(page.getByRole('button', { name: 'Efter vielsen', exact: true }))
             .toHaveAttribute('aria-expanded', 'false');
         expect(document.activeElement).toBe(document.getElementById('after-ceremony'));
+        expect(window.location.hash).toBe('#after-ceremony');
         expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(innerWidth);
         await page.getByRole('button', { name: 'Efter vielsen', exact: true }).click();
         await page.getByRole('link', { name: 'Vielsen', exact: true }).click();
-        await expect
-            .poll(() => document.getElementById('ceremony')?.getBoundingClientRect().top)
-            .toBeGreaterThanOrEqual(0);
+        await expect.poll(() => document.getElementById('ceremony')?.getBoundingClientRect().top).toBeLessThan(150);
         await expect
             .element(page.getByRole('button', { name: 'Vielsen', exact: true }))
             .toHaveAttribute('aria-expanded', 'false');

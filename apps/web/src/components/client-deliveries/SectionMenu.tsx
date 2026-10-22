@@ -32,12 +32,12 @@ export function SectionMenu({
                 requestAnimationFrame(() => {
                     const target = document.getElementById(section.anchor);
                     if (!target) return;
-                    // Focus before scrolling: moving focus during a native smooth anchor jump cancels it on mobile.
-                    target.focus({ preventScroll: true });
-                    target.scrollIntoView({ block: 'start', behavior: shouldReduceMotion ? 'instant' : 'smooth' });
                     if (window.location.hash !== `#${section.anchor}`) {
                         window.history.pushState(null, '', `#${section.anchor}`);
                     }
+                    target.focus({ preventScroll: true });
+                    // Complete chapter jumps atomically: mobile browsers can cancel smooth scrolling as the menu closes.
+                    target.scrollIntoView({ block: 'start', behavior: 'instant' });
                 });
             }}
         >
