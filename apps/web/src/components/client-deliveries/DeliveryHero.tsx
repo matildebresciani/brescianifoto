@@ -30,7 +30,7 @@ export function DeliveryHero({ gallery }: { gallery: DeliveryView }) {
                 <div className="mt-md">
                     <a
                         href="#main-content"
-                        className="delivery-hero-link focus-ring metadata inline-flex min-h-12 items-center justify-center px-xs py-xs underline"
+                        className="delivery-hero-link focus-ring metadata inline-flex min-h-12 items-center justify-center rounded-[var(--btn-radius)] border border-current px-md py-xs no-underline"
                     >
                         Se galleriet
                     </a>
