@@ -297,6 +297,7 @@
     background: var(--bg-invert);
     color: var(--fg-on-color);
 }
+.delivery-hero-link,
 .delivery-download {
     --delivery-button-roll-duration: 520ms;
     --delivery-button-roll-stagger: 12ms;
@@ -313,12 +314,12 @@
         var(--bg-invert)
     );
 }
-.delivery-download-character,
+.delivery-button-character,
 .delivery-download-icon {
     transition: transform var(--delivery-button-roll-duration)
         var(--delivery-ease);
 }
-.delivery-download-character {
+.delivery-button-character {
     position: relative;
     display: inline-block;
     vertical-align: top;
@@ -328,27 +329,29 @@
         var(--delivery-button-roll-stagger)
     );
 }
-.delivery-download-character::after {
+.delivery-button-character::after {
     content: attr(data-character);
     position: absolute;
     top: 100%;
     left: 0;
 }
-.delivery-download:enabled:focus-visible .delivery-download-character {
+:is(.delivery-hero-link, .delivery-download:enabled):focus-visible
+    .delivery-button-character {
     transform: translateY(-100%);
 }
 .delivery-download:enabled:focus-visible .delivery-download-icon {
     transform: translateY(100%);
 }
 @media (hover: hover) and (pointer: fine) {
-    .delivery-download:enabled:hover .delivery-download-character {
+    :is(.delivery-hero-link, .delivery-download:enabled):hover
+        .delivery-button-character {
         transform: translateY(-100%);
     }
     .delivery-download:enabled:hover .delivery-download-icon {
         transform: translateY(100%);
     }
 }
-.delivery-download:disabled .delivery-download-character,
+.delivery-download:disabled .delivery-button-character,
 .delivery-download:disabled .delivery-download-icon {
     transition: none;
     transform: none;
@@ -571,10 +574,13 @@ body:has(.delivery-lightbox) .delivery-back-to-top {
     .delivery-primary,
     .delivery-outline,
     .delivery-hero-link,
-    .delivery-download .delivery-download-character,
+    :is(.delivery-hero-link, .delivery-download) .delivery-button-character,
     .delivery-download .delivery-download-icon,
-    .delivery-download:enabled:is(:hover, :focus-visible)
-        .delivery-download-character,
+    :is(.delivery-hero-link, .delivery-download:enabled):is(
+            :hover,
+            :focus-visible
+        )
+        .delivery-button-character,
     .delivery-download:enabled:is(:hover, :focus-visible)
         .delivery-download-icon,
     .delivery-lightbox-control,

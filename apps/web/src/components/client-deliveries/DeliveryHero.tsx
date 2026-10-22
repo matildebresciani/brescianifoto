@@ -2,6 +2,7 @@ import { hasText } from '@payloadcms/richtext-lexical/shared';
 import Image from 'next/image';
 import RichText from '@/components/molecules/admin/RichText';
 import type { DeliveryView } from '@/lib/client-deliveries/view';
+import { RollingButtonLabel } from './RollingButtonLabel';
 
 export function DeliveryHero({ gallery }: { gallery: DeliveryView }) {
     const isOverlay = gallery.coverLayout === 'overlay';
@@ -32,7 +33,7 @@ export function DeliveryHero({ gallery }: { gallery: DeliveryView }) {
                         href="#main-content"
                         className="delivery-hero-link focus-ring metadata inline-flex min-h-12 items-center justify-center rounded-[var(--btn-radius)] border border-current px-md py-xs no-underline"
                     >
-                        Se galleriet
+                        <RollingButtonLabel label="Se galleriet" />
                     </a>
                 </div>
             )}

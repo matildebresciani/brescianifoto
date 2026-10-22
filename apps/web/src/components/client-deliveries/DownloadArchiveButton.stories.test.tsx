@@ -39,7 +39,7 @@ describe('gallery archive download', () => {
         const bounds = element.getBoundingClientRect();
         const background = getComputedStyle(element).backgroundColor;
         const foreground = getComputedStyle(element).color;
-        const character = element.querySelector('.delivery-download-character');
+        const character = element.querySelector('.delivery-button-character');
         const icon = element.querySelector('.delivery-download-icon');
         if (!character || !icon) throw new Error('Rolling label or icon is missing');
         const translateY = (target: Element) => new DOMMatrixReadOnly(getComputedStyle(target).transform).m42;
@@ -111,7 +111,7 @@ describe('gallery archive download', () => {
         const preparing = page.getByRole('button', { name: /Klargør/ });
         await expect.element(preparing).toBeDisabled();
         await expect.element(preparing).toHaveAttribute('aria-busy', 'true');
-        for (const character of preparing.element().querySelectorAll('.delivery-download-character')) {
+        for (const character of preparing.element().querySelectorAll('.delivery-button-character')) {
             expect(getComputedStyle(character).transform).toBe('none');
             expect(getComputedStyle(character).transitionProperty).toBe('none');
         }
@@ -165,7 +165,7 @@ describe('gallery archive download', () => {
         await expect.element(button).toBeDisabled();
         const element = button.element();
         await button.hover();
-        for (const character of element.querySelectorAll('.delivery-download-character')) {
+        for (const character of element.querySelectorAll('.delivery-button-character')) {
             expect(getComputedStyle(character).transform).toBe('none');
         }
         if (element instanceof HTMLButtonElement) element.click();
@@ -203,7 +203,7 @@ describe('gallery archive download', () => {
         pending.resolve(new Response(null, { status: 503 }));
         await expect.element(page.getByRole('button', { name: /Download/ })).toBeEnabled();
         await page.getByRole('button', { name: /Download/ }).hover();
-        for (const part of button.querySelectorAll('.delivery-download-character, .delivery-download-icon')) {
+        for (const part of button.querySelectorAll('.delivery-button-character, .delivery-download-icon')) {
             expect(getComputedStyle(part).transform).toBe('none');
             expect(getComputedStyle(part).transitionProperty).toBe('none');
         }

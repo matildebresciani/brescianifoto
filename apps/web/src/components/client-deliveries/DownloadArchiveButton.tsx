@@ -2,9 +2,10 @@
 
 import { Download, LoaderCircle } from 'lucide-react';
 import { ResultAsync } from 'neverthrow';
-import { type CSSProperties, useId, useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { z } from 'zod';
 import { formatBytes } from '@/lib/client-deliveries/shared';
+import { RollingButtonLabel } from './RollingButtonLabel';
 
 const downloadResponse = z.object({ url: z.url({ protocol: /^https?$/ }) });
 
@@ -88,27 +89,7 @@ export function DownloadArchiveButton({
                     )}
                 </span>
                 <span className="flex items-center gap-xs">
-                    <span className="sr-only">{label}</span>
-                    <span className="hidden h-[1lh] overflow-hidden text-left md:grid" aria-hidden="true">
-                        <span className="invisible col-start-1 row-start-1" aria-hidden="true">
-                            Download
-                        </span>
-                        <span className="col-start-1 row-start-1 whitespace-nowrap">
-                            {Array.from(label).map((character, index) => {
-                                const style: CSSProperties & Record<string, number> = { '--roll-index': index };
-                                return (
-                                    <span
-                                        key={label.slice(0, index + 1)}
-                                        className="delivery-download-character"
-                                        data-character={character}
-                                        style={style}
-                                    >
-                                        {character}
-                                    </span>
-                                );
-                            })}
-                        </span>
-                    </span>
+                    <RollingButtonLabel label={label} reservedLabel="Download" className="hidden md:grid" />
                     <span className="whitespace-nowrap md:border-l md:border-current/30 md:pl-xs">
                         {formatBytes(byteSize)}
                     </span>
