@@ -62,9 +62,11 @@ export async function deliveryView(
     isPreview: boolean,
 ): Promise<DeliveryView> {
     const { gallery, photos, archive, isArchiveCurrent } = data;
+    const signingTime = new Date();
     const toPhoto = async (photo: ClientPhoto): Promise<DeliveryPhoto> => ({
         id: photo.id,
-        src: await assetURL(photo.storageKey),
+        src: await assetURL(photo.storageKey, signingTime),
+        imageVersion: photoSetRevision([photo]),
         width: photo.width,
         height: photo.height,
         name: photo.originalFilename,

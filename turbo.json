@@ -6,13 +6,17 @@
         "VERCEL_PROJECT_PRODUCTION_URL",
         "R2_BUCKET",
         "R2_ENDPOINT",
-        "R2_PUBLIC_URL"
+        "R2_PUBLIC_URL",
+        "CLIENT_R2_BUCKET",
+        "CLIENT_R2_ENDPOINT"
     ],
     "globalPassThroughEnv": [
         "PAYLOAD_SECRET",
         "DATABASE_URI",
         "R2_ACCESS_KEY_ID",
         "R2_SECRET_ACCESS_KEY",
+        "CLIENT_R2_ACCESS_KEY_ID",
+        "CLIENT_R2_SECRET_ACCESS_KEY",
         "RESEND_API_KEY"
     ],
     "tasks": {

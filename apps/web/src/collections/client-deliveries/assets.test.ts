@@ -19,6 +19,11 @@ beforeAll(async () => {
 });
 
 describe('client photo library thumbnails', () => {
+    it('disables native cache tags so Payload preserves signed thumbnail URLs', () => {
+        const collection = payload.config.collections.find((item) => item.slug === 'client-photos');
+        expect(collection?.upload).toMatchObject({ cacheTags: false });
+    });
+
     it('adapts existing storage records for native pickers and the Media grid without replacing the original', async () => {
         const req = await createLocalReq({}, payload);
         const collection = payload.config.collections.find((item) => item.slug === 'client-photos');

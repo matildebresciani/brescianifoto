@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Media } from '@/payload-types';
 import {
     canPreloadLightboxImages,
+    getLightboxImageDimensions,
     getLightboxImageKey,
     getLightboxImageSize,
     getLightboxNeighbors,
@@ -22,6 +23,7 @@ describe('lightbox image sizing', () => {
     const viewport = { width: 1200, height: 700 };
 
     it('fits landscape and portrait requests to the actual photo area', () => {
+        expect(getLightboxImageDimensions(photo('portrait', 900, 1200), viewport)).toEqual({ width: 525, height: 700 });
         expect(getLightboxImageSize(photo('landscape'), viewport)).toBe('1200px');
         expect(getLightboxImageSize(photo('portrait', 900, 1200), viewport)).toBe('525px');
         expect(getLightboxImageSize(photo('small', 300, 200), viewport)).toBe('300px');
@@ -42,9 +44,9 @@ describe('lightbox image sizing', () => {
 describe('bounded lightbox neighbors', () => {
     const items = [photo('one'), photo('two'), photo('three'), photo('four')];
 
-    it('selects just next and previous, including wraparound', () => {
-        expect(getLightboxNeighbors(items, 0)).toEqual([items[1], items[3]]);
-        expect(getLightboxNeighbors(items, 3)).toEqual([items[0], items[2]]);
+    it('selects only the next photo, including wraparound', () => {
+        expect(getLightboxNeighbors(items, 0)).toEqual([items[1]]);
+        expect(getLightboxNeighbors(items, 3)).toEqual([items[0]]);
     });
 
     it('avoids duplicate requests for two-photo and repeated-source galleries', () => {
@@ -59,6 +61,14 @@ describe('bounded lightbox neighbors', () => {
             getLightboxImageKey({ ...photo('one'), updatedAt: '2026-10-22' }),
         );
         expect(getLightboxNeighbors([photo('one'), { ...photo('two'), url: null }], 0)).toEqual([]);
+    });
+
+    it('reuses a versioned source when captions or other metadata change', () => {
+        const original = { ...photo('one'), imageVersion: 'file-version' };
+        const edited = { ...original, updatedAt: '2026-10-22' };
+        expect(getLightboxImageKey(original)).toBe(getLightboxImageKey(edited));
+        expect(getLightboxNeighbors([original, edited], 0)).toEqual([]);
+        expect(getLightboxImageKey(original)).not.toBe(getLightboxImageKey({ ...edited, imageVersion: 'replacement' }));
     });
 });
 

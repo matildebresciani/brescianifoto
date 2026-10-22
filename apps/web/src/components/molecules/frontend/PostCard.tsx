@@ -7,6 +7,7 @@ import type { Locale } from '@/i18n/localized-collections';
 import { topDownToggle } from '@/lib/motion/motion-variants';
 import { formatLinkByCollection } from '@/lib/utilities/format-link';
 import { formatPresentationDate } from '@/lib/utilities/gallery-metadata';
+import { postCardImageSizes } from '@/lib/utilities/portfolio-image-sizes';
 import type { Post } from '@/payload-types';
 
 type Props = {
@@ -27,6 +28,7 @@ const PostCard = ({ data, locale }: Props) => {
                             resource={data.contentMeta.featuredImage}
                             className="object-cover transition group-hover:scale-105"
                             fill
+                            size={postCardImageSizes}
                         />
                     )}
                 </div>

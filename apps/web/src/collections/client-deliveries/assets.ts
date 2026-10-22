@@ -24,6 +24,8 @@ export const ClientPhotos: CollectionConfig = {
     access,
     upload: {
         disableLocalStorage: true,
+        // Payload's cache tags alter the query string and invalidate private R2 signatures.
+        cacheTags: false,
         filesRequiredOnCreate: false,
         crop: false,
         focalPoint: false,

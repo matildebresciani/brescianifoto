@@ -5,7 +5,7 @@ import Close from '@/components/atoms/frontend/buttons/Close';
 import ArrowIcon from '@/components/atoms/frontend/icons/ArrowIcon';
 import RichText from '@/components/molecules/admin/RichText';
 import Portal from '@/components/molecules/Portal';
-import { getLightboxImageKey, type LightboxViewport } from '@/lib/utilities/lightbox-images';
+import { getLightboxImageKey, getLightboxImageSize, type LightboxViewport } from '@/lib/utilities/lightbox-images';
 import { wrapIndex } from '@/lib/utilities/wrap-index';
 import type { Media } from '@/payload-types';
 import LightboxImage from './LightboxImage';
@@ -78,10 +78,10 @@ const Lightbox = ({ items, index, onClose, onNavigate }: Props) => {
                     )}
 
                     <LightboxImage
-                        key={`${current.id}:${index}`}
+                        key={`${getLightboxImageKey(current)}:${index}`}
                         image={current}
                         onViewportChange={measureViewport}
-                        onReady={() => setReadyKey(getLightboxImageKey(current))}
+                        onReady={(size) => setReadyKey(`${getLightboxImageKey(current)}:${size}`)}
                         onNavigate={(direction) => onNavigate(wrapIndex(index, direction, items.length))}
                     />
 
@@ -103,7 +103,10 @@ const Lightbox = ({ items, index, onClose, onNavigate }: Props) => {
                     items={items}
                     index={index}
                     viewport={viewport}
-                    isCurrentReady={readyKey === getLightboxImageKey(current)}
+                    isCurrentReady={Boolean(
+                        viewport &&
+                            readyKey === `${getLightboxImageKey(current)}:${getLightboxImageSize(current, viewport)}`,
+                    )}
                 />
             </ModalDialog>
         </Portal>

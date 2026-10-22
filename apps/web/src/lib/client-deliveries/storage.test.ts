@@ -43,6 +43,22 @@ describe('dedicated client storage', () => {
         expect(url.searchParams.get('X-Amz-Expires')).toBe('900');
     });
 
+    it('reuses identical image URLs within a UTC half-day and rotates at the boundary', async () => {
+        const key = 'client-deliveries/gallery/photo.jpg';
+        const first = await assetURL(key, new Date('2026-10-22T00:00:00Z'));
+        const last = await assetURL(key, new Date('2026-10-22T11:59:59.999Z'));
+        const next = await assetURL(key, new Date('2026-10-22T12:00:00Z'));
+        expect(last).toBe(first);
+        expect(next).not.toBe(first);
+        expect(new URL(first).searchParams.get('X-Amz-Date')).toBe('20261022T000000Z');
+        expect(new URL(next).searchParams.get('X-Amz-Date')).toBe('20261022T120000Z');
+        expect(await assetURL(key, new Date('2026-10-22T23:59:59.999Z'))).toBe(next);
+        expect(await assetURL(key, new Date('2026-10-23T00:00:00Z'))).not.toBe(next);
+        expect(await assetURL('client-deliveries/gallery/replacement.jpg', new Date('2026-10-22T12:00:00Z'))).not.toBe(
+            next,
+        );
+    });
+
     it.each([
         'CLIENT_R2_BUCKET',
         'CLIENT_R2_ACCESS_KEY_ID',

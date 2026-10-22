@@ -2,13 +2,15 @@
 
 import { motion, useReducedMotion } from 'motion/react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import RichText from '@/components/molecules/admin/RichText';
 import LightboxImage from '@/components/molecules/frontend/LightboxImage';
+import LightboxPreloader from '@/components/molecules/frontend/LightboxPreloader';
 import ModalDialog from '@/components/molecules/frontend/ModalDialog';
 import Portal from '@/components/molecules/Portal';
 import { type DeliveryTheme, themeStyle } from '@/lib/client-deliveries/shared';
 import type { DeliveryBlock, DeliveryPhoto } from '@/lib/client-deliveries/view';
+import { getLightboxImageKey, getLightboxImageSize, type LightboxViewport } from '@/lib/utilities/lightbox-images';
 import type { Media } from '@/payload-types';
 
 function DeliveryLightbox({
@@ -25,6 +27,29 @@ function DeliveryLightbox({
     theme: DeliveryTheme;
 }) {
     const current = photos[index];
+    const [viewport, setViewport] = useState<LightboxViewport | null>(null);
+    const [readyKey, setReadyKey] = useState<string | null>(null);
+    const measureViewport = useCallback((size: LightboxViewport) => {
+        setViewport((previous) =>
+            previous?.width === size.width && previous.height === size.height ? previous : size,
+        );
+    }, []);
+    const items = useMemo(
+        () =>
+            photos.map(
+                (photo): Media => ({
+                    id: photo.id,
+                    width: photo.width,
+                    height: photo.height,
+                    url: photo.src,
+                    imageVersion: photo.imageVersion,
+                    alt: photo.name,
+                    createdAt: photo.createdAt,
+                    updatedAt: photo.updatedAt,
+                }),
+            ),
+        [photos],
+    );
     const navigate = (offset: number) => setIndex((index + offset + photos.length) % photos.length);
     useEffect(() => {
         const onKey = (event: KeyboardEvent) => {
@@ -41,15 +66,8 @@ function DeliveryLightbox({
         return () => document.removeEventListener('keydown', onKey);
     }, [index, photos.length, setIndex]);
     if (!current) return null;
-    const image: Media = {
-        id: current.id,
-        width: current.width,
-        height: current.height,
-        url: current.src,
-        alt: current.name,
-        createdAt: current.createdAt,
-        updatedAt: current.updatedAt,
-    };
+    const image = items[index];
+    if (!image) return null;
     return (
         <Portal>
             <ModalDialog
@@ -73,7 +91,13 @@ function DeliveryLightbox({
                     </button>
                 </div>
                 <div className="flex min-h-0 flex-1 items-center gap-xs px-xs">
-                    <LightboxImage key={current.id} image={image} onNavigate={navigate} />
+                    <LightboxImage
+                        key={getLightboxImageKey(image)}
+                        image={image}
+                        onNavigate={navigate}
+                        onViewportChange={measureViewport}
+                        onReady={(size) => setReadyKey(`${getLightboxImageKey(image)}:${size}`)}
+                    />
                 </div>
                 <div className="flex items-center justify-between gap-base p-base">
                     <button
@@ -100,6 +124,15 @@ function DeliveryLightbox({
                         →
                     </button>
                 </div>
+                <LightboxPreloader
+                    items={items}
+                    index={index}
+                    viewport={viewport}
+                    isCurrentReady={Boolean(
+                        viewport &&
+                            readyKey === `${getLightboxImageKey(image)}:${getLightboxImageSize(image, viewport)}`,
+                    )}
+                />
             </ModalDialog>
         </Portal>
     );

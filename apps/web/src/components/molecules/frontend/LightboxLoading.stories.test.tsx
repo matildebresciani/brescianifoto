@@ -1,7 +1,7 @@
 import { composeStories } from '@storybook/react';
 import { type ComponentProps, useEffect } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { page, userEvent } from 'vitest/browser';
+import { cdp, page, userEvent } from 'vitest/browser';
 import * as stories from './Lightbox.stories';
 import '@/app/(frontend)/globals.css';
 
@@ -65,12 +65,13 @@ beforeEach(async () => {
     await page.viewport(1200, 800);
 });
 
-afterEach(() => {
+afterEach(async () => {
     Reflect.deleteProperty(navigator, 'connection');
+    await cdp().send('Emulation.setEmulatedMedia', { features: [] });
 });
 
 describe('lightbox loading budget', () => {
-    it('requests the fitted main image eagerly and shows a thumbnail preview until it loads', async () => {
+    it('reserves the fitted photo area with a skeleton and never requests a loading thumbnail', async () => {
         await LoadingSequence.run();
         const image = mainImage();
         const viewport = image.closest('button')?.getBoundingClientRect();
@@ -78,11 +79,22 @@ describe('lightbox loading budget', () => {
         expect(image.loading).toBe('eager');
         expect(image.sizes).toBe(`${Math.ceil((viewport.height * 900) / 1200)}px`);
         expect(Number.parseFloat(image.sizes)).toBeLessThan(1200);
-        expect(image.parentElement?.querySelector('img[sizes="56px"]')?.getAttribute('alt')).toBe('');
+        const skeleton = image.parentElement?.querySelector('[data-lightbox-skeleton]');
+        if (!(skeleton instanceof HTMLElement)) throw new Error('Skeleton is missing');
+        const reserved = skeleton.getBoundingClientRect();
+        expect(reserved.width).toBeCloseTo(image.getBoundingClientRect().width, 0);
+        expect(reserved.height).toBeCloseTo(image.getBoundingClientRect().height, 0);
+        expect(image.parentElement?.querySelectorAll('img')).toHaveLength(1);
+        await cdp().send('Emulation.setEmulatedMedia', {
+            features: [{ name: 'prefers-reduced-motion', value: 'reduce' }],
+        });
+        expect(getComputedStyle(skeleton).animationName).toBe('none');
         await settleNavigation();
         expect(backgroundRequests()).toHaveLength(0);
         completeMain();
-        await expect.poll(() => image.parentElement?.querySelector('img[sizes="56px"]')).toBeNull();
+        await expect.poll(() => image.parentElement?.querySelector('[data-lightbox-skeleton]')).toBeNull();
+        expect(image.getBoundingClientRect().width).toBeCloseTo(reserved.width, 0);
+        expect(image.getBoundingClientRect().height).toBeCloseTo(reserved.height, 0);
         await expect.poll(() => backgroundRequests().length).toBe(1);
         expect(backgroundRequests()[0]?.src).toContain('photo=2');
     });
@@ -99,11 +111,9 @@ describe('lightbox loading budget', () => {
         await expect.poll(() => backgroundRequests().length).toBe(2);
         expect(backgroundRequests()[1]?.src).toContain('photo=5');
         completeBackground();
-        await expect.poll(() => backgroundRequests().length).toBe(3);
-        expect(backgroundRequests()[2]?.src).toContain('photo=3');
-        completeBackground();
         await settleNavigation();
-        expect(backgroundRequests()).toHaveLength(3);
+        expect(backgroundRequests()).toHaveLength(2);
+        expect(backgroundRequests().some(({ src }) => src.includes('photo=3'))).toBe(false);
         expect(backgroundRequests().some(({ src }) => src.includes('photo=6'))).toBe(false);
     });
 
@@ -141,15 +151,32 @@ describe('lightbox loading budget', () => {
         mainImage().dispatchEvent(new Event('error'));
         await settleNavigation();
         expect(backgroundRequests()).toHaveLength(0);
-        expect(mainImage().parentElement?.querySelector('img[sizes="56px"]')).not.toBeNull();
+        expect(mainImage().parentElement?.querySelector('[data-lightbox-skeleton]')).toBeNull();
+        await expect.element(page.getByText('Photo could not load.', { exact: true })).toBeVisible();
+        await page.getByRole('button', { name: 'Retry', exact: true }).click();
+        expect(mainImage().parentElement?.querySelector('[data-lightbox-skeleton]')).not.toBeNull();
         completeMain();
         await expect.poll(() => backgroundRequests().length).toBe(1);
         completeBackground('error');
-        await expect.poll(() => backgroundRequests().length).toBe(2);
-        expect(backgroundRequests()[1]?.src).toContain('photo=6');
-        completeBackground('error');
         await settleNavigation();
-        expect(backgroundRequests()).toHaveLength(2);
+        expect(backgroundRequests()).toHaveLength(1);
+    });
+
+    it('keeps navigation available while loading and ignores completion of an old slide', async () => {
+        await LoadingSequence.run();
+        const previous = mainImage();
+        await page.getByRole('button', { name: 'Next image', exact: true }).click();
+        const selected = mainImage();
+        expect(selected.src).toContain('photo=2');
+        expect(selected.parentElement?.querySelector('[data-lightbox-skeleton]')).not.toBeNull();
+        previous.dispatchEvent(new Event('load'));
+        await settleNavigation();
+        expect(backgroundRequests()).toHaveLength(0);
+        expect(selected.closest('button')?.getAttribute('aria-busy')).toBe('true');
+        completeMain();
+        await expect.poll(() => selected.closest('button')?.getAttribute('aria-busy')).toBe('false');
+        await expect.poll(() => backgroundRequests().length).toBe(1);
+        expect(backgroundRequests()[0]?.src).toContain('photo=3');
     });
 
     it('only increases the selected image resolution on zoom', async () => {

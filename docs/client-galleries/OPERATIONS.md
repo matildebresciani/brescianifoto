@@ -16,7 +16,7 @@ The sidebar **Slug** is generated once and forms the final part of the gallery U
 
 Changing selected photos marks the archive stale and hides Download all. Upload a replacement ZIP, or check **I confirm this ZIP contains exactly the currently selected photos** and save if the archive is still correct. Confirmation applies only to that photo revision. Rearranging photos does not invalidate the archive.
 
-The links are unlisted, not private authentication. Anyone holding a link may share it. Unpublishing stops the gallery and new download redirects. Already issued signed image URLs last up to 24 hours and signed download links up to 15 minutes; optimized or downloaded copies can remain accessible after expiry. A page left open longer than 24 hours may need refreshing to load more photos. This is unlisted delivery, not immediate-revocation access control.
+The links are unlisted, not private authentication. Anyone holding a link may share it. Unpublishing stops the gallery and new download redirects. Signed image URLs are reused within fixed 12-hour UTC windows and expire 24 hours after the window starts, leaving 12–24 hours of source access when a page is rendered. A page left open longer than 12 hours may need refreshing to load more photos. Signed download links retain their 15-minute lifetime; optimized or downloaded copies can remain accessible after expiry. This is unlisted delivery, not immediate-revocation access control.
 
 ## Reusable gallery colors
 
@@ -66,12 +66,12 @@ These folders appear automatically as files are uploaded; there is no separate f
 
 ### CORS
 
-Apply these rules to the dedicated client bucket. The admin runs at `https://brescianifoto.dk/admin`, so its allowed origin is `https://brescianifoto.dk` (no `/admin` path). Add other exact origins only if they actually host the admin, such as a preview deployment. Add localhost only to a development bucket if needed.
+Apply these rules to the dedicated client bucket. The live admin runs at `https://www.brescianifoto.dk/admin`; include the exact `https://www.brescianifoto.dk` origin as well as the bare domain (no `/admin` path). Add other exact origins only if they actually host the admin, such as a preview deployment. Add localhost only to a development bucket if needed.
 
 ```json
 [
   {
-    "AllowedOrigins": ["https://brescianifoto.dk"],
+    "AllowedOrigins": ["https://brescianifoto.dk", "https://www.brescianifoto.dk"],
     "AllowedMethods": ["GET", "HEAD", "PUT"],
     "AllowedHeaders": ["*"],
     "ExposeHeaders": ["ETag"],
@@ -81,6 +81,8 @@ Apply these rules to the dedicated client bucket. The admin runs at `https://bre
 ```
 
 The browser uploads 16 MiB parts directly to R2; Vercel receives only small JSON commands. Exposing `ETag` is required to complete multipart uploads. Photo completion has a 60-second route duration and reads one JPEG at a time to verify its format, compute SHA-256, and create a separate 300px WebP thumbnail. The source object is never recompressed or overwritten. Allow sufficient Vercel function memory for three concurrent JPEG validations; test the maximum supported image size on the chosen plan.
+
+Client storage settings must also be available during builds through `turbo.json`: the bucket and endpoint determine Next's allowed image sources, while credentials use environment passthrough. Missing build settings can cause `INVALID_IMAGE_OPTIMIZE_REQUEST` even when uploads succeed at runtime. Keep Payload upload `cacheTags` disabled for client photos so native thumbnails retain their exact signed query strings.
 
 ### Abandoned multipart uploads
 

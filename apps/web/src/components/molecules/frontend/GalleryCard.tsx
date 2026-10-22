@@ -8,6 +8,7 @@ import { downUpToggle } from '@/lib/motion/motion-variants';
 import { getGalleryCoverImage, payloadObject } from '@/lib/utilities/composables';
 import { formatLinkByCollection } from '@/lib/utilities/format-link';
 import { formatGalleryCardCaption } from '@/lib/utilities/gallery-metadata';
+import { galleryCardImageSizes } from '@/lib/utilities/portfolio-image-sizes';
 import type { Gallery } from '@/payload-types';
 import Tag from './Tag';
 
@@ -49,7 +50,7 @@ const GalleryCard = ({ data, locale, showTag = false, revealIndex = 0 }: Props) 
                                 resource={cover}
                                 fill
                                 className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
-                                size="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
+                                size={galleryCardImageSizes}
                             />
                         )}
                     </div>

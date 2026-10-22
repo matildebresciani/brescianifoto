@@ -19,7 +19,7 @@ describe('gallery sharing metadata', () => {
         const metadata = generateGalleryPageMetadata(gallery, 'da', 'https://brescianifoto.vercel.app');
         expect(metadata).toMatchObject({
             title: 'Artist — brescianifoto',
-            description: 'Artist · 15 Oct 2026 · 1 image',
+            description: 'Artist · 15 Oct 2026 / 1 image',
             alternates: { canonical: '/gallery/artist-at-vega' },
             openGraph: { images: [{ url: 'https://brescianifoto.vercel.app/images/__mocks__/placeholder.jpg' }] },
             twitter: { card: 'summary_large_image' },

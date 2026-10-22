@@ -8,6 +8,8 @@ import { getClientSideURL } from './get-url';
  */
 export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
     if (!url) return '';
+    // Adding even a cache-busting parameter would invalidate an S3 presigned request.
+    if (/[?&]X-Amz-Signature=/i.test(url)) return url;
 
     let cache = cacheTag;
 

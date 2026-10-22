@@ -2,6 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FixedToolbarFeature, InlineToolbarFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 import type { CollectionConfig } from 'payload';
+import { prepareMediaImageVersion, trackMediaFileUpload } from '@/lib/payload-hooks/media-image-version';
 import { resolveAdminThumbnail } from '@/lib/payload-hooks/resolve-admin-thumbnail';
 import { revalidatePortfolioMedia } from '@/lib/payload-hooks/revalidate-portfolio-media';
 
@@ -23,11 +24,18 @@ export const Media: CollectionConfig = {
         update: authenticated,
     },
     hooks: {
+        beforeOperation: [trackMediaFileUpload],
+        beforeChange: [prepareMediaImageVersion],
         afterChange: [revalidatePortfolioMedia],
         afterDelete: [revalidatePortfolioMedia],
         afterRead: [resolveAdminThumbnail],
     },
     fields: [
+        {
+            name: 'imageVersion',
+            type: 'text',
+            admin: { hidden: true },
+        },
         {
             name: 'alt',
             type: 'text',

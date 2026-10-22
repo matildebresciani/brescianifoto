@@ -136,6 +136,7 @@ describe('unlisted delivery reads', () => {
         expect(view.archive).toBeUndefined();
         expect(view.blocks).toHaveLength(1);
         expect(view.photoCount).toBe(1);
+        expect(view.cover?.imageVersion).toBe(photoSetRevision([photo]));
         expect(JSON.stringify(view)).not.toContain('Private internal notes');
         expect(JSON.stringify(view)).not.toContain('checksum');
     });
