@@ -138,6 +138,19 @@
 .delivery-hero-overlay .metadata {
     margin-top: var(--space-md);
 }
+.delivery-hero-link {
+    transition:
+        background-color 280ms ease,
+        color 280ms ease;
+}
+.delivery-hero-link:hover {
+    background: var(--fg-base);
+    color: var(--bg-base);
+    border-color: var(--fg-base);
+}
+.delivery-hero-link:focus-visible {
+    outline-color: currentColor;
+}
 .delivery-welcome .delivery-rich-text > :last-child {
     margin-bottom: 0;
 }
@@ -511,6 +524,7 @@
     .delivery-nav-link:focus-visible span,
     .delivery-primary,
     .delivery-outline,
+    .delivery-hero-link,
     .delivery-download .delivery-download-character,
     .delivery-download .delivery-download-icon,
     .delivery-download:enabled:is(:hover, :focus-visible)
