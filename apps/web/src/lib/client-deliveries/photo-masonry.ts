@@ -21,8 +21,12 @@ export type PhotoMasonryTile = {
 };
 
 /** Account for the part of an object-cover image hidden outside its tile; the browser applies pixel density. */
-export function getPhotoImageSize(photo: PhotoDimensions, tile: Pick<PhotoMasonryTile, 'width' | 'height'>): string {
-    return `${Math.ceil(Math.max(tile.width, tile.height * (photo.width / photo.height)))}px`;
+export function getPhotoImageSize(
+    photo: PhotoDimensions,
+    tile: Pick<PhotoMasonryTile, 'width' | 'height'>,
+    scale = 1,
+): string {
+    return `${Math.ceil(Math.max(tile.width, tile.height * (photo.width / photo.height)) * scale)}px`;
 }
 
 /**

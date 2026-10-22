@@ -1,7 +1,7 @@
 import { hasText } from '@payloadcms/richtext-lexical/shared';
-import Image from 'next/image';
 import RichText from '@/components/molecules/admin/RichText';
 import type { DeliveryView } from '@/lib/client-deliveries/view';
+import { DeliveryCover } from './DeliveryCover';
 import { RollingButtonLabel } from './RollingButtonLabel';
 
 export function DeliveryHero({ gallery }: { gallery: DeliveryView }) {
@@ -44,18 +44,13 @@ export function DeliveryHero({ gallery }: { gallery: DeliveryView }) {
             <header className={`delivery-hero ${isOverlay ? 'delivery-hero-overlay' : ''}`}>
                 {!isOverlay && content}
                 {gallery.cover && (
-                    <div className="delivery-cover-frame">
-                        <Image
-                            src={gallery.cover.src}
-                            alt={`${gallery.title} — forsidebillede`}
-                            width={gallery.cover.width}
-                            height={gallery.cover.height}
-                            sizes="100vw"
-                            priority
-                            className="delivery-cover"
-                            style={{ objectPosition: `${gallery.focalX}% ${gallery.focalY}%` }}
-                        />
-                    </div>
+                    <DeliveryCover
+                        cover={gallery.cover}
+                        alt={`${gallery.title} — forsidebillede`}
+                        isOverlay={isOverlay}
+                        focalX={gallery.focalX}
+                        focalY={gallery.focalY}
+                    />
                 )}
                 {isOverlay && content}
             </header>

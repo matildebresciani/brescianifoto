@@ -14,6 +14,14 @@ const mixedPhotos = Array.from({ length: 17 }, (_, index) => ({
 }));
 
 describe('client grid image resolution', () => {
+    it('covers a full-height phone hero at the maximum Ken Burns scale', () => {
+        const requestedWidth = Number.parseInt(
+            getPhotoImageSize({ width: 4549, height: 3412 }, { width: 393, height: 852 }, 1.04),
+            10,
+        );
+        expect(requestedWidth).toBeGreaterThanOrEqual(852 * (4549 / 3412) * 1.04);
+        expect(requestedWidth * 3).toBeGreaterThan(3500);
+    });
     it('requests the full covered image width rather than just its visible crop', () => {
         expect(getPhotoImageSize({ width: 6000, height: 4000 }, { width: 179, height: 134.25 })).toBe('202px');
         expect(getPhotoImageSize({ width: 4000, height: 4000 }, { width: 179, height: 238.67 })).toBe('239px');

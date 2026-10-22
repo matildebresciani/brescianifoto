@@ -1,13 +1,33 @@
 import { composeStories } from '@storybook/react';
+import type { ComponentProps } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import * as stories from './DeliveryHero.stories';
 
-// These fixtures exercise the hero controls without an image server or rich-text content.
-vi.mock('next/image', () => ({ default: () => null }));
+vi.mock('next/image', () => ({
+    __esModule: true,
+    default: ({ quality, preload, ...props }: ComponentProps<'img'> & { quality?: number; preload?: boolean }) => (
+        // biome-ignore lint/performance/noImgElement: Exercise cover geometry without a Next.js image server.
+        <img {...props} alt={props.alt} data-image-quality={quality} data-image-preload={preload} />
+    ),
+}));
 vi.mock('@/components/molecules/admin/RichText', () => ({ default: () => null }));
 
-const { Wedding } = composeStories(stories);
+const { Wedding, LandscapeCover, PortraitCover, EditorialCover } = composeStories(stories);
+
+async function expectCoverResolution() {
+    await expect
+        .poll(() => {
+            const image = document.querySelector<HTMLImageElement>('.delivery-cover');
+            const frame = document.querySelector('.delivery-cover-frame');
+            if (!image || !frame) return false;
+            const bounds = frame.getBoundingClientRect();
+            const requestedWidth = Number.parseFloat(image.sizes);
+            const ratio = Number(image.getAttribute('width')) / Number(image.getAttribute('height'));
+            return requestedWidth >= bounds.width * 1.04 && requestedWidth / ratio >= bounds.height * 1.04;
+        })
+        .toBe(true);
+}
 
 beforeEach(async () => {
     await page.viewport(390, 844);
@@ -21,6 +41,36 @@ afterEach(async () => {
 });
 
 describe('wedding hero button contrast', () => {
+    it('requests enough detail for a tall phone cover and remeasures on rotation and content growth', async () => {
+        await page.viewport(393, 852);
+        await LandscapeCover.run();
+        await expectCoverResolution();
+        const image = document.querySelector<HTMLImageElement>('.delivery-cover');
+        if (!image) throw new Error('Cover image missing');
+        expect(Number.parseFloat(image.sizes) * 3).toBeGreaterThan(3500);
+        expect(image.getAttribute('data-image-quality')).toBe('90');
+        expect(image.getAttribute('data-image-preload')).toBe('true');
+        expect(image.style.objectPosition).toBe('50% 5%');
+
+        await page.viewport(852, 393);
+        await expectCoverResolution();
+        const copy = document.querySelector<HTMLElement>('.delivery-hero-copy');
+        if (!copy) throw new Error('Hero copy missing');
+        copy.style.minHeight = '1400px';
+        await expectCoverResolution();
+    });
+
+    it('sizes portrait covers for their full crop', async () => {
+        await PortraitCover.run();
+        await expectCoverResolution();
+    });
+
+    it('sizes editorial covers for their capped height on phone and desktop', async () => {
+        await EditorialCover.run();
+        await expectCoverResolution();
+        await page.viewport(1440, 1800);
+        await expectCoverResolution();
+    });
     it('rolls the letters on hover with contrasting text and no button resizing', async () => {
         await Wedding.run();
         const link = page.getByRole('link', { name: 'Se galleriet' });
