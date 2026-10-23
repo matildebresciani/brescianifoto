@@ -39,7 +39,9 @@ export function DeliveryGallery({ gallery }: { gallery: DeliveryView }) {
             )}
             <div className={`relative${gallery.coverLayout === 'overlay' ? ' delivery-cover-area-overlay' : ''}`}>
                 <div className="delivery-masthead flex flex-wrap items-center justify-between gap-base px-md py-md md:px-xl">
-                    <span className="delivery-wordmark">brescianifoto</span>
+                    <a href="/" className="delivery-wordmark focus-ring no-underline">
+                        brescianifoto
+                    </a>
                     <span className="metadata">{gallery.photoCount} billeder</span>
                 </div>
                 <DeliveryHero gallery={gallery} />

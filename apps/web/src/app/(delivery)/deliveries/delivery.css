@@ -5,6 +5,7 @@
     --delivery-color-duration: 600ms;
     --delivery-nav-height: 80px;
     --delivery-text-nav: clamp(1rem, 0.964286rem + 0.178571vw, 1.125rem);
+    --delivery-copy-width: 60ch;
     --delivery-overlay-color: var(--void);
     --delivery-overlay-opacity: 42%;
     --delivery-cover-text: #faffef;
@@ -74,6 +75,12 @@
     margin-left: 0;
 }
 .delivery-hero-copy[style*="right"] .statement {
+    margin-right: 0;
+}
+.delivery-hero-copy[style*="left"] .delivery-rich-text {
+    margin-left: 0;
+}
+.delivery-hero-copy[style*="right"] .delivery-rich-text {
     margin-right: 0;
 }
 .delivery-cover-frame {
@@ -392,12 +399,34 @@
     outline-offset: 8px;
 }
 .delivery-text {
-    max-width: 900px;
+    max-width: var(--delivery-copy-width);
     margin: 0 auto;
+}
+.delivery-rich-text {
+    max-width: var(--delivery-copy-width);
+    text-wrap: balance;
+    overflow-wrap: anywhere;
 }
 .delivery-section-introduction {
     margin-bottom: var(--space-md);
     overflow-wrap: anywhere;
+}
+.delivery-section-introduction .delivery-rich-text {
+    max-width: none;
+    margin-inline: 0;
+}
+.delivery-section-introduction .delivery-rich-text > * {
+    max-width: var(--delivery-copy-width);
+}
+.delivery-section-introduction
+    .delivery-rich-text
+    > :is([style*="text-align: center"], [style*="text-align:center"]) {
+    margin-inline: auto;
+}
+.delivery-section-introduction
+    .delivery-rich-text
+    > :is([style*="text-align: right"], [style*="text-align:right"]) {
+    margin-inline-start: auto;
 }
 .delivery-content .delivery-rich-text > * {
     margin-block: 0 var(--space-xs);
