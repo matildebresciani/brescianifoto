@@ -30,6 +30,7 @@ import { defaultLocale, locales } from './i18n/localized-collections';
 import { deliveryUploadEndpoint } from './lib/client-deliveries/upload-endpoint';
 import { festivalURLMaintenance } from './lib/endpoints/festival-url-maintenance';
 import { portfolioSetup } from './lib/endpoints/portfolio-setup';
+import { publicPhotoMaintenance } from './lib/endpoints/public-photo-maintenance.mjs';
 import { plugins } from './lib/plugins';
 import { getServerSideURL } from './lib/utilities/get-url';
 
@@ -111,7 +112,7 @@ export default buildConfig({
             key: 'seed',
         },
     ],
-    endpoints: [festivalURLMaintenance, portfolioSetup, deliveryUploadEndpoint],
+    endpoints: [festivalURLMaintenance, portfolioSetup, deliveryUploadEndpoint, ...publicPhotoMaintenance],
     cors: [getServerSideURL()].filter(Boolean),
     globals: [Options, Translations],
     plugins: [
