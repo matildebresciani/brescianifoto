@@ -12,3 +12,9 @@ Run from `apps/web`, loading DATABASE_URI for the intended database. The script 
 Rollback while writes are paused: `node --env-file=.env.development scripts/share-public-photos.mjs --restore=/absolute/private/path/photos.json`. Redeploy the previous release with fresh caches. After a partial failure, restore before retrying apply. Restoration overwrites affected documents, so do not restore after accepting new edits.
 
 Raw MongoDB writes preserve media IDs and versions without invoking unrelated hooks; this is why migration and cache clearing must happen during deployment downtime. No uploads are moved or deleted. Captions and all client data remain untouched.
+
+## Run inside Vercel without exporting credentials
+
+The signed-in CMS administrator can open `/api/maintenance/public-photos` for a read-only preview. The apply form is bound to that exact plan and expires after ten minutes; content changes require a fresh preview. Apply writes BSON-preserving backup rows to the private `_public_photo_migration_backups` MongoDB collection before applying the changes in one transaction. No credentials are returned to the browser.
+
+The success page includes the backup run ID and a restore link. `/api/maintenance/public-photos?restore=RUN_ID` shows the authenticated restore form. Restore runs transactionally and refuses to overwrite subsequent edits. Stage the shared-schema deployment before applying, promote it immediately afterward, and verify the same endpoint reports zero remaining changes. Both apply and restore invalidate public cache tags. The maintenance-only release retains the original schema and can be used for rollback.

@@ -14,6 +14,7 @@ const GalleryBlock: BC<GalleryProps> = async ({ block, locale = defaultLocale })
                   id: block.photoSelection,
                   depth: 1,
                   overrideAccess: false,
+                  disableErrors: true,
               })
             : block.photoSelection;
     const source = selection ?? block;
