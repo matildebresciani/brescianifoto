@@ -27,7 +27,6 @@ export const Icons: CollectionConfig = {
         {
             name: 'alt',
             type: 'text',
-            localized: true,
         },
     ],
     upload: {

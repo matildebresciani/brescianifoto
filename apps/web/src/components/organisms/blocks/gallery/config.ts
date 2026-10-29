@@ -9,6 +9,12 @@ export const Gallery = createBlock('gallery', {
     },
     fields: [
         {
+            name: 'photoSelection',
+            type: 'relationship',
+            relationTo: 'photo-selections',
+            admin: { description: 'Shared across languages. Open or create a selection to edit its photos.' },
+        },
+        {
             name: 'selectionMode',
             label: 'Photo selection',
             type: 'radio',
@@ -32,6 +38,7 @@ export const Gallery = createBlock('gallery', {
             ],
             admin: {
                 layout: 'horizontal',
+                hidden: true,
                 description:
                     'Random uses a saved mix from public galleries. It refreshes when a new gallery first becomes public. An empty custom selection uses the same mix.',
             },
@@ -40,7 +47,7 @@ export const Gallery = createBlock('gallery', {
             ...payloadGallery(),
             admin: {
                 ...payloadGallery().admin,
-                condition: (_data, siblingData) => siblingData.selectionMode !== 'random',
+                hidden: true,
             },
         },
     ],

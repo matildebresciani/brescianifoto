@@ -17,6 +17,7 @@ import { ClientDownloads, ClientPhotos } from './collections/client-deliveries/a
 import { ClientGalleries } from './collections/client-deliveries/galleries';
 import { Galleries } from './collections/content/galleries/config';
 import { Pages } from './collections/content/pages/config';
+import { PhotoSelections } from './collections/content/photo-selections/config';
 import { Posts } from './collections/content/posts/config';
 import { Faqs } from './collections/entries/faqs/config';
 import { SavedLayouts } from './collections/entries/saved-layouts/config';
@@ -82,6 +83,7 @@ export default buildConfig({
         Posts,
         PostCategories,
         Galleries,
+        PhotoSelections,
         Tags,
         TagGroups,
         Locations,

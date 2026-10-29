@@ -26,7 +26,7 @@ export const Galleries = createRoutedCollection(
                 tabs: [
                     {
                         label: 'Gallery',
-                        fields: [payloadGallery({ required: true })],
+                        fields: [payloadGallery({ required: true, localized: false })],
                     },
                     {
                         label: 'Meta',

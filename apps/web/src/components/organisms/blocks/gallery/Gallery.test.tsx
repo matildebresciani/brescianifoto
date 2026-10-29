@@ -5,6 +5,7 @@ import type { GalleryBlock as GalleryProps, Media } from '@/payload-types';
 import GalleryBlock from './Gallery';
 
 const mocks = vi.hoisted(() => ({ getAutomaticGalleryMix: vi.fn() }));
+vi.mock('@/lib/config', () => ({ initPayload: vi.fn() }));
 vi.mock('@/lib/data/payload/get-automatic-gallery-mix', () => mocks);
 vi.mock('@/components/molecules/frontend/Gallery', () => ({
     default: ({ images }: { images: (string | Media)[] }) =>
@@ -20,6 +21,24 @@ const render = async (block: GalleryProps) =>
     renderToStaticMarkup(await GalleryBlock({ block, pageId: 'page', locale: 'da' }));
 
 describe('gallery block selection', () => {
+    it('uses the shared selection instead of legacy locale photos', async () => {
+        expect(
+            await render({
+                blockType: 'gallery',
+                gallery: ['old'],
+                photoSelection: {
+                    id: 'shared',
+                    name: 'Shared',
+                    selectionMode: 'custom',
+                    gallery: ['shared-b', 'shared-a'],
+                    createdAt: '',
+                    updatedAt: '',
+                },
+            }),
+        ).toContain('shared-b,shared-a');
+        expect(mocks.getAutomaticGalleryMix).not.toHaveBeenCalled();
+    });
+
     it('preserves legacy selections and custom ordering', async () => {
         for (const selectionMode of [undefined, 'custom'] as const) {
             expect(await render({ blockType: 'gallery', selectionMode, gallery: ['second', 'first'] })).toContain(
